@@ -1,5 +1,8 @@
 {
   "name": "toglion",
   "private": true,
-  "license": "MIT"
+  "license": "MIT",
+  "workspaces": [
+    "client"
+  ]
 }
