@@ -6,5 +6,9 @@
     "api",
     "client",
     "dashboard"
-  ]
+  ],
+  "dependencies": {
+    "@cloudflare/wrangler": "^1.17.0",
+    "@manypkg/cli": "^0.18.0"
+  }
 }
