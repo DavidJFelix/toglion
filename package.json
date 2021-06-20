@@ -7,6 +7,9 @@
     "client",
     "dashboard"
   ],
+  "scripts": {
+    "start": "manypkg run dashboard dev"
+  },
   "dependencies": {
     "@cloudflare/wrangler": "^1.17.0",
     "@manypkg/cli": "^0.18.0"
