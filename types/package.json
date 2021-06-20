@@ -1,0 +1,6 @@
+{
+  "name": "@toglion/types",
+  "version": "0.0.0",
+  "description": "Common types shared between toglion packages",
+  "license": "MIT"
+}

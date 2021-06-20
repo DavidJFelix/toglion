@@ -5,7 +5,8 @@
   "workspaces": [
     "api",
     "client",
-    "dashboard"
+    "dashboard",
+    "types"
   ],
   "scripts": {
     "start": "manypkg run dashboard dev"
