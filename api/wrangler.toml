@@ -1,9 +1,15 @@
-name = "api2"
+name = "toglion-api"
 type = "javascript"
 zone_id = ""
 account_id = ""
 route = ""
 workers_dev = true
+kv_namespaces = [
+  {
+    binding = "KV",
+    id = "996bda76fa9a4c6583d389d47cfb2c35"
+  }
+]
 
 [build]
 command = "npm install && npm run build"
