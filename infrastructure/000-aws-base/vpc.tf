@@ -67,6 +67,10 @@ module "us_east_1_public_subnet_cidrs" {
   networks = [for az_name in sort(data.aws_availability_zones.us_east_1.names) : {name = az_name, new_bits = 4}]
 }
 
+locals {
+  subnet_count = length(data.aws_availability_zones.us_east_1.names)
+}
+
 module "vpc_us_east_1" {
   source = "terraform-aws-modules/vpc/aws"
   providers = {
@@ -83,6 +87,9 @@ module "vpc_us_east_1" {
   azs             = sort(data.aws_availability_zones.us_east_1.names)
   private_subnets = values(module.us_east_1_private_subnet_cidrs.network_cidr_blocks)
   public_subnets  = values(module.us_east_1_public_subnet_cidrs.network_cidr_blocks)
+
+  private_subnet_ipv6_prefixes = range(subnet_count)
+  public_subnet_ipv6_prefixes	= range(subnet_count, subnet_count * 2)
 
   enable_nat_gateway = true
 
