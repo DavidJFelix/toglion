@@ -25,15 +25,15 @@ module "vpc_cidrs" {
   ]
 }
 
-# module "aws_vpc_us_east_1" {
-#   source = "./modules/vpc"
-#   providers = {
-#     aws = aws.us_east_1
-#   }
+module "aws_vpc_us_east_1" {
+  source = "./modules/vpc"
+  providers = {
+    aws = aws.us_east_1
+  }
 
-#   cidr_block = module.vpc_cidrs.network_cidr_blocks.us_east_1
-#   tags       = merge(local.common_tags)
-# }
+  cidr_block = module.vpc_cidrs.network_cidr_blocks.us_east_1
+  tags       = merge(local.common_tags)
+}
 
 module "aws_vpc_us_east_2" {
   source = "./modules/vpc"
