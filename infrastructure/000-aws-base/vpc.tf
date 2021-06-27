@@ -57,6 +57,7 @@ module "aws_vpc_us_west_1" {
 
 module "aws_vpc_us_west_2" {
   source = "./modules/vpc"
+
   providers = {
     aws = aws.us_west_2
   }
