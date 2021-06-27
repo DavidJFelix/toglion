@@ -29,7 +29,7 @@ module "subnet_group_cidrs" {
 module "private_subnet_cidrs" {
   source = "hashicorp/subnets/cidr"
 
-  base_cidr_block = module.subnet_group_cidrs.base_cidr_block
+  base_cidr_block = module.subnet_group_cidrs.network_cidr_blocks.private
   networks = [for az_name in sort(data.aws_availability_zones.this.names) : {name = az_name, new_bits = 4}]
 }
 
@@ -37,7 +37,7 @@ module "private_subnet_cidrs" {
 module "public_subnet_cidrs" {
   source = "hashicorp/subnets/cidr"
 
-  base_cidr_block = module.subnet_group_cidrs.base_cidr_block
+  base_cidr_block = module.subnet_group_cidrs.network_cidr_blocks.public
   networks = [for az_name in sort(data.aws_availability_zones.this.names) : {name = az_name, new_bits = 4}]
 }
 
