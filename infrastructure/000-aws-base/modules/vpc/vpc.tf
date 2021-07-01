@@ -22,6 +22,10 @@ module "subnet_group_cidrs" {
       name     = "public"
       new_bits = 2
     },
+    {
+      name     = "intra"
+      new_bits = 2
+    }
   ]
 }
 
@@ -30,7 +34,7 @@ module "private_subnet_cidrs" {
   source = "hashicorp/subnets/cidr"
 
   base_cidr_block = module.subnet_group_cidrs.network_cidr_blocks.private
-  networks = [for az_name in sort(data.aws_availability_zones.this.names) : {name = az_name, new_bits = 4}]
+  networks        = [for az_name in sort(data.aws_availability_zones.this.names) : { name = az_name, new_bits = 4 }]
 }
 
 # Divide the public groups by AZ and provide each with a /22 CIDR
@@ -38,7 +42,15 @@ module "public_subnet_cidrs" {
   source = "hashicorp/subnets/cidr"
 
   base_cidr_block = module.subnet_group_cidrs.network_cidr_blocks.public
-  networks = [for az_name in sort(data.aws_availability_zones.this.names) : {name = az_name, new_bits = 4}]
+  networks        = [for az_name in sort(data.aws_availability_zones.this.names) : { name = az_name, new_bits = 4 }]
+}
+
+# Divide the intra groups by AZ and provide each with a /22 CIDR
+module "intra_subnet_cidrs" {
+  source = "hashicorp/subnets/cidr"
+
+  base_cidr_block = module.subnet_group_cidrs.network_cidr_blocks.intra
+  networks        = [for az_name in sort(data.aws_availability_zones.this.names) : { name = az_name, new_bits = 4 }]
 }
 
 locals {
@@ -58,11 +70,63 @@ module "vpc" {
   azs             = sort(data.aws_availability_zones.this.names)
   private_subnets = values(module.private_subnet_cidrs.network_cidr_blocks)
   public_subnets  = values(module.public_subnet_cidrs.network_cidr_blocks)
+  intra_subnets   = values(module.intra_subnet_cidrs.network_cidr_blocks)
 
   private_subnet_ipv6_prefixes = range(local.subnet_count)
-  public_subnet_ipv6_prefixes	= range(local.subnet_count, local.subnet_count * 2)
+  public_subnet_ipv6_prefixes  = range(local.subnet_count, local.subnet_count * 2)
+  intra_subnet_ipv6_prefixes   = range(local.subnet_count * 2, local.subnet_count * 3)
 
-  enable_nat_gateway = true
+  # FIXME: turn on later if/when we use private subnets.
+  # Until then, this is a latent cost per hour
+  enable_nat_gateway = false
 
   tags = merge(var.tags)
+}
+
+module "dynamodb_vpc_endpoint" {
+  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+
+  vpc_id             = module.vpc.vpc_id
+  security_group_ids = [module.vpc.default_security_group_id]
+
+  endpoints = {
+    dynamodb = {
+      service         = "dynamodb"
+      service_type    = "Gateway"
+      route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+      policy          = data.aws_iam_policy_document.dynamodb_endpoint_policy.json
+    }
+  }
+
+  tags = merge(var.tags)
+}
+
+# Data source used to avoid race condition
+data "aws_vpc_endpoint_service" "dynamodb" {
+  service = "dynamodb"
+
+  filter {
+    name   = "service-type"
+    values = ["Gateway"]
+  }
+}
+
+data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
+  statement {
+    effect    = "Deny"
+    actions   = ["dynamodb:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:sourceVpce"
+
+      values = [data.aws_vpc_endpoint_service.dynamodb.id]
+    }
+  }
 }
