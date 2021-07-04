@@ -74,6 +74,22 @@ output "aws_vpc_us_west_2_intra_subnets" {
   value = module.aws_vpc_us_west_2.intra_subnets
 }
 
+output "aws_vpc_us_east_1_default_security_group_id" {
+  value = module.aws_vpc_us_east_1.default_security_group_id
+}
+
+output "aws_vpc_us_east_2_default_security_group_id" {
+  value = module.aws_vpc_us_east_2.default_security_group_id
+}
+
+output "aws_vpc_us_west_1_default_security_group_id" {
+  value = module.aws_vpc_us_west_1.default_security_group_id
+}
+
+output "aws_vpc_us_west_2_default_security_group_id" {
+  value = module.aws_vpc_us_west_2.default_security_group_id
+}
+
 output "terraform_cloud_iam_access_key_id" {
   value = aws_iam_access_key.terraform_cloud.id
 }
