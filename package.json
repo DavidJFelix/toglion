@@ -9,6 +9,7 @@
     "types"
   ],
   "scripts": {
+    "build": "preconstruct build && manypkg run dashboard build",
     "postinstall": "preconstruct dev",
     "start": "manypkg run dashboard dev"
   },
