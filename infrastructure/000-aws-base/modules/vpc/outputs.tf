@@ -13,3 +13,7 @@ output "public_subnets" {
 output "intra_subnets" {
   value = module.vpc.intra_subnets
 }
+
+output "default_security_group_id" {
+  value = module.vpc.default_security_group_id
+}
