@@ -29,3 +29,9 @@ variable "regional_dynamodb_table" {
   description = "The regional table used as a region-local database"
   type        = string
 }
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default     = {}
+}

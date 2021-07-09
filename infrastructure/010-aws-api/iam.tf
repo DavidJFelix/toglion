@@ -55,7 +55,7 @@ resource "aws_iam_role" "lambda_role" {
 
 resource "aws_iam_role_policy_attachment" "lambda_vpc_managed_policy" {
   role       = aws_iam_role.lambda_role.name
-  policy_arn = data.lambda_vpc_managed_policy.arn
+  policy_arn = data.aws_iam_policy.lambda_vpc_managed_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "global_dynamodb" {
@@ -78,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "us_west_1_dynamodb" {
   policy_arn = module.us_west_1_dynamodb_table.iam_policy_dynamodb_read_write_arn
 }
 
-resource "aws_iam_role_policy_attachment" "us_east_2_dynamodb" {
+resource "aws_iam_role_policy_attachment" "us_west_2_dynamodb" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = module.us_west_2_dynamodb_table.iam_policy_dynamodb_read_write_arn
 }

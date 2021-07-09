@@ -4,7 +4,7 @@ data "terraform_remote_state" "aws_base" {
   config = {
     organization = "toglion"
     workspaces = {
-      name = "000-aws-base"
+      name = "production-000-aws-base"
     }
   }
 }

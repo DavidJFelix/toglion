@@ -35,7 +35,7 @@ module "us_east_1_dynamodb_table" {
   }
 
   name_prefix                        = "api-regional"
-  server_side_encryption_kms_key_arn = aws_kms_key.dynamodb_us_east_2.arn
+  server_side_encryption_kms_key_arn = aws_kms_key.dynamodb_us_east_1.arn
   tags                               = merge(local.common_tags)
 }
 
@@ -45,8 +45,9 @@ module "us_east_2_dynamodb_table" {
     aws = aws.us_east_1
   }
 
-  name_prefix = "api-regional"
-  tags        = merge(local.common_tags)
+  name_prefix                        = "api-regional"
+  server_side_encryption_kms_key_arn = aws_kms_key.dynamodb_us_east_2.arn
+  tags                               = merge(local.common_tags)
 }
 
 module "us_west_1_dynamodb_table" {

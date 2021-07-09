@@ -1,6 +1,7 @@
 variable "is_global" {
   description = "Whether or not its a global table"
-  type        = string
+  type        = bool
+  default     = false
 }
 
 variable "name_prefix" {
