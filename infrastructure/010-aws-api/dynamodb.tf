@@ -42,7 +42,7 @@ module "us_east_1_dynamodb_table" {
 module "us_east_2_dynamodb_table" {
   source = "./modules/dynamodb"
   providers = {
-    aws = aws.us_east_1
+    aws = aws.us_east_2
   }
 
   name_prefix                        = "api-regional"
@@ -53,7 +53,7 @@ module "us_east_2_dynamodb_table" {
 module "us_west_1_dynamodb_table" {
   source = "./modules/dynamodb"
   providers = {
-    aws = aws.us_east_1
+    aws = aws.us_west_1
   }
 
   name_prefix                        = "api-regional"
@@ -64,7 +64,7 @@ module "us_west_1_dynamodb_table" {
 module "us_west_2_dynamodb_table" {
   source = "./modules/dynamodb"
   providers = {
-    aws = aws.us_east_1
+    aws = aws.us_west_2
   }
 
   name_prefix                        = "api-regional"
