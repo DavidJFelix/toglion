@@ -1,17 +1,17 @@
 resource "aws_ssm_parameter" "serverless_deployment_bucket" {
   name  = "/services/api/SERVERLESS_DEPLOYMENT_BUCKET"
   type  = "String"
-  value = var.serverless_deployment_bucket
+  value = var.deployment_bucket
 
-  tags = merge(local.common_tags)
+  tags = merge(var.tags)
 }
 
 resource "aws_ssm_parameter" "lambda_role_arn" {
   name  = "/services/api/LAMBDA_ROLE_ARN"
   type  = "String"
-  value = var.lambda_role_arn
+  value = var.role_arn
 
-  tags = merge(local.common_tags)
+  tags = merge(var.tags)
 }
 
 resource "aws_ssm_parameter" "lambda_subnets" {

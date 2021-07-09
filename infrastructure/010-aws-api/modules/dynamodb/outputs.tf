@@ -1,12 +1,12 @@
 
 output "dynamodb_table_arn" {
   description = "ARN of the DynamoDB table"
-  value       = module.dynamodb_table_arn
+  value       = module.this.dynamodb_table_arn
 }
 
 output "dynamodb_table_id" {
   description = "ID of the DynamoDB table"
-  value       = module.dynamodb_table_id
+  value       = module.this.dynamodb_table_id
 }
 
 output "dynamodb_table_stream_arn" {
