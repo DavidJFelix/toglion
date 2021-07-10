@@ -1,4 +1,9 @@
-dist
+# package directories
 node_modules
-transpiled
-/.idea/
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Webpack directories
+.webpack
