@@ -15,8 +15,8 @@ variable "role_arn" {
   type        = string
 }
 
-variable "deployment_bucket" {
-  description = "The bucket to deploy serverless code to"
+variable "access_log_bucket" {
+  description = "The bucket to log s3 access to"
   type        = string
 }
 

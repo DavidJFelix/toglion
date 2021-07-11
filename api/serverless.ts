@@ -28,6 +28,10 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     },
     lambdaHashingVersion: '20201221',
+    deploymentBucket: {
+      name: '${ssm:/services/api/SERVERLESS_DEPLOYMENT_BUCKET}',
+      serverSideEncryption: 'AES256',
+    },
     vpc: {
       // Types here don't account for variable lookup in the resultant cloudformation template.
       securityGroupIds:

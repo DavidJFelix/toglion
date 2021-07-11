@@ -1,7 +1,7 @@
 resource "aws_ssm_parameter" "serverless_deployment_bucket" {
   name  = "/services/api/SERVERLESS_DEPLOYMENT_BUCKET"
   type  = "String"
-  value = var.deployment_bucket
+  value = aws_s3_bucket.this.id
 
   tags = merge(var.tags)
 }
