@@ -1,11 +1,11 @@
 resource "aws_s3_bucket" "this" {
   acl           = "private"
   bucket_prefix = "serverless-code"
-  tags          = merge(local.common_tags)
+  tags          = merge(var.tags)
 
   logging {
-    target_bucket = data.terraform_remote_state.aws_base.outputs.s3_access_logs_s3_bucket_id
-    target_prefix = "aws/s3/${local.common_tags.Stack}/serverless-code/"
+    target_bucket = var.access_log_bucket
+    target_prefix = "aws/s3/010-aws-api/serverless-code/"
   }
 
   server_side_encryption_configuration {
