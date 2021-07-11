@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "serverless_code" {
+resource "aws_s3_bucket" "this" {
   acl           = "private"
   bucket_prefix = "serverless-code"
   tags          = merge(local.common_tags)
