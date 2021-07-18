@@ -1,6 +1,7 @@
 import {handlerPath} from '@lib/handlerResolver'
+import type {FunctionDefinition} from '@lib/serverless'
 
-export const connectToWebsocket = {
+export const connectToWebsocket: FunctionDefinition = {
   handler: `${handlerPath(__dirname)}/handler.connectToWebsocket`,
   events: [
     {

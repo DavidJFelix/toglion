@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'api/**'
+      - '.github/workflows/main-api.yml'
 jobs:
   test:
     runs-on: ubuntu-20.04
