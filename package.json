@@ -15,7 +15,8 @@
   "scripts": {
     "build": "preconstruct build && manypkg run dashboard build",
     "postinstall": "preconstruct dev",
-    "start": "manypkg run dashboard dev"
+    "start": "manypkg run dashboard dev",
+    "storybook": "manypkg run dashboard storybook"
   },
   "dependencies": {
     "@babel/core": "^7.14.6",
