@@ -8,6 +8,9 @@ on:
       - '.github/workflows/main-api.yml'
 jobs:
   test:
+    defaults:
+      run:
+        working-directory: './api'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
@@ -22,8 +25,10 @@ jobs:
           CI: true
       - name: Jest test
         run: yarn run test
-        working-directory: './api'
   deploy:
+    defaults:
+      run:
+        working-directory: './api'
     # Wait for tests to pass before we deploy
     needs: ['test']
     runs-on: ubuntu-20.04
@@ -48,7 +53,6 @@ jobs:
           CI: true
       - name: Serverless Deploy
         run: yarn run sls --region=${{matrix.aws_region}} deploy --stage=prod
-        working-directory: './api'
         env:
           CI: true
           AWS_ACCESS_KEY_ID: ${{ secrets.SERVERLESS_AWS_ACCESS_KEY_ID }}
