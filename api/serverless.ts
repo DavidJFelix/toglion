@@ -1,5 +1,6 @@
 import type {AWS} from '@serverless/typescript'
 
+import {connectToWebsocket} from '@functions/connectToWebsocket'
 import {hello} from '@functions/hello'
 
 const serverlessConfiguration: AWS = {
@@ -24,14 +25,14 @@ const serverlessConfiguration: AWS = {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },
-    environment: {
-      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-    },
-    lambdaHashingVersion: '20201221',
     deploymentBucket: {
       name: '${ssm:/services/api/SERVERLESS_DEPLOYMENT_BUCKET}',
       serverSideEncryption: 'AES256',
     },
+    environment: {
+      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+    },
+    lambdaHashingVersion: '20201221',
     vpc: {
       // Types here don't account for variable lookup in the resultant cloudformation template.
       securityGroupIds:
@@ -39,8 +40,9 @@ const serverlessConfiguration: AWS = {
 
       subnetIds: '${ssm:/services/api/LAMBDA_SUBNETS}' as unknown as string[],
     },
+    websocketsApiRouteSelectionExpression: '$request.body.type',
   },
-  functions: {hello},
+  functions: {connectToWebsocket, hello},
 }
 
 module.exports = serverlessConfiguration
