@@ -9,17 +9,16 @@ import {
 } from '@chakra-ui/react'
 import {FeatureFlag} from '@toglion/types'
 
+export interface FeatureFlagsListProps {
+  flags: FeatureFlag[]
+  onToggle: (id: string) => void
+}
+
 const EnabledIcon = ({isEnabled}: {isEnabled: boolean}) => (
   <Circle w={2} h={2} bgColor={isEnabled ? 'green.500' : 'gray.500'} />
 )
 
-export const FeatureFlagsList = ({
-  flags,
-  onToggle,
-}: {
-  flags: FeatureFlag[]
-  onToggle: (id: string) => void
-}) => (
+export const FeatureFlagsList = ({flags, onToggle}: FeatureFlagsListProps) => (
   <VStack
     borderWidth="1px"
     borderColor="gray.200"
@@ -27,7 +26,7 @@ export const FeatureFlagsList = ({
     spacing={0}
     align="stretch"
   >
-    {flags.map((flag) => (
+    {flags?.map((flag) => (
       <HStack key={flag.id} spacing={3} p={3}>
         <EnabledIcon isEnabled={flag.isEnabled} />
         <Box flexGrow={1}>
