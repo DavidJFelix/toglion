@@ -1,0 +1,55 @@
+name: 'Build, Test, and Deploy API from main branch'
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '/api/**'
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+          cache: yarn
+      - name: Yarn Install
+        run: yarn install --frozen-lockfile
+        env:
+          CI: true
+      - name: Jest test
+        run: yarn run test
+        working-directory: './api'
+  deploy:
+    # Wait for tests to pass before we deploy
+    needs: ['test']
+    runs-on: ubuntu-20.04
+    strategy:
+      # Don't deploy more if one of them fails
+      fail-fast: true
+      matrix:
+        # Run API deploys for each region
+        aws_region: ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2']
+      # Don't deploy to more than one region at a time, to allow for possible failure
+      max-parallel: 1
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+          cache: yarn
+      - name: Yarn Install
+        run: yarn install --frozen-lockfile
+        env:
+          CI: true
+      - name: Serverless Deploy
+        run: yarn run sls --region=${{matrix.aws_region}} deploy --stage=prod
+        working-directory: './api'
+        env:
+          CI: true
+          AWS_ACCESS_KEY_ID: ${{ secrets.SERVERLESS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SERVERLESS_AWS_SECRET_ACCESS_KEY }}
+
