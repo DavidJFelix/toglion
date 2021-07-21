@@ -52,7 +52,7 @@ jobs:
         env:
           CI: true
       - name: Serverless Deploy
-        run: yarn run sls --region=${{matrix.aws_region}} deploy --stage=prod
+        run: yarn run deploy:prod --region=${{matrix.aws_region}}
         env:
           CI: true
           AWS_ACCESS_KEY_ID: ${{ secrets.SERVERLESS_AWS_ACCESS_KEY_ID }}
