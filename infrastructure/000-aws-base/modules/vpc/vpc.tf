@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 # Get a list of AZs supported by this region so we can put a subnet in each one
 data "aws_availability_zones" "this" {
   filter {
@@ -126,7 +128,25 @@ data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
       test     = "StringNotEquals"
       variable = "aws:sourceVpce"
 
-      values = [data.aws_vpc_endpoint_service.dynamodb.id]
+      values = [data.aws_vpc_endpoint_service.dynamodb.service_id]
+    }
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+
+      values = [data.aws_caller_identity.current.account_id]
     }
   }
 }

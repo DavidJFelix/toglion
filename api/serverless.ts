@@ -1,6 +1,7 @@
 import type {AWS} from '@serverless/typescript'
 
 import {connectToWebsocket} from '@functions/connectToWebsocket'
+import {disconnectFromWebsocket} from '@functions/disconnectFromWebsocket'
 import {hello} from '@functions/hello'
 
 const serverlessConfiguration: AWS = {
@@ -31,6 +32,8 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      GLOBAL_DYNAMODB_TABLE: '${ssm:/services/api/GLOBAL_DYNAMODB_TABLE}',
+      REGIONAL_DYNAMODB_TABLE: '${ssm:/services/api/REGIONAL_DYNAMODB_TABLE}',
     },
     lambdaHashingVersion: '20201221',
     vpc: {
@@ -42,7 +45,7 @@ const serverlessConfiguration: AWS = {
     },
     websocketsApiRouteSelectionExpression: '$request.body.type',
   },
-  functions: {connectToWebsocket, hello},
+  functions: {connectToWebsocket, disconnectFromWebsocket, hello},
 }
 
 module.exports = serverlessConfiguration

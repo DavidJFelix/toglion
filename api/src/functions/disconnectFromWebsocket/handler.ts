@@ -2,26 +2,27 @@ import 'source-map-support/register'
 
 import {APIGatewayProxyHandler} from 'aws-lambda'
 import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {insert} from '@lib/dynamodb'
+import {softDelete} from '@lib/dynamodb'
 import {getConfig} from '@lib/config'
 
-export const connectToWebsocket: APIGatewayProxyHandler = async (event) => {
-  const config = getConfig()
+export const disconnectFromWebsocket: APIGatewayProxyHandler = async (
+  event,
+) => {
   const client = new DynamoDB({})
+  const config = getConfig()
 
-  await insert({
+  await softDelete({
     client,
     tableName: config.regionalDynamoDBTableName,
     key: {id: event.requestContext.connectionId, type: 'wsConnection'},
-    value: {},
-    options: {timeToLiveInSeconds: 3600},
+    options: {timeToLiveInSeconds: 300},
   })
   return {
     statusCode: 200,
     body: JSON.stringify({
-      type: 'onConnectSuccess',
+      type: 'onDisconnectSuccess',
       data: {
-        message: 'connected',
+        message: 'disconnected',
         connectionId: event.requestContext.connectionId,
         region: config.awsRegion,
       },

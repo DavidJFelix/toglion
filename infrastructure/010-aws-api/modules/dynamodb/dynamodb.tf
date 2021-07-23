@@ -29,12 +29,6 @@ module "this" {
 
   global_secondary_indexes = [
     {
-      hash_key        = "SortKey"
-      name            = "InverseIndex"
-      projection_type = "KEYS_ONLY"
-      range_key       = "PartitionKey"
-    },
-    {
       hash_key        = "Value"
       name            = "ValueIndex"
       projection_type = "ALL"
