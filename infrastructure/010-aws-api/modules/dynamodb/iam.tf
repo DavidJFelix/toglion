@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 data "aws_iam_policy_document" "read_write" {
   statement {
     effect = "Allow"
@@ -16,9 +18,28 @@ data "aws_iam_policy_document" "read_write" {
     ]
 
     resources = [
-      "${module.this.dynamodb_table_arn}",
-      "${module.this.dynamodb_table_arn}/index/*"
+      "${var.is_global ? "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.this.dynamodb_table_id}" : module.this.dynamodb_table_arn}",
+      "${var.is_global ? "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.this.dynamodb_table_id}" : module.this.dynamodb_table_arn}/index/*"
     ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid    = "AllowKMSDecryptEncrypt"
+
+    actions = [
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext",
+    ]
+
+    resources = concat(
+      [var.server_side_encryption_kms_key_arn],
+      [for replica_region in var.replica_regions : replica_region.kms_key_arn],
+    )
   }
 }
 
