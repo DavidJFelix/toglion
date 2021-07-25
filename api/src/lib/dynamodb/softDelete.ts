@@ -11,6 +11,8 @@ export async function softDelete<T = object>({
   options,
 }: SoftDeleteParams): Promise<Entry<T>> {
   const now = new Date()
+  const utcSecondsSinceEpoch =
+    Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
   const response = await client.updateItem({
     TableName: tableName,
     Key: {
@@ -25,7 +27,7 @@ export async function softDelete<T = object>({
       '#DeletedAt': 'DeletedAt',
       '#IsDeleted': 'IsDeleted',
       '#ModifiedAt': 'ModifiedAt',
-      ...(options.timeToLiveInSeconds !== undefined
+      ...(options?.timeToLiveInSeconds !== undefined
         ? {
             '#TTL': 'TTL',
           }
@@ -41,10 +43,10 @@ export async function softDelete<T = object>({
       ':ModifiedAt': {
         S: now.toISOString(),
       },
-      ...(options.timeToLiveInSeconds !== undefined
+      ...(options?.timeToLiveInSeconds !== undefined
         ? {
             ':TTL': {
-              N: `${options.timeToLiveInSeconds}`,
+              N: `${options.timeToLiveInSeconds + utcSecondsSinceEpoch}`,
             },
           }
         : {}),
