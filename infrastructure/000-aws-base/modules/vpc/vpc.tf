@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 # Get a list of AZs supported by this region so we can put a subnet in each one
 data "aws_availability_zones" "this" {
@@ -104,13 +105,9 @@ module "dynamodb_vpc_endpoint" {
 }
 
 # Data source used to avoid race condition
-data "aws_vpc_endpoint_service" "dynamodb" {
-  service = "dynamodb"
-
-  filter {
-    name   = "service-type"
-    values = ["Gateway"]
-  }
+data "aws_vpc_endpoint" "dynamodb" {
+  vpc_id       = module.vpc.vpc_id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
 }
 
 data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
@@ -128,7 +125,7 @@ data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
       test     = "StringNotEquals"
       variable = "aws:sourceVpce"
 
-      values = [data.aws_vpc_endpoint_service.dynamodb.service_id]
+      values = [data.aws_vpc_endpoint.dynamodb.id]
     }
   }
 
