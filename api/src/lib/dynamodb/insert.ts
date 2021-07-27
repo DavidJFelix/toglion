@@ -44,7 +44,7 @@ export async function insert<TOld = object, TNew = object>({
     },
     ExpressionAttributeValues: {
       ':RawValue': {
-        S: JSON.stringify({value}),
+        S: JSON.stringify(value),
       },
       ':CreatedAt': {
         S: options?.createdAt?.toISOString() ?? now.toISOString(),
