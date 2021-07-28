@@ -2,9 +2,10 @@ import 'source-map-support/register'
 
 import {APIGatewayProxyHandler} from 'aws-lambda'
 import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {insert} from '@lib/dynamodb'
+import {insert} from '@lib/dynamodb/insert'
 import {getConfig} from '@lib/config'
 
+// FIXME: add logging and event validation, remove response that does nothing
 export const connectToWebsocket: APIGatewayProxyHandler = async (event) => {
   const config = getConfig()
   const client = new DynamoDB({})
@@ -19,11 +20,13 @@ export const connectToWebsocket: APIGatewayProxyHandler = async (event) => {
   return {
     statusCode: 200,
     body: JSON.stringify({
-      type: 'onConnectSuccess',
-      data: {
-        message: 'connected',
-        connectionId: event.requestContext.connectionId,
-        region: config.awsRegion,
+      type: 'on_connect_success',
+      payload: {
+        data: {
+          message: 'connected',
+          connectionId: event.requestContext.connectionId,
+          region: config.awsRegion,
+        },
       },
     }),
   }

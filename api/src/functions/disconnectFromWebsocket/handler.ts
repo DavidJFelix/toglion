@@ -2,9 +2,10 @@ import 'source-map-support/register'
 
 import {APIGatewayProxyHandler} from 'aws-lambda'
 import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {softDelete} from '@lib/dynamodb'
+import {softDelete} from '@lib/dynamodb/softDelete'
 import {getConfig} from '@lib/config'
 
+// FIXME: add logging and event validation, remove response that does nothing
 export const disconnectFromWebsocket: APIGatewayProxyHandler = async (
   event,
 ) => {
@@ -20,11 +21,13 @@ export const disconnectFromWebsocket: APIGatewayProxyHandler = async (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      type: 'onDisconnectSuccess',
-      data: {
-        message: 'disconnected',
-        connectionId: event.requestContext.connectionId,
-        region: config.awsRegion,
+      type: 'on_disconnect_success',
+      payload: {
+        data: {
+          message: 'disconnected',
+          connectionId: event.requestContext.connectionId,
+          region: config.awsRegion,
+        },
       },
     }),
   }

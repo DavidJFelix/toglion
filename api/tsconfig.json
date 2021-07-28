@@ -1,11 +1,18 @@
 {
-  "extends": "./tsconfig.paths.json",
+  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@functions/*": ["src/functions/*"],
+      "@lib/*": ["src/lib/*"]
+    },
     "lib": ["ESNext"],
     "moduleResolution": "node",
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "removeComments": true,
+    "strict": true,
+    "strictNullChecks": true,
     "sourceMap": true,
     "target": "ES2020",
     "outDir": "lib"

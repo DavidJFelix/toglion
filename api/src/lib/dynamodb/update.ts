@@ -18,7 +18,7 @@ export async function update<TOld = object, TNew = object>({
     Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
   const response = await client.updateItem({
     TableName: tableName,
-    ConditionExpression: upsert ? undefined : 'attribute_exists(PartitionId)',
+    ConditionExpression: upsert ? undefined : 'attribute_exists(PartitionKey)',
     ReturnValues: 'ALL_OLD',
     Key: {
       PartitionKey: {
@@ -77,7 +77,7 @@ export async function update<TOld = object, TNew = object>({
         : {}),
     },
     UpdateExpression: `SET #RawValue = :RawValue, #ModifiedAt = :ModifiedAt, #IsDeleted = :IsDeleted, #CreatedAt = ${
-      upsert ? ':CreatedAt' : 'if_not_exist(#CreatedAt, :CreatedAt)'
+      upsert ? ':CreatedAt' : 'if_not_exists(#CreatedAt, :CreatedAt)'
     }${
       options?.isDeleted !== undefined && options.isDeleted
         ? ', #DeletedAt = :DeletedAt'
