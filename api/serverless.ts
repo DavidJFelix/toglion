@@ -2,6 +2,9 @@ import type {AWS} from '@serverless/typescript'
 
 import {connectToWebsocket} from '@functions/connectToWebsocket'
 import {disconnectFromWebsocket} from '@functions/disconnectFromWebsocket'
+import {clientPing, clientPong} from '@functions/graphql-subscriptions/pingPong'
+import {connectionInit} from '@functions/graphql-subscriptions/connectionInit'
+import {defaultWebsocket} from '@functions/graphql-subscriptions/defaultWebsocket'
 import {hello} from '@functions/hello'
 
 const serverlessConfiguration: AWS = {
@@ -45,7 +48,15 @@ const serverlessConfiguration: AWS = {
     },
     websocketsApiRouteSelectionExpression: '$request.body.type',
   },
-  functions: {connectToWebsocket, disconnectFromWebsocket, hello},
+  functions: {
+    connectToWebsocket,
+    defaultWebsocket,
+    disconnectFromWebsocket,
+    hello,
+    clientPing,
+    clientPong,
+    connectionInit,
+  },
 }
 
 module.exports = serverlessConfiguration

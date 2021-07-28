@@ -21,7 +21,7 @@ module.exports = {
     cacheWithContext: false,
     plugins: [
       new TsconfigPathsPlugin({
-        configFile: './tsconfig.paths.json',
+        configFile: './tsconfig.json',
       }),
     ],
   },
