@@ -19,7 +19,12 @@ output "dynamodb_table_stream_label" {
   value       = var.is_global ? module.this.dynamodb_table_stream_label : null
 }
 
-output "iam_policy_dynamodb_read_write_arn" {
-  description = "The ARN for a policy which allows read/write to the dynamodb table created by this module"
-  value       = aws_iam_policy.read_write.arn
+data "aws_caller_identity" "current" {}
+
+output "iam_policy_arns" {
+  description = "A list of ARNs for accessing the db and indexes"
+  value = [
+    "${var.is_global ? "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.this.dynamodb_table_id}" : module.this.dynamodb_table_arn}",
+    "${var.is_global ? "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.this.dynamodb_table_id}" : module.this.dynamodb_table_arn}/index/*"
+  ]
 }

@@ -147,3 +147,21 @@ data "aws_iam_policy_document" "execute_api_endpoint_policy" {
     }
   }
 }
+
+data "aws_region" "current" {}
+
+data "aws_vpc_endpoint" "dynamodb" {
+  depends_on = [
+    module.dynamodb_vpc_endpoint
+  ]
+  vpc_id       = module.vpc.vpc_id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+}
+
+data "aws_vpc_endpoint" "execute_api" {
+  depends_on = [
+    module.dynamodb_vpc_endpoint
+  ]
+  vpc_id       = module.vpc.vpc_id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
+}

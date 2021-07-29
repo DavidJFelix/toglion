@@ -58,110 +58,51 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_managed_policy" {
   policy_arn = data.aws_iam_policy.lambda_vpc_managed_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "global_dynamodb" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = module.global_dynamodb_table.iam_policy_dynamodb_read_write_arn
-}
-
-resource "aws_iam_role_policy_attachment" "us_east_1_dynamodb" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = module.us_east_1_dynamodb_table.iam_policy_dynamodb_read_write_arn
-}
-
-resource "aws_iam_role_policy_attachment" "us_east_2_dynamodb" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = module.us_east_2_dynamodb_table.iam_policy_dynamodb_read_write_arn
-}
-
-resource "aws_iam_role_policy_attachment" "us_west_1_dynamodb" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = module.us_west_1_dynamodb_table.iam_policy_dynamodb_read_write_arn
-}
-
-resource "aws_iam_role_policy_attachment" "us_west_2_dynamodb" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = module.us_west_2_dynamodb_table.iam_policy_dynamodb_read_write_arn
-}
-
-
-data "aws_vpc_endpoint" "us_east_1_dynamodb" {
-  provider     = aws.us_east_1
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_vpc_id
-  service_name = "com.amazonaws.us-east-1.dynamodb"
-}
-
-data "aws_vpc_endpoint" "us_east_2_dynamodb" {
-  provider     = aws.us_east_2
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_vpc_id
-  service_name = "com.amazonaws.us-east-2.dynamodb"
-}
-
-data "aws_vpc_endpoint" "us_west_1_dynamodb" {
-  provider     = aws.us_west_1
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_vpc_id
-  service_name = "com.amazonaws.us-west-1.dynamodb"
-}
-
-data "aws_vpc_endpoint" "us_west_2_dynamodb" {
-  provider     = aws.us_west_2
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_vpc_id
-  service_name = "com.amazonaws.us-west-2.dynamodb"
-}
-
-data "aws_vpc_endpoint" "us_east_1_execute_api" {
-  provider     = aws.us_east_1
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_vpc_id
-  service_name = "com.amazonaws.us-east-1.execute-api"
-}
-
-data "aws_vpc_endpoint" "us_east_2_execute_api" {
-  provider     = aws.us_east_2
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_vpc_id
-  service_name = "com.amazonaws.us-east-2.execute-api"
-}
-
-data "aws_vpc_endpoint" "us_west_1_execute_api" {
-  provider     = aws.us_west_1
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_vpc_id
-  service_name = "com.amazonaws.us-west-1.execute-api"
-}
-
-data "aws_vpc_endpoint" "us_west_2_execute_api" {
-  provider     = aws.us_west_2
-  vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_vpc_id
-  service_name = "com.amazonaws.us-west-2.execute-api"
-}
-
-data "aws_iam_policy_document" "lambda_policy" {
-  # This policy is explicitly denied from accessing dynamodb outside of the defined VPC endpoints
+data "aws_iam_policy_document" "lambda_dynamodb" {
+  # This statement allows dynamodb access to the created tables only through the VPC endpoint
   statement {
-    effect  = "Deny"
-    actions = ["dynamodb:*"]
-    resources = [
-      module.global_dynamodb_table.dynamodb_table_arn,
-      module.us_east_1_dynamodb_table.dynamodb_table_arn,
-      module.us_east_2_dynamodb_table.dynamodb_table_arn,
-      module.us_west_1_dynamodb_table.dynamodb_table_arn,
-      module.us_west_2_dynamodb_table.dynamodb_table_arn,
+    effect = "Allow"
+    sid    = "ddb"
+
+    actions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:ConditionCheckItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:UpdateItem",
     ]
 
+    resources = concat(
+      module.global_dynamodb_table.iam_policy_arns,
+      module.us_east_1_dynamodb_table.iam_policy_arns,
+      module.us_east_2_dynamodb_table.iam_policy_arns,
+      module.us_west_1_dynamodb_table.iam_policy_arns,
+      module.us_west_2_dynamodb_table.iam_policy_arns,
+    )
+
     condition {
-      test     = "ForAllValues:StringNotEquals"
-      variable = "aws:sourceVpce"
+      test     = "StringEquals"
+      variable = "aws:SourceVpce"
 
       values = [
-        data.aws_vpc_endpoint.us_east_1_dynamodb.id,
-        data.aws_vpc_endpoint.us_east_2_dynamodb.id,
-        data.aws_vpc_endpoint.us_west_1_dynamodb.id,
-        data.aws_vpc_endpoint.us_west_2_dynamodb.id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_dynamodb_vpc_endpoint_id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_dynamodb_vpc_endpoint_id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_dynamodb_vpc_endpoint_id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_dynamodb_vpc_endpoint_id,
       ]
     }
   }
+}
 
-  # This policy is allowed to reach the execute API for any API gateway but only through the VPC endpoints for it
+data "aws_iam_policy_document" "lambda_execute_api" {
+  # This statement allows execute API for any API gateway but only through the VPC endpoints for it
   statement {
     effect = "Allow"
-    sid    = "LambdaPolicy"
+    sid    = "exapi"
 
     actions = [
       "execute-api:*",
@@ -172,20 +113,52 @@ data "aws_iam_policy_document" "lambda_policy" {
     ]
 
     condition {
-      test     = "ForAnyValues:StringNotEquals"
-      variable = "aws:sourceVpce"
+      test     = "StringEquals"
+      variable = "aws:SourceVpce"
 
       values = [
-        data.aws_vpc_endpoint.us_east_1_dynamodb.id,
-        data.aws_vpc_endpoint.us_east_2_dynamodb.id,
-        data.aws_vpc_endpoint.us_west_1_dynamodb.id,
-        data.aws_vpc_endpoint.us_west_2_dynamodb.id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_execute_api_vpc_endpoint_id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_execute_api_vpc_endpoint_id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_execute_api_vpc_endpoint_id,
+        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_execute_api_vpc_endpoint_id,
       ]
     }
   }
 }
+data "aws_iam_policy_document" "lambda_kms" {
+  statement {
+    effect = "Allow"
+    sid    = "kms"
 
-resource "aws_iam_role_policy_attachment" "lambda_policy" {
+    actions = [
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext",
+    ]
+
+    resources = [
+      aws_kms_key.dynamodb_us_east_1.arn,
+      aws_kms_key.dynamodb_us_east_2.arn,
+      aws_kms_key.dynamodb_us_west_1.arn,
+      aws_kms_key.dynamodb_us_west_2.arn,
+    ]
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_policy" {
   role       = aws_iam_role.lambda_role.name
-  policy_arn = data.aws_iam_policy_document.lambda_policy.json
+  policy_arn = data.aws_iam_policy_document.lambda_dynamodb.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_execute_api_policy" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = data.aws_iam_policy_document.lambda_execute_api.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_kms_policy" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = data.aws_iam_policy_document.lambda_kms.json
 }
