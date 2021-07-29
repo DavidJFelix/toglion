@@ -85,41 +85,65 @@ resource "aws_iam_role_policy_attachment" "us_west_2_dynamodb" {
 
 
 data "aws_vpc_endpoint" "us_east_1_dynamodb" {
+  providers = {
+    aws = aws.us_east_1
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_vpc_id
   service_name = "com.amazonaws.us-east-1.dynamodb"
 }
 
 data "aws_vpc_endpoint" "us_east_2_dynamodb" {
+  providers = {
+    aws = aws.us_east_2
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_vpc_id
   service_name = "com.amazonaws.us-east-2.dynamodb"
 }
 
 data "aws_vpc_endpoint" "us_west_1_dynamodb" {
+  providers = {
+    aws = aws.us_west_1
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_vpc_id
   service_name = "com.amazonaws.us-west-1.dynamodb"
 }
 
 data "aws_vpc_endpoint" "us_west_2_dynamodb" {
+  providers = {
+    aws = aws.us_west_2
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_vpc_id
   service_name = "com.amazonaws.us-west-2.dynamodb"
 }
 
 data "aws_vpc_endpoint" "us_east_1_execute_api" {
+  providers = {
+    aws = aws.us_east_1
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_vpc_id
   service_name = "com.amazonaws.us-east-1.execute-api"
 }
 
 data "aws_vpc_endpoint" "us_east_2_execute_api" {
+  providers = {
+    aws = aws.us_east_2
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_vpc_id
   service_name = "com.amazonaws.us-east-2.execute-api"
 }
 
 data "aws_vpc_endpoint" "us_west_1_execute_api" {
+  providers = {
+    aws = aws.us_west_1
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_vpc_id
   service_name = "com.amazonaws.us-west-1.execute-api"
 }
 
 data "aws_vpc_endpoint" "us_west_2_execute_api" {
+  providers = {
+    aws = aws.us_west_2
+  }
   vpc_id       = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_vpc_id
   service_name = "com.amazonaws.us-west-2.execute-api"
 }
