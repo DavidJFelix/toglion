@@ -1,6 +1,3 @@
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
-
 # Get a list of AZs supported by this region so we can put a subnet in each one
 data "aws_availability_zones" "this" {
   filter {
@@ -99,36 +96,18 @@ module "dynamodb_vpc_endpoint" {
       route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
       policy          = data.aws_iam_policy_document.dynamodb_endpoint_policy.json
     }
+    execute_api = {
+      service         = "execute-api"
+      service_type    = "Interface"
+      route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+      policy          = data.aws_iam_policy_document.execute_api_endpoint_policy.json
+    }
   }
 
   tags = merge(var.tags)
 }
 
-# Data source used to avoid race condition
-data "aws_vpc_endpoint" "dynamodb" {
-  vpc_id       = module.vpc.vpc_id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
-}
-
 data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
-  statement {
-    effect    = "Deny"
-    actions   = ["dynamodb:*"]
-    resources = ["*"]
-
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "StringNotEquals"
-      variable = "aws:sourceVpce"
-
-      values = [data.aws_vpc_endpoint.dynamodb.id]
-    }
-  }
-
   statement {
     effect    = "Allow"
     actions   = ["dynamodb:*"]
@@ -141,9 +120,30 @@ data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
 
     condition {
       test     = "StringEquals"
-      variable = "aws:PrincipalAccount"
+      variable = "aws:SourceVpc"
 
-      values = [data.aws_caller_identity.current.account_id]
+      values = [module.vpc.vpc_id]
+    }
+  }
+}
+
+
+data "aws_iam_policy_document" "execute_api_endpoint_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["execute-api:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceVpc"
+
+      values = [module.vpc.vpc_id]
     }
   }
 }
