@@ -148,17 +148,35 @@ data "aws_iam_policy_document" "lambda_kms" {
   }
 }
 
+resource "aws_iam_policy" "lambda_dynamodb" {
+  description = "The policy for the Lambda DynamoDB"
+  name_prefix = "APILambdaDynamoDB"
+  policy      = data.aws_iam_policy_document.lambda_dynamodb.json
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_policy" {
   role       = aws_iam_role.lambda_role.name
-  policy_arn = data.aws_iam_policy_document.lambda_dynamodb.json
+  policy_arn = aws_iam_policy.lambda_dynamodb.arn
+}
+
+resource "aws_iam_policy" "lambda_execute_api" {
+  description = "The policy for the Lambda Execute API"
+  name_prefix = "APILambdaExecuteAPI"
+  policy      = data.aws_iam_policy_document.lambda_execute_api.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_execute_api_policy" {
   role       = aws_iam_role.lambda_role.name
-  policy_arn = data.aws_iam_policy_document.lambda_execute_api.json
+  policy_arn = aws_iam_policy.lambda_execute_api.arn
+}
+
+resource "aws_iam_policy" "lambda_kms" {
+  description = "The policy for the Lambda DynamoDB"
+  name_prefix = "APILambdaDynamoDB"
+  policy      = data.aws_iam_policy_document.lambda_kms.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_kms_policy" {
   role       = aws_iam_role.lambda_role.name
-  policy_arn = data.aws_iam_policy_document.lambda_kms.json
+  policy_arn = aws_iam_policy.lambda_kms.arn
 }
