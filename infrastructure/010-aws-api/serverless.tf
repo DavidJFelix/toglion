@@ -20,7 +20,7 @@ module "us_east_2_serverless" {
   }
 
   role_arn                = aws_iam_role.lambda_role.arn
-  subnets                 = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_privae_subnets
+  subnets                 = data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_private_subnets
   security_groups         = [data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_default_security_group_id]
   access_log_bucket       = data.terraform_remote_state.aws_base.outputs.aws_s3_access_logs_us_east_2_s3_bucket_id
   global_dynamodb_table   = module.global_dynamodb_table.dynamodb_table_id
