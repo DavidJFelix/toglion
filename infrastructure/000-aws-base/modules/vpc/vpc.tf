@@ -76,9 +76,7 @@ module "vpc" {
   public_subnet_ipv6_prefixes  = range(local.subnet_count, local.subnet_count * 2)
   intra_subnet_ipv6_prefixes   = range(local.subnet_count * 2, local.subnet_count * 3)
 
-  # FIXME: turn on later if/when we use private subnets.
-  # Until then, this is a latent cost per hour
-  enable_nat_gateway = false
+  enable_nat_gateway = true
 
   tags = merge(var.tags)
 }
