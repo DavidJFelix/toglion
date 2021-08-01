@@ -66,6 +66,8 @@ module "vpc" {
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
 
+  enable_dns_hostnames = true
+  enable_dns_support   = true
 
   azs             = sort(data.aws_availability_zones.this.names)
   private_subnets = values(module.private_subnet_cidrs.network_cidr_blocks)
@@ -76,12 +78,13 @@ module "vpc" {
   public_subnet_ipv6_prefixes  = range(local.subnet_count, local.subnet_count * 2)
   intra_subnet_ipv6_prefixes   = range(local.subnet_count * 2, local.subnet_count * 3)
 
-  enable_nat_gateway = true
+  # FIXME: turn this on when EIP limit increases in us-east-1
+  enable_nat_gateway = false
 
   tags = merge(var.tags)
 }
 
-module "dynamodb_vpc_endpoint" {
+module "vpc_endpoints" {
   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
 
   vpc_id             = module.vpc.vpc_id
@@ -95,10 +98,18 @@ module "dynamodb_vpc_endpoint" {
       policy          = data.aws_iam_policy_document.dynamodb_endpoint_policy.json
     }
     execute_api = {
-      service         = "execute-api"
-      service_type    = "Interface"
-      route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
-      policy          = data.aws_iam_policy_document.execute_api_endpoint_policy.json
+      service             = "execute-api"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      subnet_ids          = flatten([module.vpc.intra_subnets, module.vpc.private_subnets])
+      policy              = data.aws_iam_policy_document.execute_api_endpoint_policy.json
+    }
+    logs = {
+      service             = "logs"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      subnet_ids          = flatten([module.vpc.intra_subnets, module.vpc.private_subnets])
+      policy              = data.aws_iam_policy_document.logs_endpoint_policy.json
     }
   }
 
@@ -146,11 +157,31 @@ data "aws_iam_policy_document" "execute_api_endpoint_policy" {
   }
 }
 
+data "aws_iam_policy_document" "logs_endpoint_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["logs:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceVpc"
+
+      values = [module.vpc.vpc_id]
+    }
+  }
+}
+
 data "aws_region" "current" {}
 
 data "aws_vpc_endpoint" "dynamodb" {
   depends_on = [
-    module.dynamodb_vpc_endpoint
+    module.vpc_endpoints
   ]
   vpc_id       = module.vpc.vpc_id
   service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
@@ -158,8 +189,17 @@ data "aws_vpc_endpoint" "dynamodb" {
 
 data "aws_vpc_endpoint" "execute_api" {
   depends_on = [
-    module.dynamodb_vpc_endpoint
+    module.vpc_endpoints
   ]
   vpc_id       = module.vpc.vpc_id
   service_name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
+}
+
+
+data "aws_vpc_endpoint" "logs" {
+  depends_on = [
+    module.vpc_endpoints
+  ]
+  vpc_id       = module.vpc.vpc_id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.logs"
 }
