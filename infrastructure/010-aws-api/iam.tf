@@ -22,12 +22,15 @@ data "aws_iam_policy_document" "lambda_execution_permission_boundary" {
     sid    = "ServiceBoundaries"
 
     actions = [
+      "cloudwatch:*",
       "execute-api:*",
       "ec2:*",
       "dynamodb:*",
       "kms:*",
       "lambda:*",
+      "logs:*",
       "s3:*",
+      "xray:*"
     ]
 
     resources = [
