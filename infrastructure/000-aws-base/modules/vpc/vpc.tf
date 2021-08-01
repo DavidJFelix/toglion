@@ -101,14 +101,14 @@ module "vpc_endpoints" {
       service             = "execute-api"
       service_type        = "Interface"
       private_dns_enabled = true
-      subnet_ids          = flatten([module.vpc.intra_subnets, module.vpc.private_subnets])
+      subnet_ids          = module.vpc.intra_subnets
       policy              = data.aws_iam_policy_document.execute_api_endpoint_policy.json
     }
     logs = {
       service             = "logs"
       service_type        = "Interface"
       private_dns_enabled = true
-      subnet_ids          = flatten([module.vpc.intra_subnets, module.vpc.private_subnets])
+      subnet_ids          = module.vpc.intra_subnets
       policy              = data.aws_iam_policy_document.logs_endpoint_policy.json
     }
   }
