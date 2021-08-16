@@ -1,25 +1,21 @@
 import {DynamoDBParams, Entry, Key} from './types'
+import {encodeKeys} from './utils'
 
 export interface HardDeleteParams extends DynamoDBParams {
   key: Key
+  sortKey?: Key
   shouldExist?: boolean
 }
 export async function hardDelete<T = object>({
   client,
   tableName,
   key,
+  sortKey,
   shouldExist = false,
 }: HardDeleteParams): Promise<Entry<T> | void> {
   const response = await client.deleteItem({
     TableName: tableName,
-    Key: {
-      PartitionKey: {
-        S: `${key.type}/${key.id}`,
-      },
-      SortKey: {
-        S: `${key.type}/${key.id}`,
-      },
-    },
+    Key: encodeKeys(key, sortKey),
     ...(shouldExist
       ? {
           ConditionExpression: 'attribute_exists(PartitionKey)',
