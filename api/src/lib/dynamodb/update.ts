@@ -1,14 +1,20 @@
 import {DynamoDBParams, Entry, InsertOrUpdateOptions, Key} from './types'
+import {encodeKeys} from './utils'
 
-export interface UpdateParams<T> extends DynamoDBParams {
+export interface UpdateParams<T extends object> extends DynamoDBParams {
   key: Key
+  sortKey?: Key
   value: T
   options?: InsertOrUpdateOptions
 }
-export async function update<TOld = object, TNew = object>({
+export async function update<
+  TOld extends object = object,
+  TNew extends object = object,
+>({
   client,
   tableName,
   key,
+  sortKey,
   options,
   value,
 }: UpdateParams<TNew>): Promise<Entry<TOld> | void> {
@@ -20,14 +26,7 @@ export async function update<TOld = object, TNew = object>({
     TableName: tableName,
     ConditionExpression: upsert ? undefined : 'attribute_exists(PartitionKey)',
     ReturnValues: 'ALL_OLD',
-    Key: {
-      PartitionKey: {
-        S: `${key.type}/${key.id}`,
-      },
-      SortKey: {
-        S: `${key.type}/${key.id}`,
-      },
-    },
+    Key: encodeKeys(key, sortKey),
     ExpressionAttributeNames: {
       '#RawValue': 'RawValue',
       '#CreatedAt': 'CreatedAt',
@@ -44,7 +43,7 @@ export async function update<TOld = object, TNew = object>({
     },
     ExpressionAttributeValues: {
       ':RawValue': {
-        S: JSON.stringify({value}),
+        S: JSON.stringify(value),
       },
       ':CreatedAt': {
         S: options?.createdAt?.toISOString() ?? now.toISOString(),

@@ -1,7 +1,9 @@
 import {DynamoDBParams, Entry, InsertOrUpdateOptions, Key} from './types'
+import {encodeKeys} from './utils'
 
 export interface InsertParams<T> extends DynamoDBParams {
   key: Key
+  sortKey?: Key
   value: T
   options?: InsertOrUpdateOptions
 }
@@ -9,6 +11,7 @@ export async function insert<TOld = object, TNew = object>({
   client,
   tableName,
   key,
+  sortKey,
   value,
   options,
 }: InsertParams<TNew>): Promise<Entry<TOld> | void> {
@@ -23,14 +26,7 @@ export async function insert<TOld = object, TNew = object>({
         : 'attribute_not_exists(PartitionKey)',
     ReturnValues:
       options?.upsert !== undefined && options.upsert ? 'ALL_OLD' : undefined,
-    Key: {
-      PartitionKey: {
-        S: `${key.type}/${key.id}`,
-      },
-      SortKey: {
-        S: `${key.type}/${key.id}`,
-      },
-    },
+    Key: encodeKeys(key, sortKey),
     ExpressionAttributeNames: {
       '#RawValue': 'RawValue',
       '#CreatedAt': 'CreatedAt',
@@ -81,7 +77,7 @@ export async function insert<TOld = object, TNew = object>({
         ? ', #DeletedAt = :DeletedAt'
         : ''
     }${options?.timeToLiveInSeconds !== undefined ? ', #TTL = :TTL' : ''}${
-      options?.timeToLiveInSeconds === undefined ? ', REMOVE #TTL' : ''
+      options?.timeToLiveInSeconds === undefined ? ' REMOVE #TTL' : ''
     }`,
   })
   return options?.upsert !== undefined && options.upsert

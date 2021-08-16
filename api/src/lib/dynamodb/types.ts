@@ -1,4 +1,4 @@
-import type {DynamoDB} from '@aws-sdk/client-dynamodb'
+import type {AttributeValue, DynamoDB} from '@aws-sdk/client-dynamodb'
 
 export interface DynamoDBParams {
   client: DynamoDB
@@ -8,6 +8,15 @@ export interface DynamoDBParams {
 export interface Key {
   type: string
   id: string
+}
+
+interface DynamoDBKey {
+  [key: string]: AttributeValue
+}
+
+export interface EncodedKey extends DynamoDBKey {
+  PartitionKey: AttributeValue.SMember
+  SortKey: AttributeValue.SMember
 }
 
 export interface TimeStampFields {
@@ -21,6 +30,8 @@ export interface SoftDeleteFields {
 }
 
 export interface Entry<T> extends SoftDeleteFields, TimeStampFields {
+  key?: Key
+  sortKey?: Key
   value: T
 }
 

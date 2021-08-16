@@ -1,6 +1,7 @@
 import type {Handler} from '@faaskit/core'
 import type {AWSLambdaContext} from '@faaskit/adapter-aws-lambda'
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda'
+import {logger} from '@lib/logging'
 
 export interface APIGatewayProxyContext {
   APIGatewayWebsocketProxy: APIGatewayProxyEvent
@@ -14,6 +15,7 @@ export function APIGatewayWebsocketProxyMiddleware<
   next: Handler<TNextEvent, TContext & APIGatewayProxyContext, TNextResult>,
 ): Handler<APIGatewayProxyEvent, TContext, APIGatewayProxyResult> {
   return async (event, context) => {
+    logger.info({event})
     try {
       const result = await next(JSON.parse(event.body) as TNextEvent, {
         ...context,
@@ -27,6 +29,7 @@ export function APIGatewayWebsocketProxyMiddleware<
         body: JSON.stringify(result),
       }
     } catch (error) {
+      logger.info({error})
       return {
         statusCode: 500,
         headers: {

@@ -1,28 +1,28 @@
 import 'source-map-support/register'
 
-import {getConfig} from '@lib/config'
 import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {update} from '@lib/dynamodb/update'
-import {LoggingRecoveryMiddleware} from '@lib/middleware/loggingRecoveryMiddleware'
-import {TimingLogMiddleware} from '@lib/middleware/timingLogMiddleware'
 import {adaptFaasKitHandlerForLambda} from '@faaskit/adapter-aws-lambda'
 import {compose} from '@faaskit/core'
+import {getConfig} from '@lib/config'
+import {update} from '@lib/dynamodb/update'
 import {
   APIGatewayProxyContext,
   APIGatewayWebsocketProxyMiddleware,
 } from '@lib/middleware/apiGatewayWebsocketProxyMiddleware'
+import {LoggingRecoveryMiddleware} from '@lib/middleware/loggingRecoveryMiddleware'
+import {TimingLogMiddleware} from '@lib/middleware/timingLogMiddleware'
 
-export interface connectionInitEvent {
+export interface ConnectionInitEvent {
   type: 'connection_init'
 }
-export interface connectionAckResponse {
+export interface ConnectionAckResponse {
   type: 'connection_ack'
 }
 
 async function connectionInitHandler(
-  _event: connectionInitEvent,
+  _event: ConnectionInitEvent,
   {APIGatewayWebsocketProxy}: APIGatewayProxyContext,
-): Promise<connectionAckResponse> {
+): Promise<ConnectionAckResponse> {
   const config = getConfig()
   const dbClient = new DynamoDB({})
 

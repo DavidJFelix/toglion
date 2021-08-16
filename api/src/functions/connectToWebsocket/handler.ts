@@ -9,7 +9,6 @@ import {getConfig} from '@lib/config'
 export const connectToWebsocket: APIGatewayProxyHandler = async (event) => {
   const config = getConfig()
   const client = new DynamoDB({})
-
   await insert({
     client,
     tableName: config.regionalDynamoDBTableName,
@@ -17,6 +16,7 @@ export const connectToWebsocket: APIGatewayProxyHandler = async (event) => {
     value: {},
     options: {timeToLiveInSeconds: 3600},
   })
+
   return {
     statusCode: 200,
     body: JSON.stringify({

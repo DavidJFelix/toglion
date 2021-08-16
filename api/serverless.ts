@@ -5,7 +5,8 @@ import {disconnectFromWebsocket} from '@functions/disconnectFromWebsocket'
 import {clientPing, clientPong} from '@functions/graphql-subscriptions/pingPong'
 import {connectionInit} from '@functions/graphql-subscriptions/connectionInit'
 import {defaultWebsocket} from '@functions/graphql-subscriptions/defaultWebsocket'
-import {hello} from '@functions/hello'
+import {subscribe} from '@functions/graphql-subscriptions/subscribe'
+import {onGlobalTableChange} from '@functions/onGlobalTableChange/'
 
 const serverlessConfiguration: AWS = {
   service: 'api',
@@ -52,10 +53,11 @@ const serverlessConfiguration: AWS = {
     connectToWebsocket,
     defaultWebsocket,
     disconnectFromWebsocket,
-    hello,
     clientPing,
     clientPong,
     connectionInit,
+    subscribe,
+    onGlobalTableChange,
   },
 }
 
