@@ -68,7 +68,6 @@ data "aws_iam_policy_document" "lambda_dynamodb" {
     sid    = "ddb"
 
     actions = [
-      // Table and Index
       "dynamodb:BatchGetItem",
       "dynamodb:BatchWriteItem",
       "dynamodb:ConditionCheckItem",
@@ -78,13 +77,6 @@ data "aws_iam_policy_document" "lambda_dynamodb" {
       "dynamodb:Query",
       "dynamodb:Scan",
       "dynamodb:UpdateItem",
-
-      // Streams
-      "dynamodb:GetRecords",
-      "dynamodb:GetShardIterator",
-      "dynamodb:DescribeStream",
-      "dynamodb:ListShards",
-      "dynamodb:ListStreams",
     ]
 
     resources = concat(
@@ -93,7 +85,6 @@ data "aws_iam_policy_document" "lambda_dynamodb" {
       module.us_east_2_dynamodb_table.iam_policy_arns,
       module.us_west_1_dynamodb_table.iam_policy_arns,
       module.us_west_2_dynamodb_table.iam_policy_arns,
-      ["arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.global_dynamodb_table.dynamodb_table_id}/stream/*"],
     )
 
     condition {
@@ -108,6 +99,22 @@ data "aws_iam_policy_document" "lambda_dynamodb" {
       ]
     }
   }
+
+  statement {
+    effect = "Allow"
+    sid    = "ddbs"
+
+    actions = [
+      "dynamodb:GetRecords",
+      "dynamodb:GetShardIterator",
+      "dynamodb:DescribeStream",
+      "dynamodb:ListShards",
+      "dynamodb:ListStreams",
+    ]
+
+    resources = [
+      "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.global_dynamodb_table.dynamodb_table_id}/stream/*"
+    ] 
 }
 
 data "aws_iam_policy_document" "lambda_execute_api" {
