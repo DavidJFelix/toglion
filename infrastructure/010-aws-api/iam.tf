@@ -108,13 +108,26 @@ data "aws_iam_policy_document" "lambda_dynamodb" {
       "dynamodb:GetRecords",
       "dynamodb:GetShardIterator",
       "dynamodb:DescribeStream",
+    ]
+
+    resources = [
+      "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.global_dynamodb_table.dynamodb_table_id}/stream/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+    sid    = "ddbs2"
+
+    actions = [
       "dynamodb:ListShards",
       "dynamodb:ListStreams",
     ]
 
     resources = [
-      "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/${module.global_dynamodb_table.dynamodb_table_id}/stream/*"
-    ] 
+      "*"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "lambda_execute_api" {
