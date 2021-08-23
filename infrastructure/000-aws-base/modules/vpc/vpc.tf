@@ -28,7 +28,8 @@ module "subnet_group_cidrs" {
     }
   ]
 }
-  
+
+# FIXME: update this to look up region when us-east-1 gets more
 locals {
   eip_limit = 3
 }
@@ -41,10 +42,7 @@ module "private_subnet_cidrs" {
   # FIXME: remove slice when EIP limit increases in us-east-1
   networks = [
     for az_name in slice(
-      sort(data.aws_availability_zones.this.names), 0, max([
-        local.eip_limit,
-        length(data.aws_availability_zones.this.names)
-      ])
+      sort(data.aws_availability_zones.this.names), 0, local.eip_limit,
     ) : { name = az_name, new_bits = 4 }
   ]
 }
