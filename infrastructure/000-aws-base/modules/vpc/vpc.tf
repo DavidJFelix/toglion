@@ -28,13 +28,25 @@ module "subnet_group_cidrs" {
     }
   ]
 }
+  
+locals {
+  eip_limit = 3
+}
 
 # Divide the private groups by AZ and provide each with a /22 CIDR
 module "private_subnet_cidrs" {
   source = "hashicorp/subnets/cidr"
 
   base_cidr_block = module.subnet_group_cidrs.network_cidr_blocks.private
-  networks        = [for az_name in sort(data.aws_availability_zones.this.names) : { name = az_name, new_bits = 4 }]
+  # FIXME: remove slice when EIP limit increases in us-east-1
+  networks = [
+    for az_name in slice(
+      sort(data.aws_availability_zones.this.names), 0, max([
+        local.eip_limit,
+        data.aws_availability_zones.this.names
+      ])
+    ) : { name = az_name, new_bits = 4 }
+  ]
 }
 
 # Divide the public groups by AZ and provide each with a /22 CIDR
@@ -78,8 +90,7 @@ module "vpc" {
   public_subnet_ipv6_prefixes  = range(local.subnet_count, local.subnet_count * 2)
   intra_subnet_ipv6_prefixes   = range(local.subnet_count * 2, local.subnet_count * 3)
 
-  # FIXME: turn this on when EIP limit increases in us-east-1
-  enable_nat_gateway = false
+  enable_nat_gateway = true
 
   tags = merge(var.tags)
 }
