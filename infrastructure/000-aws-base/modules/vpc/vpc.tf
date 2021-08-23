@@ -84,122 +84,85 @@ module "vpc" {
   tags = merge(var.tags)
 }
 
-module "vpc_endpoints" {
-  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+# module "vpc_endpoints" {
+#   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
 
-  vpc_id             = module.vpc.vpc_id
-  security_group_ids = [module.vpc.default_security_group_id]
+#   vpc_id             = module.vpc.vpc_id
+#   security_group_ids = [module.vpc.default_security_group_id]
 
-  endpoints = {
-    dynamodb = {
-      service         = "dynamodb"
-      service_type    = "Gateway"
-      route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
-      policy          = data.aws_iam_policy_document.dynamodb_endpoint_policy.json
-    }
-    execute_api = {
-      service             = "execute-api"
-      service_type        = "Interface"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.intra_subnets
-      policy              = data.aws_iam_policy_document.execute_api_endpoint_policy.json
-    }
-    logs = {
-      service             = "logs"
-      service_type        = "Interface"
-      private_dns_enabled = true
-      subnet_ids          = module.vpc.intra_subnets
-      policy              = data.aws_iam_policy_document.logs_endpoint_policy.json
-    }
-  }
+#   endpoints = {
+#     dynamodb = {
+#       service         = "dynamodb"
+#       service_type    = "Gateway"
+#       route_table_ids = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+#       policy          = data.aws_iam_policy_document.dynamodb_endpoint_policy.json
+#     }
+#     logs = {
+#       service             = "logs"
+#       service_type        = "Interface"
+#       private_dns_enabled = true
+#       subnet_ids          = module.vpc.intra_subnets
+#       policy              = data.aws_iam_policy_document.logs_endpoint_policy.json
+#     }
+#   }
 
-  tags = merge(var.tags)
-}
+#   tags = merge(var.tags)
+# }
 
-data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
-  statement {
-    effect    = "Allow"
-    actions   = ["dynamodb:*"]
-    resources = ["*"]
+# data "aws_iam_policy_document" "dynamodb_endpoint_policy" {
+#   statement {
+#     effect    = "Allow"
+#     actions   = ["dynamodb:*"]
+#     resources = ["*"]
 
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
+#     principals {
+#       type        = "*"
+#       identifiers = ["*"]
+#     }
 
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceVpc"
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceVpc"
 
-      values = [module.vpc.vpc_id]
-    }
-  }
-}
+#       values = [module.vpc.vpc_id]
+#     }
+#   }
+# }
 
+# data "aws_iam_policy_document" "logs_endpoint_policy" {
+#   statement {
+#     effect    = "Allow"
+#     actions   = ["logs:*"]
+#     resources = ["*"]
 
-data "aws_iam_policy_document" "execute_api_endpoint_policy" {
-  statement {
-    effect    = "Allow"
-    actions   = ["execute-api:*"]
-    resources = ["*"]
+#     principals {
+#       type        = "*"
+#       identifiers = ["*"]
+#     }
 
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceVpc"
 
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceVpc"
+#       values = [module.vpc.vpc_id]
+#     }
+#   }
+# }
 
-      values = [module.vpc.vpc_id]
-    }
-  }
-}
+# data "aws_region" "current" {}
 
-data "aws_iam_policy_document" "logs_endpoint_policy" {
-  statement {
-    effect    = "Allow"
-    actions   = ["logs:*"]
-    resources = ["*"]
+# data "aws_vpc_endpoint" "dynamodb" {
+#   depends_on = [
+#     module.vpc_endpoints
+#   ]
+#   vpc_id       = module.vpc.vpc_id
+#   service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+# }
 
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceVpc"
-
-      values = [module.vpc.vpc_id]
-    }
-  }
-}
-
-data "aws_region" "current" {}
-
-data "aws_vpc_endpoint" "dynamodb" {
-  depends_on = [
-    module.vpc_endpoints
-  ]
-  vpc_id       = module.vpc.vpc_id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
-}
-
-data "aws_vpc_endpoint" "execute_api" {
-  depends_on = [
-    module.vpc_endpoints
-  ]
-  vpc_id       = module.vpc.vpc_id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.execute-api"
-}
-
-
-data "aws_vpc_endpoint" "logs" {
-  depends_on = [
-    module.vpc_endpoints
-  ]
-  vpc_id       = module.vpc.vpc_id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.logs"
-}
+# data "aws_vpc_endpoint" "logs" {
+#   depends_on = [
+#     module.vpc_endpoints
+#   ]
+#   vpc_id       = module.vpc.vpc_id
+#   service_name = "com.amazonaws.${data.aws_region.current.name}.logs"
+# }
