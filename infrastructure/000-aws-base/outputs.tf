@@ -94,37 +94,21 @@ output "aws_vpc_us_west_2_default_security_group_id" {
   value = module.aws_vpc_us_west_2.default_security_group_id
 }
 
-output "aws_vpc_us_east_1_dynamodb_vpc_endpoint_id" {
-  value = module.aws_vpc_us_east_1.dynamodb_vpc_endpoint_id
-}
+# output "aws_vpc_us_east_1_dynamodb_vpc_endpoint_id" {
+#   value = module.aws_vpc_us_east_1.dynamodb_vpc_endpoint_id
+# }
 
-output "aws_vpc_us_east_2_dynamodb_vpc_endpoint_id" {
-  value = module.aws_vpc_us_east_2.dynamodb_vpc_endpoint_id
-}
+# output "aws_vpc_us_east_2_dynamodb_vpc_endpoint_id" {
+#   value = module.aws_vpc_us_east_2.dynamodb_vpc_endpoint_id
+# }
 
-output "aws_vpc_us_west_1_dynamodb_vpc_endpoint_id" {
-  value = module.aws_vpc_us_west_1.dynamodb_vpc_endpoint_id
-}
+# output "aws_vpc_us_west_1_dynamodb_vpc_endpoint_id" {
+#   value = module.aws_vpc_us_west_1.dynamodb_vpc_endpoint_id
+# }
 
-output "aws_vpc_us_west_2_dynamodb_vpc_endpoint_id" {
-  value = module.aws_vpc_us_west_2.dynamodb_vpc_endpoint_id
-}
-
-output "aws_vpc_us_east_1_execute_api_vpc_endpoint_id" {
-  value = module.aws_vpc_us_east_1.execute_api_vpc_endpoint_id
-}
-
-output "aws_vpc_us_east_2_execute_api_vpc_endpoint_id" {
-  value = module.aws_vpc_us_east_2.execute_api_vpc_endpoint_id
-}
-
-output "aws_vpc_us_west_1_execute_api_vpc_endpoint_id" {
-  value = module.aws_vpc_us_west_1.execute_api_vpc_endpoint_id
-}
-
-output "aws_vpc_us_west_2_execute_api_vpc_endpoint_id" {
-  value = module.aws_vpc_us_west_2.execute_api_vpc_endpoint_id
-}
+# output "aws_vpc_us_west_2_dynamodb_vpc_endpoint_id" {
+#   value = module.aws_vpc_us_west_2.dynamodb_vpc_endpoint_id
+# }
 
 output "terraform_cloud_iam_access_key_id" {
   value = aws_iam_access_key.terraform_cloud.id
