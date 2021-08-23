@@ -43,7 +43,7 @@ module "private_subnet_cidrs" {
     for az_name in slice(
       sort(data.aws_availability_zones.this.names), 0, max([
         local.eip_limit,
-        data.aws_availability_zones.this.names
+        length(data.aws_availability_zones.this.names)
       ])
     ) : { name = az_name, new_bits = 4 }
   ]
