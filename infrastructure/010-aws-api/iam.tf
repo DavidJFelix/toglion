@@ -87,17 +87,17 @@ data "aws_iam_policy_document" "lambda_dynamodb" {
       module.us_west_2_dynamodb_table.iam_policy_arns,
     )
 
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceVpce"
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceVpce"
 
-      values = [
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_dynamodb_vpc_endpoint_id,
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_dynamodb_vpc_endpoint_id,
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_dynamodb_vpc_endpoint_id,
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_dynamodb_vpc_endpoint_id,
-      ]
-    }
+#       values = [
+#         data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_dynamodb_vpc_endpoint_id,
+#         data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_dynamodb_vpc_endpoint_id,
+#         data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_dynamodb_vpc_endpoint_id,
+#         data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_dynamodb_vpc_endpoint_id,
+#       ]
+#     }
   }
 
   statement {
@@ -143,18 +143,6 @@ data "aws_iam_policy_document" "lambda_execute_api" {
     resources = [
       "*"
     ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceVpce"
-
-      values = [
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_1_execute_api_vpc_endpoint_id,
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_east_2_execute_api_vpc_endpoint_id,
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_1_execute_api_vpc_endpoint_id,
-        data.terraform_remote_state.aws_base.outputs.aws_vpc_us_west_2_execute_api_vpc_endpoint_id,
-      ]
-    }
   }
 }
 data "aws_iam_policy_document" "lambda_kms" {
