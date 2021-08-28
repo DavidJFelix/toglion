@@ -8,7 +8,7 @@ module "main_aws_acm_us_east_1" {
   route53_zone_id = aws_route53_zone.main.zone_id
 }
 
-module "main_aws_acm_us_east_1" {
+module "main_aws_acm_us_east_2" {
   source = "./modules/acm_domain"
   providers = {
     aws = aws.us_east_2
