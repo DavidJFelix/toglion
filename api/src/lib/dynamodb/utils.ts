@@ -22,13 +22,13 @@ export function parseKey(key: string): Key {
 export function encodeKeys(partitionKey: Key, sortKey?: Key): EncodedKey {
   return {
     PartitionKey: {
-      S: `${partitionKey.type}/${partitionKey.id}`,
+      S: stringifyKey(partitionKey),
     },
     SortKey: {
       S:
         sortKey !== undefined
-          ? `${sortKey.type}/${sortKey.id}`
-          : `${partitionKey.type}/${partitionKey.id}`,
+          ? stringifyKey(sortKey)
+          : stringifyKey(partitionKey),
     },
   }
 }
