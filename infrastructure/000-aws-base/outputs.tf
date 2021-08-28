@@ -125,3 +125,7 @@ output "github_serverless_iam_access_key_id" {
 output "github_serverless_encrypted_iam_secret_access_key" {
   value = aws_iam_access_key.github_serverless.encrypted_secret
 }
+
+output "main_domain_zone_id" {
+  value = aws_route53_zone.main.zone_id
+}
