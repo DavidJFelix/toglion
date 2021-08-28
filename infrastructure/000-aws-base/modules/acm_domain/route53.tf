@@ -13,4 +13,5 @@ resource "aws_route53_record" "this" {
   ttl             = 60
   type            = each.value.type
   zone_id         = var.route53_zone_id
+  tags            = merge(var.tags)
 }

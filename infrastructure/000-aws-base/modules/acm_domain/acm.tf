@@ -14,7 +14,7 @@ resource "aws_acm_certificate" "this" {
     "*.${var.domain_name}",
   ]
 
-  tags = merge(local.common_tags)
+  tags = merge(var.tags)
 
   validation_method = "DNS"
 }
