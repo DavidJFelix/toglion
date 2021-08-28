@@ -1,25 +1,39 @@
-
-resource "aws_acm_certificate" "main" {
-  domain_name = "${var.domain_name}"
-
-  options {
-    certificate_transparency_logging_preference = "ENABLED"
+module "main_aws_acm_us_east_1" {
+  source = "./modules/acm_domain"
+  providers = {
+    aws = aws.us_east_1
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  subject_alternative_names = [
-    "*.${var.domain_name}",
-  ]
-
-  tags = merge(local.common_tags)
-
-  validation_method = "DNS"
+  domain_name     = var.domain_name
+  route53_zone_id = aws_route53_zone.main.zone_id
 }
 
-resource "aws_acm_certificate_validation" "main" {
-  certificate_arn         = aws_acm_certificate.main.arn
-  validation_record_fqdns = [for record in aws_route53_record.main : record.fqdn]
+module "main_aws_acm_us_east_1" {
+  source = "./modules/acm_domain"
+  providers = {
+    aws = aws.us_east_2
+  }
+
+  domain_name     = var.domain_name
+  route53_zone_id = aws_route53_zone.main.zone_id
+}
+
+module "main_aws_acm_us_west_1" {
+  source = "./modules/acm_domain"
+  providers = {
+    aws = aws.us_west_1
+  }
+
+  domain_name     = var.domain_name
+  route53_zone_id = aws_route53_zone.main.zone_id
+}
+
+module "main_aws_acm_us_west_2" {
+  source = "./modules/acm_domain"
+  providers = {
+    aws = aws.us_west_2
+  }
+
+  domain_name     = var.domain_name
+  route53_zone_id = aws_route53_zone.main.zone_id
 }
