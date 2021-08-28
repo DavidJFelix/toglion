@@ -7,3 +7,9 @@ variable "route53_zone_id" {
   description = "The route53 zone to apply ACM domain validations to"
   type        = string
 }
+
+variable "tags" {
+  default     = {}
+  description = "Tags applied to the VPC resources"
+  type        = map
+}
