@@ -145,3 +145,7 @@ output "main_acm_certificate_us_west_1_arn" {
 output "main_acm_certificate_us_west_2_arn" {
   value = module.main_aws_acm_us_west_2.acm_certificate_arn
 }
+
+output "main_route53_zone_id" {
+  value = aws_route53_zone.main.zone_id
+}
