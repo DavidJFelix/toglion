@@ -12,7 +12,7 @@ module "us_east_1_serverless" {
   regional_dynamodb_table       = module.us_east_1_dynamodb_table.dynamodb_table_id
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_east_1.acm_certificate_arn
-  websocket_domain_name         = aws_route53_zone.websocket.domain_name
+  websocket_domain_name         = aws_route53_zone.websocket.fqdn
 }
 
 module "us_east_2_serverless" {
@@ -29,7 +29,7 @@ module "us_east_2_serverless" {
   regional_dynamodb_table       = module.us_east_2_dynamodb_table.dynamodb_table_id
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_east_2.acm_certificate_arn
-  websocket_domain_name         = aws_route53_zone.websocket.domain_name
+  websocket_domain_name         = aws_route53_zone.websocket.fqdn
 }
 
 module "us_west_1_serverless" {
@@ -46,7 +46,7 @@ module "us_west_1_serverless" {
   regional_dynamodb_table       = module.us_west_1_dynamodb_table.dynamodb_table_id
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_west_1.acm_certificate_arn
-  websocket_domain_name         = aws_route53_zone.websocket.domain_name
+  websocket_domain_name         = aws_route53_zone.websocket.fqdn
 }
 
 module "us_west_2_serverless" {
@@ -63,5 +63,5 @@ module "us_west_2_serverless" {
   regional_dynamodb_table       = module.us_west_2_dynamodb_table.dynamodb_table_id
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_west_2.acm_certificate_arn
-  websocket_domain_name         = aws_route53_zone.websocket.domain_name
+  websocket_domain_name         = aws_route53_zone.websocket.fqdn
 }
