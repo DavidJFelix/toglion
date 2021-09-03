@@ -3,14 +3,14 @@ data "aws_route53_zone" "main" {
 }
 
 resource "aws_route53_zone" "websocket" {
-  name = "wsapi.${data.aws_route53_zone.main.name}"
+  name = local.websocket_domain
 
   tags = merge(local.common_tags)
 }
 
 resource "aws_route53_record" "websocket_ns" {
   allow_overwrite = true
-  name            = "wsapi.${data.aws_route53_zone.main.name}"
+  name            = local.websocket_domain
   records         = aws_route53_zone.websocket.name_servers
   ttl             = 24 * 60 * 60
   type            = "NS"
