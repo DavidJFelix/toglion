@@ -35,3 +35,13 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "websocket_acm_certificate_arn" {
+  description = "ACM arn to use websocket custom domain name"
+  type        = string
+}
+
+variable "websocket_domain_name" {
+  description = "Domain name to use for websocket custom domain name"
+  type        = string
+}

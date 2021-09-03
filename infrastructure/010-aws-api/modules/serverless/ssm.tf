@@ -57,3 +57,20 @@ resource "aws_ssm_parameter" "regional_dynamodb_table" {
 
   tags = merge(var.tags)
 }
+
+
+resource "aws_ssm_parameter" "websocket_domain_name" {
+  name  = "/services/api/WEBSOCKET_DOMAIN_NAME"
+  type  = "String"
+  value = var.websocket_domain_name
+
+  tags = merge(var.tags)
+}
+
+resource "aws_ssm_parameter" "websocket_acm_certificate_arn" {
+  name  = "/services/api/REGIONAL_DYNAMODB_TABLE"
+  type  = "String"
+  value = var.websocket_acm_certificate_arn
+
+  tags = merge(var.tags)
+}

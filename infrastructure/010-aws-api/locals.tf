@@ -4,5 +4,5 @@ locals {
     Stack       = "010-aws-api"
     IsTerraform = "true"
   }
-  websocket_donain = "wsapi.${data.aws_route53_zone.main.name}"
+  websocket_domain = "wsapi.${data.aws_route53_zone.main.name}"
 }
