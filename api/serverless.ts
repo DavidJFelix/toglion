@@ -59,6 +59,20 @@ const serverlessConfiguration: AWS = {
     subscribe,
     onGlobalTableChange,
   },
+  resources: {
+    Resources: {
+      CustomDomainMapping: {
+        Type: 'AWS::ApiGateway::BasePathMapping',
+        Properties: {
+          DomainName: '${ssm:/services/api/WEBSOCKET_DOMAIN_NAME}',
+          RestApiId: {
+            Ref: 'WebsocketsApi',
+          },
+          Stage: '${opt:stage}',
+        },
+      },
+    },
+  },
 }
 
 module.exports = serverlessConfiguration
