@@ -13,6 +13,6 @@ resource "aws_route53_record" "websocket_api_gateway" {
   }
 
   latency_routing_policy {
-    region = data.aws_region.current
+    region = data.aws_region.current.name
   }
 }
