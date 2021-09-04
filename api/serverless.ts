@@ -62,10 +62,10 @@ const serverlessConfiguration: AWS = {
   resources: {
     Resources: {
       CustomDomainMapping: {
-        Type: 'AWS::ApiGateway::BasePathMapping',
+        Type: 'AWS::ApiGatewayV2::ApiMapping',
         Properties: {
           DomainName: '${ssm:/services/api/WEBSOCKET_DOMAIN_NAME}',
-          RestApiId: {
+          ApiId: {
             Ref: 'WebsocketsApi',
           },
           Stage: '${opt:stage}',
