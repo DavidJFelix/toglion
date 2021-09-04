@@ -1,8 +1,9 @@
-resource "aws_api_gateway_domain_name" "websocket" {
-  domain_name              = var.websocket_domain_name
-  regional_certificate_arn = var.websocket_acm_certificate_arn
+resource "aws_apigatewayv2_domain_name" "websocket" {
+  domain_name = var.websocket_domain_name
 
-  endpoint_configuration {
-    types = ["REGIONAL"]
+  domain_name_configuration {
+    certificate_arn = var.websocket_acm_certificate_arn
+    endpoint_type   = "REGIONAL"
+    security_policy = "TLS_1_2"
   }
 }
