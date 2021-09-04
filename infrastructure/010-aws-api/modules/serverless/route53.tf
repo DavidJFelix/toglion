@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 resource "aws_route53_record" "websocket_api_gateway" {
   allow_overwrite = true
   name            = var.websocket_domain_name
@@ -11,6 +13,6 @@ resource "aws_route53_record" "websocket_api_gateway" {
   }
 
   latency_routing_policy {
-
+    region = data.aws_region.current
   }
 }
