@@ -13,6 +13,7 @@ module "us_east_1_serverless" {
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_east_1.acm_certificate_arn
   websocket_domain_name         = local.websocket_domain
+  websocket_route53_zone_id     = aws_route53_zone.websocket.zone_id
 }
 
 module "us_east_2_serverless" {
@@ -30,6 +31,7 @@ module "us_east_2_serverless" {
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_east_2.acm_certificate_arn
   websocket_domain_name         = local.websocket_domain
+  websocket_route53_zone_id     = aws_route53_zone.websocket.zone_id
 }
 
 module "us_west_1_serverless" {
@@ -47,6 +49,7 @@ module "us_west_1_serverless" {
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_west_1.acm_certificate_arn
   websocket_domain_name         = local.websocket_domain
+  websocket_route53_zone_id     = aws_route53_zone.websocket.zone_id
 }
 
 module "us_west_2_serverless" {
@@ -64,4 +67,5 @@ module "us_west_2_serverless" {
   tags                          = merge(local.common_tags)
   websocket_acm_certificate_arn = module.main_aws_acm_us_west_2.acm_certificate_arn
   websocket_domain_name         = local.websocket_domain
+  websocket_route53_zone_id     = aws_route53_zone.websocket.zone_id
 }

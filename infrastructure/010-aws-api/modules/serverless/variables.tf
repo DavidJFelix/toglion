@@ -45,3 +45,8 @@ variable "websocket_domain_name" {
   description = "Domain name to use for websocket custom domain name"
   type        = string
 }
+
+variable "websocket_route53_zone_id" {
+  description = "The Route 53 Zone ID used for the websocket domain name"
+  type        = string
+}
