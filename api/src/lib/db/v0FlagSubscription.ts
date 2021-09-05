@@ -2,7 +2,6 @@ import {getConfig} from '@lib/config'
 import {client as dbClient} from '@lib/db/client'
 import {insert} from '@lib/dynamodb/insert'
 import {query} from '@lib/dynamodb/query'
-import {URL} from 'url'
 import {v0FlagSubscription, wsConnection} from './types'
 
 export interface V0FlagSubscription {
