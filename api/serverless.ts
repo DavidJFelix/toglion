@@ -39,7 +39,12 @@ const serverlessConfiguration: AWS = {
       GLOBAL_DYNAMODB_TABLE: '${ssm:/services/api/GLOBAL_DYNAMODB_TABLE}',
       REGIONAL_DYNAMODB_TABLE: '${ssm:/services/api/REGIONAL_DYNAMODB_TABLE}',
       WSAPI_GATEWAY_ENDPOINT: {
-        'Fn::GetAtt': ['WebsocketsApi', 'ApiEndpoint'],
+        'Fn::Join': [
+          {
+            'Fn::GetAtt': ['WebsocketsApi', 'ApiEndpoint'],
+          },
+          '/${opt:stage}',
+        ],
       },
     },
     lambdaHashingVersion: '20201221',
