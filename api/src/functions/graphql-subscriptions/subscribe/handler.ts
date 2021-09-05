@@ -122,7 +122,6 @@ export async function subscribeHandler(
               queryId: context.queryId,
               key,
               connectionId: context.connectionId,
-              endpoint: context.endpoint,
               awsRegion: context.awsRegion,
             })
             const flag = await getV0Flag({
@@ -150,6 +149,7 @@ export async function subscribeHandler(
     }
   } catch (error) {
     logger.info({message: 'in the catch', error: error ?? 'empty'})
+    throw error
   }
 }
 

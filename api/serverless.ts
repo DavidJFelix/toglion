@@ -38,6 +38,9 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       GLOBAL_DYNAMODB_TABLE: '${ssm:/services/api/GLOBAL_DYNAMODB_TABLE}',
       REGIONAL_DYNAMODB_TABLE: '${ssm:/services/api/REGIONAL_DYNAMODB_TABLE}',
+      WSAPI_GATEWAY_ENDPOINT: {
+        'Fn::GetAtt': ['WebsocketsApi', 'ApiEndpoint'],
+      },
     },
     lambdaHashingVersion: '20201221',
     vpc: {

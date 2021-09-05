@@ -17,13 +17,11 @@ export interface CreateV0FlagSubscriptionParams {
   key: string
   connectionId: string
   awsRegion: string
-  endpoint: string
 }
 export async function createV0FlagSubscription({
   key,
   awsRegion,
   connectionId,
-  endpoint,
 }: CreateV0FlagSubscriptionParams) {
   const config = getConfig()
   await insert({
@@ -40,7 +38,7 @@ export async function createV0FlagSubscription({
     value: {
       awsRegion,
       connectionId,
-      endpoint,
+      endpoint: config.websocketApiEndpoint,
     },
   })
 }

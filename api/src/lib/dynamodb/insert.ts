@@ -80,15 +80,16 @@ export async function insert<TOld = object, TNew = object>({
       options?.timeToLiveInSeconds === undefined ? ' REMOVE #TTL' : ''
     }`,
   })
-  return options?.upsert !== undefined && options.upsert
-    ? {
-        createdAt: new Date(response.Attributes.CreatedAt.S),
-        modifiedAt: new Date(response.Attributes.ModifiedAt.S),
-        isDeleted: response.Attributes.IsDeleted.BOOL,
-        value: JSON.parse(response.Attributes.RawValue.S),
-        deletedAt: response.Attributes.DeletedAt
-          ? new Date(response.Attributes.DeletedAt.S)
-          : undefined,
-      }
-    : undefined
+  if (options?.upsert !== undefined && options.upsert) {
+    return {
+      createdAt: new Date(response.Attributes!.CreatedAt.S!),
+      modifiedAt: new Date(response.Attributes!.ModifiedAt.S!),
+      isDeleted: response.Attributes!.IsDeleted.BOOL!,
+      value: JSON.parse(response.Attributes!.RawValue.S!),
+      deletedAt: response.Attributes!.DeletedAt
+        ? new Date(response.Attributes!.DeletedAt.S!)
+        : undefined,
+    }
+  }
+  return
 }
