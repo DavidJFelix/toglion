@@ -40,10 +40,13 @@ const serverlessConfiguration: AWS = {
       REGIONAL_DYNAMODB_TABLE: '${ssm:/services/api/REGIONAL_DYNAMODB_TABLE}',
       WSAPI_GATEWAY_ENDPOINT: {
         'Fn::Join': [
-          {
-            'Fn::GetAtt': ['WebsocketsApi', 'ApiEndpoint'],
-          },
-          '/${opt:stage}',
+          '/',
+          [
+            {
+              'Fn::GetAtt': ['WebsocketsApi', 'ApiEndpoint'],
+            },
+            '${opt:stage}',
+          ],
         ],
       },
     },
