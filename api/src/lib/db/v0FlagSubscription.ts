@@ -38,7 +38,7 @@ export async function createV0FlagSubscription({
     value: {
       awsRegion,
       connectionId,
-      endpoint: config.websocketApiEndpoint,
+      endpoint: config.websocketApiEndpoint.replace(/^wss/, 'https'),
     },
   })
 }
