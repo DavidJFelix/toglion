@@ -18,7 +18,7 @@ const defaultFlags: FeatureFlag[] = [
   },
 ]
 
-const IndexPage = () => {
+function IndexPage() {
   const [flags, setFlags] = useState(defaultFlags)
 
   const onFlagToggle = (id: string) => {
