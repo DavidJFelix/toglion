@@ -15,7 +15,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         ? req.query.scopes.split(',')
         : ['user:email'],
     allowSignup: req.query.allowSignup === 'true' ? true : false,
-    redirectUrl: (req.query.redirectUrl as string | undefined) || '/',
+    redirectUrl:
+      (req.query.redirectUrl as string | undefined) ||
+      `${config.hostname}/api/auth/github/callback`,
   })
 
   res.writeHead(302, {location: url})

@@ -1,4 +1,5 @@
-import {Box, Heading} from '@chakra-ui/react'
+import NextLink from 'next/link'
+import {Box, Heading, Link as ChakraLink} from '@chakra-ui/react'
 import {FeatureFlag} from '@toglion/types'
 import {useState} from 'react'
 import {FeatureFlagsList} from '../components/FeatureFlagsList'
@@ -43,6 +44,9 @@ function IndexPage() {
     <Box maxW="lg">
       <Heading>Feature Flags</Heading>
       <FeatureFlagsList flags={flags} onToggle={onFlagToggle} />
+      <NextLink href="/test-auth" passHref>
+        <ChakraLink>Auth n stuff</ChakraLink>
+      </NextLink>
     </Box>
   )
 }
