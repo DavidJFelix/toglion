@@ -7,7 +7,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const oauth2Client = new google.auth.OAuth2(
     config.google.clientId,
     config.google.clientSecret,
-    'http://localhost:3000/api/auth/google/callback',
+    `${config.hostname}/api/auth/google/callback`,
   )
 
   const scopes = [
