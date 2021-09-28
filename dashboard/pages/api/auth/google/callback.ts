@@ -12,7 +12,7 @@ export default async function CallbackHandler(
   const oauth2Client = new google.auth.OAuth2(
     config.google.clientId,
     config.google.clientSecret,
-    'http://localhost:3000/api/auth/google/callback',
+    `${config.hostname}/api/auth/google/callback`,
   )
 
   const {tokens} = await oauth2Client.getToken(req.query.code as string)
