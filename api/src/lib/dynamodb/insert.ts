@@ -1,53 +1,68 @@
-import {DynamoDBParams, Entry, InsertOrUpdateOptions, Key} from './types'
+import {UpdateItemCommandInput} from '@aws-sdk/client-dynamodb'
+import {
+  generateExpressionAttributeNames,
+  generateExpressionAttributeValueBooleans,
+  generateExpressionAttributeValueStrings,
+} from '.'
+import {
+  DynamoDBClientParams,
+  DynamoDBTableNameParams,
+  Entry,
+  InsertOrUpdateOptions,
+  Key,
+} from './types'
 import {encodeKeys} from './utils'
 
-export interface InsertParams<T> extends DynamoDBParams {
+export interface GenerateInsertParams<T extends object>
+  extends DynamoDBTableNameParams {
   key: Key
   sortKey?: Key
   value: T
   options?: InsertOrUpdateOptions
 }
-export async function insert<TOld = object, TNew = object>({
-  client,
+export function generateInsert<T extends object = object>({
   tableName,
   key,
   sortKey,
   value,
   options,
-}: InsertParams<TNew>): Promise<Entry<TOld> | void> {
+}: GenerateInsertParams<T>): UpdateItemCommandInput {
   const now = new Date()
   const utcSecondsSinceEpoch =
     Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
-  const response = await client.updateItem({
+  return {
     TableName: tableName,
     ConditionExpression:
       options?.upsert !== undefined && options.upsert
         ? undefined
-        : 'attribute_not_exists(PartitionKey)',
+        : 'attribute_not_exists(#PartitionKey)',
     ReturnValues:
       options?.upsert !== undefined && options.upsert ? 'ALL_OLD' : undefined,
     Key: encodeKeys(key, sortKey),
     ExpressionAttributeNames: {
-      '#RawValue': 'RawValue',
-      '#CreatedAt': 'CreatedAt',
-      '#ModifiedAt': 'ModifiedAt',
+      ...generateExpressionAttributeNames(
+        'CreatedAt',
+        'IsDeleted',
+        'ModifiedAt',
+        'PartitionKey',
+        'RawValue',
+        'TTL',
+      ),
       ...(options?.deletedAt !== undefined ||
       (options?.isDeleted !== undefined && options.isDeleted)
         ? {'#DeletedAt': 'DeletedAt'}
         : {}),
-      '#IsDeleted': 'IsDeleted',
-      '#TTL': 'TTL',
     },
     ExpressionAttributeValues: {
-      ':RawValue': {
-        S: JSON.stringify(value),
-      },
-      ':CreatedAt': {
-        S: options?.createdAt?.toISOString() ?? now.toISOString(),
-      },
-      ':ModifiedAt': {
-        S: options?.modifiedAt?.toISOString() ?? now.toISOString(),
-      },
+      ...generateExpressionAttributeValueStrings(
+        ['CreatedAt', (options?.createdAt ?? now).toISOString()],
+        ['ModifiedAt', (options?.modifiedAt ?? now).toISOString()],
+        ['RawValue', JSON.stringify(value)],
+      ),
+      ...generateExpressionAttributeValueBooleans([
+        'IsDeleted',
+        options?.isDeleted ?? false,
+      ]),
       ...(options?.deletedAt !== undefined
         ? {
             ':DeletedAt': {
@@ -61,9 +76,6 @@ export async function insert<TOld = object, TNew = object>({
             },
           }
         : {}),
-      ':IsDeleted': {
-        BOOL: options?.isDeleted ?? false,
-      },
       ...(options?.timeToLiveInSeconds !== undefined
         ? {
             ':TTL': {
@@ -79,7 +91,18 @@ export async function insert<TOld = object, TNew = object>({
     }${options?.timeToLiveInSeconds !== undefined ? ', #TTL = :TTL' : ''}${
       options?.timeToLiveInSeconds === undefined ? ' REMOVE #TTL' : ''
     }`,
-  })
+  }
+}
+
+export interface InsertParams<T extends object>
+  extends DynamoDBClientParams,
+    GenerateInsertParams<T> {}
+export async function insert<
+  TOld extends object = object,
+  TNew extends object = object,
+>(params: InsertParams<TNew>): Promise<Entry<TOld> | void> {
+  const {client, options} = params
+  const response = await client.updateItem(generateInsert(params))
   if (options?.upsert !== undefined && options.upsert) {
     return {
       createdAt: new Date(response.Attributes!.CreatedAt.S!),

@@ -1,56 +1,59 @@
+import {UpdateItemCommandInput} from '@aws-sdk/client-dynamodb'
+import {
+  DynamoDBTableNameParams,
+  generateExpressionAttributeNameIf,
+  generateExpressionAttributeValueStrings,
+} from '.'
 import {DynamoDBParams, Entry, InsertOrUpdateOptions, Key} from './types'
-import {encodeKeys} from './utils'
+import {encodeKeys, generateExpressionAttributeNames} from './utils'
 
-export interface UpdateParams<T extends object> extends DynamoDBParams {
+export interface GenerateUpdateParams<T extends object>
+  extends DynamoDBTableNameParams {
   key: Key
   sortKey?: Key
   value: T
   options?: InsertOrUpdateOptions
 }
-export async function update<
-  TOld extends object = object,
-  TNew extends object = object,
->({
-  client,
+export function generateUpdate<T extends object = object>({
   tableName,
   key,
   sortKey,
-  options,
   value,
-}: UpdateParams<TNew>): Promise<Entry<TOld> | void> {
+  options,
+}: GenerateUpdateParams<T>): UpdateItemCommandInput {
   const now = new Date()
-  const upsert = options.upsert !== undefined && options.upsert
+  const upsert = options?.upsert
   const utcSecondsSinceEpoch =
     Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
-  const response = await client.updateItem({
+  return {
     TableName: tableName,
     ConditionExpression: upsert ? undefined : 'attribute_exists(PartitionKey)',
     ReturnValues: 'ALL_OLD',
     Key: encodeKeys(key, sortKey),
     ExpressionAttributeNames: {
-      '#RawValue': 'RawValue',
-      '#CreatedAt': 'CreatedAt',
-      '#ModifiedAt': 'ModifiedAt',
-      ...(options?.deletedAt !== undefined ||
-      (options?.isDeleted !== undefined && options.isDeleted)
-        ? {'#DeletedAt': 'DeletedAt'}
-        : {}),
-      '#IsDeleted': 'IsDeleted',
-      ...(options?.timeToLiveInSeconds !== undefined ||
-      (options?.upsert !== undefined && options.upsert)
-        ? {'#TTL': 'TTL'}
-        : {}),
+      ...generateExpressionAttributeNames(
+        'CreatedAt',
+        'IsDeleted',
+        'ModifiedAt',
+        'RawValue',
+      ),
+      ...generateExpressionAttributeNameIf(
+        'DeletedAt',
+        options?.deletedAt !== undefined ||
+          (options?.isDeleted !== undefined && options.isDeleted),
+      ),
+      ...generateExpressionAttributeNameIf(
+        'TTL',
+        options?.timeToLiveInSeconds !== undefined ||
+          (options?.upsert !== undefined && options.upsert),
+      ),
     },
     ExpressionAttributeValues: {
-      ':RawValue': {
-        S: JSON.stringify(value),
-      },
-      ':CreatedAt': {
-        S: options?.createdAt?.toISOString() ?? now.toISOString(),
-      },
-      ':ModifiedAt': {
-        S: options?.modifiedAt?.toISOString() ?? now.toISOString(),
-      },
+      ...generateExpressionAttributeValueStrings(
+        ['CreatedAt', (options?.createdAt ?? now).toISOString()],
+        ['ModifiedAt', (options?.modifiedAt ?? now).toISOString()],
+        ['RawValue', JSON.stringify(value)],
+      ),
       ...(options?.deletedAt !== undefined
         ? {
             ':DeletedAt': {
@@ -88,15 +91,29 @@ export async function update<
         ? ', REMOVE #TTL'
         : ''
     }`,
-  })
-  return options.upsert
+  }
+}
+
+export interface UpdateParams<T extends object> extends DynamoDBParams {
+  key: Key
+  sortKey?: Key
+  value: T
+  options?: InsertOrUpdateOptions
+}
+export async function update<
+  TOld extends object = object,
+  TNew extends object = object,
+>(params: UpdateParams<TNew>): Promise<Entry<TOld> | void> {
+  const {client, options} = params
+  const response = await client.updateItem(generateUpdate(params))
+  return options?.upsert
     ? {
-        createdAt: new Date(response.Attributes.CreatedAt.S),
-        modifiedAt: new Date(response.Attributes.ModifiedAt.S),
-        isDeleted: response.Attributes.IsDeleted.BOOL,
-        value: JSON.parse(response.Attributes.RawValue.S),
-        deletedAt: response.Attributes.DeletedAt
-          ? new Date(response.Attributes.DeletedAt.S)
+        createdAt: new Date(response.Attributes!.CreatedAt.S!),
+        modifiedAt: new Date(response.Attributes!.ModifiedAt.S!),
+        isDeleted: response.Attributes!.IsDeleted.BOOL!,
+        value: JSON.parse(response.Attributes!.RawValue.S!),
+        deletedAt: response.Attributes!.DeletedAt
+          ? new Date(response.Attributes!.DeletedAt.S!)
           : undefined,
       }
     : undefined

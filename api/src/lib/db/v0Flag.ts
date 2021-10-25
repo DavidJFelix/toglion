@@ -2,7 +2,7 @@ import {getConfig} from '@lib/config'
 import {client as dbClient} from '@lib/db/client'
 import {insert} from '@lib/dynamodb/insert'
 import {get} from '@lib/dynamodb/get'
-import {v0Flag, v0FlagSubscription} from './types'
+import {v0Flag} from './types'
 import {update} from '@lib/dynamodb'
 
 export interface V0Flag {
@@ -26,6 +26,11 @@ export async function createV0Flag({key, value}: CreateV0FlagParams) {
       value,
     },
   })
+}
+
+export interface CreateV0FlagAssociation {
+  v0FlagId: string
+  ownerOrganizationId: string
 }
 
 export interface GetV0FlagParams {
