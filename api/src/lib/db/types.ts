@@ -1,3 +1,8 @@
+export const emailUser = 'emailUser'
+export const githubUser = 'githubUser'
+export const googleUser = 'googleUser'
+export const organization = 'organization'
+export const user = 'user'
 export const v0Flag = 'v0Flag'
 export const v0FlagSubscription = 'v0FlagSubscription'
 export const wsConnection = 'wsConnection'

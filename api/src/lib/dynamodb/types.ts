@@ -1,9 +1,16 @@
 import type {AttributeValue, DynamoDB} from '@aws-sdk/client-dynamodb'
 
-export interface DynamoDBParams {
+export interface DynamoDBClientParams {
   client: DynamoDB
+}
+
+export interface DynamoDBTableNameParams {
   tableName: string
 }
+
+export interface DynamoDBParams
+  extends DynamoDBClientParams,
+    DynamoDBTableNameParams {}
 
 export interface Key {
   type: string
@@ -46,8 +53,14 @@ export interface TimeToLiveOptions {
 
 export interface InsertOrUpdateOptions
   extends SoftDeleteOptions,
-    TimeToLiveOptions {
-  createdAt?: Date
-  modifiedAt?: Date
+    TimeToLiveOptions,
+    Partial<TimeStampFields> {
   upsert?: boolean
+}
+
+export interface PutOptions
+  extends SoftDeleteOptions,
+    TimeToLiveOptions,
+    Partial<TimeStampFields> {
+  overwrite?: boolean
 }
