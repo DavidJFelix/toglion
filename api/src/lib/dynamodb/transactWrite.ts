@@ -1,15 +1,17 @@
 import {generateUpdate, GenerateUpdateParams} from './update'
 import {generateInsert, GenerateInsertParams} from './insert'
-import {DynamoDBParams} from './types'
+import {DynamoDBClientParams} from './types'
 import {Put, TransactWriteItem, Update} from '@aws-sdk/client-dynamodb'
 import {generatePut, GeneratePutParams} from './put'
+import {nanoid} from 'nanoid'
 
-export interface TransactWriteParams extends DynamoDBParams {
+export interface TransactWriteParams extends DynamoDBClientParams {
   hardDeletes?: []
   inserts?: GenerateInsertParams<object>[]
   puts?: GeneratePutParams<object>[]
   softDeletes?: []
   updates?: GenerateUpdateParams<object>[]
+  clientRequestToken?: string
 }
 export async function transactWrite(params: TransactWriteParams) {
   const {client, inserts, puts, updates} = params
@@ -25,6 +27,6 @@ export async function transactWrite(params: TransactWriteParams) {
 
   await client.transactWriteItems({
     TransactItems: [...transactInserts, ...transactPuts, ...transactUpdates],
-    ClientRequestToken: '',
+    ClientRequestToken: params.clientRequestToken ?? nanoid(),
   })
 }
