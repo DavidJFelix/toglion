@@ -9,7 +9,7 @@ import {
 import {stringifyKey} from '@lib/dynamodb/utils'
 import {chunk} from '@lib/util/chunk'
 
-interface SubjectOrResource {
+export interface SubjectOrResource {
   type: string
   id: string
 }
@@ -24,15 +24,20 @@ export interface Permission {
   resource: PermissionResource
 }
 
-function newSubjectOrResource(type: string, id: string): SubjectOrResource {
+export function newSubjectOrResource(
+  type: string,
+  id: string,
+): SubjectOrResource {
   return {
     type,
     id,
   }
 }
 
-export const newSubject = newSubjectOrResource
-export const newResource = newSubjectOrResource
+export const newSubject: (type: string, id: string) => PermissionSubject =
+  newSubjectOrResource
+export const newResource: (type: string, id: string) => PermissionResource =
+  newSubjectOrResource
 
 export function permissionToKey(
   permission: Permission,

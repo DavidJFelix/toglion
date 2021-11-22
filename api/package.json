@@ -42,7 +42,11 @@
     "webpack-node-externals": "^2.5.2"
   },
   "jest": {
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "moduleNameMapper": {
+      "^@functions/(.*)$": "<rootDir>/src/functions/$1",
+      "^@lib/(.*)$": "<rootDir>/src/lib/$1"
+    }
   },
   "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
   "license": "MIT"
