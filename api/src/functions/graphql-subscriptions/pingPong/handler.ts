@@ -3,14 +3,14 @@ import 'source-map-support/register'
 import {getConfig} from '@lib/config'
 import {DynamoDB} from '@aws-sdk/client-dynamodb'
 import {update} from '@lib/dynamodb/update'
-import {LoggingRecoveryMiddleware} from '@lib/middleware/loggingRecoveryMiddleware'
-import {TimingLogMiddleware} from '@lib/middleware/timingLogMiddleware'
+import {LoggingRecoveryMiddleware} from '@lib/faas/middlewares/loggingRecoveryMiddleware'
+import {TimingLogMiddleware} from '@lib/faas/middlewares/timingLogMiddleware'
 import {adaptFaasKitHandlerForLambda} from '@faaskit/adapter-aws-lambda'
 import {compose} from '@faaskit/core'
 import {
   APIGatewayProxyContext,
   APIGatewayWebsocketProxyMiddleware,
-} from '@lib/middleware/apiGatewayWebsocketProxyMiddleware'
+} from '@lib/faas/middlewares/apiGatewayWebsocketProxyMiddleware'
 
 export interface PingPongEvent {
   type: 'ping' | 'pong'
