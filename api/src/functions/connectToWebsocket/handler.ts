@@ -12,7 +12,7 @@ export const connectToWebsocket: APIGatewayProxyHandler = async (event) => {
   await insert({
     client,
     tableName: config.regionalDynamoDBTableName,
-    key: {id: event.requestContext.connectionId, type: 'wsConnection'},
+    key: {id: event.requestContext.connectionId!, type: 'wsConnection'},
     value: {},
     options: {timeToLiveInSeconds: 3600},
   })

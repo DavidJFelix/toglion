@@ -7,9 +7,9 @@ import {createV0FlagSubscription} from '@lib/db/v0FlagSubscription'
 import {
   APIGatewayProxyContext,
   APIGatewayWebsocketProxyMiddleware,
-} from '@lib/middleware/apiGatewayWebsocketProxyMiddleware'
-import {LoggingRecoveryMiddleware} from '@lib/middleware/loggingRecoveryMiddleware'
-import {TimingLogMiddleware} from '@lib/middleware/timingLogMiddleware'
+} from '@lib/faas/middlewares/apiGatewayWebsocketProxyMiddleware'
+import {LoggingRecoveryMiddleware} from '@lib/faas/middlewares/loggingRecoveryMiddleware'
+import {TimingLogMiddleware} from '@lib/faas/middlewares/timingLogMiddleware'
 
 import {
   graphql,

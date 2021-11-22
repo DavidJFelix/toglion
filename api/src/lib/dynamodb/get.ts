@@ -16,9 +16,9 @@ export async function get<T = object>({
     Key: encodeKeys(key, sortKey),
   })
   return {
-    createdAt: new Date(response.Item.CreatedAt.S),
-    modifiedAt: new Date(response.Item.ModifiedAt.S),
-    isDeleted: response.Item.IsDeleted.BOOL,
-    value: JSON.parse(response.Item.RawValue.S),
+    createdAt: new Date(response.Item!.CreatedAt.S!),
+    modifiedAt: new Date(response.Item!.ModifiedAt.S!),
+    isDeleted: response.Item!.IsDeleted.BOOL!,
+    value: JSON.parse(response.Item!.RawValue.S!),
   }
 }

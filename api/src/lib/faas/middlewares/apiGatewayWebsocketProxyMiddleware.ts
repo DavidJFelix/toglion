@@ -17,7 +17,7 @@ export function APIGatewayWebsocketProxyMiddleware<
   return async (event, context) => {
     logger.info({event})
     try {
-      const result = await next(JSON.parse(event.body) as TNextEvent, {
+      const result = await next(JSON.parse(event.body ?? '') as TNextEvent, {
         ...context,
         APIGatewayWebsocketProxy: event,
       })

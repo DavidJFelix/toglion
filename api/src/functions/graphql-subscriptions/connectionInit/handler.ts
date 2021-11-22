@@ -8,9 +8,9 @@ import {update} from '@lib/dynamodb/update'
 import {
   APIGatewayProxyContext,
   APIGatewayWebsocketProxyMiddleware,
-} from '@lib/middleware/apiGatewayWebsocketProxyMiddleware'
-import {LoggingRecoveryMiddleware} from '@lib/middleware/loggingRecoveryMiddleware'
-import {TimingLogMiddleware} from '@lib/middleware/timingLogMiddleware'
+} from '@lib/faas/middlewares/apiGatewayWebsocketProxyMiddleware'
+import {LoggingRecoveryMiddleware} from '@lib/faas/middlewares/loggingRecoveryMiddleware'
+import {TimingLogMiddleware} from '@lib/faas/middlewares/timingLogMiddleware'
 
 export interface ConnectionInitEvent {
   type: 'connection_init'

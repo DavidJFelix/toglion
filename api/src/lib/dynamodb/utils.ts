@@ -13,18 +13,18 @@ export function createAssociationKey({
   relation,
   subject,
 }: CreateAssociationKeyParams) {
-  return [owner, relation, subject].join('/')
+  return [owner, relation, subject].join('#')
 }
 
 export function stringifyKey(key: Key): string {
-  return `${key.type}/${key.id}`
+  return `${key.type}#${key.id}`
 }
 
 export function parseKey(key: string): Key {
-  const keyParts = key.split('/')
+  const keyParts = key.split('#')
   if (keyParts.length !== 2) {
     throw new InvalidKeyStringError(
-      `Incorrect number of key parts: ${keyParts.length}; key: ${key}; must contain 1 "/" between 2 parts`,
+      `Incorrect number of key parts: ${keyParts.length}; key: ${key}; must contain 1 "#" between 2 parts`,
     )
   }
   return {
