@@ -25,6 +25,8 @@
   },
   "devDependencies": {
     "@serverless/typescript": "^2.23.0",
+    "@swc/cli": "^0.1.51",
+    "@swc/core": "^1.2.111",
     "@tsconfig/recommended": "^1.0.1",
     "@types/aws-lambda": "^8.10.71",
     "@types/jest": "^26.0.24",
