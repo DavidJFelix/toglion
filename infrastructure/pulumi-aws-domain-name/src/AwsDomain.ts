@@ -3,10 +3,8 @@ import {
   ComponentResourceOptions,
   Input,
   Inputs,
-  ProviderResource,
 } from '@pulumi/pulumi'
 import {acm, Provider, Region, route53} from '@pulumi/aws'
-import {input} from '@pulumi/aws/types'
 
 const commonTags = {
   IacType: 'Pulumi',
