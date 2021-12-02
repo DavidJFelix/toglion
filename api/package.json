@@ -20,13 +20,13 @@
     "graphql": "^15.5.1",
     "nanoid": "^3.1.30",
     "source-map-support": "^0.5.19",
-    "ts-jest": "^27.0.7",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "@serverless/typescript": "^2.23.0",
     "@swc/cli": "^0.1.51",
     "@swc/core": "^1.2.111",
+    "@swc/jest": "^0.2.10",
     "@tsconfig/recommended": "^1.0.1",
     "@types/aws-lambda": "^8.10.71",
     "@types/jest": "^26.0.24",
@@ -44,7 +44,11 @@
     "webpack-node-externals": "^2.5.2"
   },
   "jest": {
-    "preset": "ts-jest",
+    "transform": {
+      "^.+\\.(t|j)sx?$": [
+        "@swc/jest"
+      ]
+    },
     "moduleNameMapper": {
       "^@functions/(.*)$": "<rootDir>/src/functions/$1",
       "^@lib/(.*)$": "<rootDir>/src/lib/$1"
