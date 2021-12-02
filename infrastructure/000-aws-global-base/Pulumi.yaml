@@ -1,0 +1,3 @@
+name: 000-pulumi-aws-base
+runtime: nodejs
+description: A minimal AWS TypeScript Pulumi program
