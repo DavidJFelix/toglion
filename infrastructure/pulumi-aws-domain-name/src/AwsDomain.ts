@@ -20,9 +20,9 @@ export interface AwsDomainInputs extends Inputs {
 
 export class AwsDomain extends ComponentResource {
   readonly zone: route53.Zone
-  readonly validationRecords: Partial<Record<Region, route53.Record[]>>
-  readonly certificates: Partial<Record<Region, acm.Certificate>>
-  readonly validations: Partial<Record<Region, acm.CertificateValidation>>
+  readonly validationRecords: Partial<Record<Region, route53.Record[]>> = {}
+  readonly certificates: Partial<Record<Region, acm.Certificate>> = {}
+  readonly validations: Partial<Record<Region, acm.CertificateValidation>> = {}
 
   constructor(
     name: string,
@@ -37,10 +37,6 @@ export class AwsDomain extends ComponentResource {
       name: domainName,
       tags: {...commonTags, ...tags},
     })
-
-    this.certificates = {}
-    this.validationRecords = {}
-    this.validations = {}
 
     regions.forEach((region) => {
       const provider = new Provider(`provider=${region}`, {region})
