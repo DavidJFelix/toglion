@@ -1,2 +1,11 @@
 config:
+  000-aws-global-base:data:
+    domainName: toglion.com
+    tags:
+      Application: 000-aws-global-base
+      Environment: Production-main
+      IsCloudFormation: "False"
+      IsManual: "False"
+      IsPulumi: "True"
+      IsTerraform: "False"
   aws:region: us-east-1
