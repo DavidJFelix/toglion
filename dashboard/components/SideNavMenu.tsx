@@ -1,3 +1,4 @@
+import React from 'react'
 import {Flex, Icon, VStack} from '@chakra-ui/react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'
@@ -26,7 +27,7 @@ export function SideNavMenu() {
       p={3}
     >
       {routes.map(({icon, path, title}) => (
-        <Link key={title} href={path}>
+        <Link key={title} href={path} passHref>
           <Flex
             as="a"
             width={14}
