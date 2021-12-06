@@ -7,13 +7,14 @@ import {
   DrawerHeader,
   DrawerOverlay,
   Flex,
+  Icon,
   IconButton,
   Image,
   useDisclosure,
-  VStack,
 } from '@chakra-ui/react'
 import {HiMenu} from 'react-icons/hi'
 import React, {ReactNode} from 'react'
+import {SideNavMenu} from '../SideNavMenu'
 
 export interface AppShellProps {
   children?: ReactNode
@@ -55,30 +56,14 @@ export function AppShell({children}: AppShellProps) {
                 md: 'none',
               }}
               mr={4}
-              icon={<Box as={HiMenu} size={24} />}
+              icon={<Icon as={HiMenu} w={6} h={6} />}
               onClick={onOpen}
               colorScheme="orange"
             />
           </Flex>
         </Flex>
         <Flex flex="1 1 0">
-          <VStack
-            aria-label="Side Navigation Bar"
-            as="nav"
-            width={20}
-            display={{
-              base: 'none',
-              md: 'flex',
-            }}
-            backgroundColor="gray.800"
-            spacing={4}
-            p={4}
-          >
-            <Box width={12} height={12} backgroundColor="orange.400" />
-            <Box width={12} height={12} backgroundColor="orange.400" />
-            <Box width={12} height={12} backgroundColor="orange.400" />
-            <Box width={12} height={12} backgroundColor="orange.400" />
-          </VStack>
+          <SideNavMenu />
           <Box flex="1 1 0" backgroundColor="gray.50" p={6}>
             {children}
           </Box>

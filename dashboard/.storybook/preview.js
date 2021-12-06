@@ -1,7 +1,8 @@
+import {INITIAL_VIEWPORTS} from '@storybook/addon-viewport'
 import {ChakraProvider} from '@chakra-ui/react'
-import {StoryContext} from '@storybook/react'
+import {RouterContext} from 'next/dist/shared/lib/router-context'
 
-const withChakra = (StoryFn: Function, context: StoryContext) => {
+const withChakra = (StoryFn, context) => {
   return (
     <ChakraProvider>
       <StoryFn />
@@ -18,5 +19,11 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+  },
+  nextRouter: {
+    Provider: RouterContext.Provider,
+  },
+  viewport: {
+    viewports: INITIAL_VIEWPORTS,
   },
 }

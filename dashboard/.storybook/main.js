@@ -4,7 +4,11 @@ const toPath = (_path) => path.join(process.cwd(), '..', _path)
 
 module.exports = {
   stories: ['../**/*.stories.mdx', '../**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    'storybook-addon-next-router',
+  ],
   features: {
     previewCsfV3: true,
   },

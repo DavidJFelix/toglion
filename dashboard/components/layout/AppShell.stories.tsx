@@ -24,6 +24,11 @@ export default {
   },
 }
 
-export const Empty = {
-  args: {},
+export const Empty = () => <BlankAppShell />
+Empty.story = {
+  parameters: {
+    nextRouter: {
+      pathname: '/flags',
+    },
+  },
 }
