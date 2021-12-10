@@ -1,0 +1,3 @@
+name: 001-aws-regional-base
+runtime: nodejs
+description: AWS account regional setup
