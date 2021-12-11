@@ -1,0 +1,10 @@
+config:
+  001-aws-regional-base:data:
+    tags:
+      Application: 001-aws-regional-base
+      Environment: Production-main
+      IsCloudFormation: "False"
+      IsManual: "False"
+      IsPulumi: "True"
+      IsTerraform: "False"
+  aws:region: us-west-2
