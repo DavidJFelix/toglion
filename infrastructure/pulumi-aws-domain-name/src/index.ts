@@ -1,1 +1,0 @@
-export {AwsDomain} from './AwsDomain'

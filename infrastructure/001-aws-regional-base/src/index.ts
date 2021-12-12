@@ -1,12 +1,26 @@
-import {Config, getProject, getStack} from '@pulumi/pulumi'
-import {kms, s3} from '@pulumi/aws'
+import {
+  Config,
+  getProject,
+  getStack,
+  Output,
+  StackReference,
+} from '@pulumi/pulumi'
+import {acm, kms, route53, s3} from '@pulumi/aws'
 
-interface AWSBaseData {
+// Manage configuration
+interface ConfigData {
+  globalBaseStackName: string
   tags: Record<string, string>
 }
 
 const config = new Config()
-const {tags} = config.requireObject<AWSBaseData>('data')
+const {globalBaseStackName, tags} = config.requireObject<ConfigData>('data')
+
+// Get cross-stack outputs
+const other = new StackReference(globalBaseStackName)
+const route53MainZone = other.getOutput(
+  'route53MainZone',
+) as Output<route53.Zone>
 
 // We'll use this key for lambda deployment including source encryption
 // as well as env variable encryption
@@ -59,4 +73,41 @@ export const lambdaDeploymentBucket = new s3.Bucket('lambda-deployment', {
   versioning: {
     enabled: true,
   },
+})
+
+// ACM certificate
+export const acmMainCertificate = new acm.Certificate('main', {
+  domainName: route53MainZone.name,
+  options: {
+    certificateTransparencyLoggingPreference: 'ENABLED',
+  },
+  subjectAlternativeNames: [route53MainZone.apply(({name}) => `*.${name}`)],
+  tags: {...tags},
+  validationMethod: 'DNS',
+})
+
+export const route53ValidationRecords =
+  acmMainCertificate.domainValidationOptions.apply((dvos) =>
+    dvos.map(
+      (dvo) =>
+        new route53.Record(
+          `main-${dvo.domainName}-${dvo.resourceRecordName}`,
+          {
+            allowOverwrite: true,
+            name: dvo.resourceRecordName,
+            records: [dvo.resourceRecordValue],
+            ttl: 60,
+            type: dvo.resourceRecordType,
+            zoneId: route53MainZone.id,
+          },
+          {deleteBeforeReplace: true},
+        ),
+    ),
+  )
+
+export const acmMainValidation = new acm.CertificateValidation('main', {
+  certificateArn: acmMainCertificate.arn,
+  validationRecordFqdns: route53ValidationRecords.apply((records) =>
+    records.map(({fqdn}) => fqdn),
+  ),
 })

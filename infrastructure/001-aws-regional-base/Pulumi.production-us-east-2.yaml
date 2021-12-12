@@ -1,5 +1,6 @@
 config:
   001-aws-regional-base:data:
+    globalBaseStackName: 'DavidJFelix/000-aws-global-base/production-main'
     tags:
       Application: 001-aws-regional-base
       Environment: Production-main
