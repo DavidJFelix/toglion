@@ -78,3 +78,22 @@ export const route53MainZone = new route53.Zone('main', {
     Description: 'Zone used by Toglion to host the application',
   },
 })
+
+//Vercel Settings
+export const route53WwwCnameRecord = new route53.Record('www-cname-main', {
+  allowOverwrite: true,
+  name: 'www',
+  records: ['cname.vercel-dns.com'],
+  ttl: 300,
+  type: 'CNAME',
+  zoneId: route53MainZone.id,
+})
+
+export const route53BareRecord = new route53.Record('bare-main', {
+  allowOverwrite: true,
+  name: '',
+  records: ['76.76.21.21'],
+  ttl: 300,
+  type: 'A',
+  zoneId: route53MainZone.id,
+})
