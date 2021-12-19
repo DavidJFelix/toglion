@@ -1,0 +1,1227 @@
+openapi: 3.0.0
+info:
+  title: toglion
+  version: 'RFC'
+tags:
+  - name: '405-error'
+    description: |
+      <SchemaDefinition schemaRef="#/components/responses/401" showReadOnly={true} showWriteOnly={true} />
+  - name: '429-error'
+    description: |
+      <SchemaDefinition schemaRef="#/components/responses/401" showReadOnly={true} showWriteOnly={true} />
+x-tagGroups:
+  - name: Auth
+    tags:
+      - api-keys
+  - name: Audit Logs
+    tags:
+      - audit-logs
+  - name: Organizations
+    tags:
+      - bulk-organization
+      - organizations
+      - organizations-api-keys
+      - organizations-audit-logs
+      - organizations-flags
+      - organizations-groups
+      - organizations-members
+      - organizations-tags
+  - name: Flags
+    tags:
+      - flags
+      - organizations-flags
+  - name: Users
+    tags:
+      - users
+  - name: Errors
+    tags:
+      - '405-error'
+      - '429-error'
+
+paths:
+  # '/admin/audit-logs':
+    # delete:
+    # post:
+    # put:
+  # '/admin/audit-logs/{auditLogId}':
+    # delete:
+    # patch:
+    # put:
+  # '/admin/auth/assume-role':
+    # post:
+  # '/admin/organizations':
+    # delete:
+    # post:
+    # put:
+  # '/admin/organizations/{organizationId}/api-keys':
+    # delete:
+    # put:
+  # '/admin/organizations/{organizationId}/flags':
+    # delete:
+    # put:
+  # '/admin/organizations/{organizationId}/groups':
+    # delete:
+    # put:
+  # '/admin/organizations/{organizationId}/members':
+    # delete:
+    # put:
+  # '/admin/organizations/{organizationId}/payments':
+    # delete:
+    # put:
+  # '/admin/organizations/{organizationId}/payments/{paymentId}':
+    # delete:
+  # '/admin/organizations/{organizationId}/tags':
+    # delete:
+    # put:
+  # '/admin/payment-plans':
+    # delete:
+    # post:
+    # put:
+  # '/admin/payment-plan/{paymentPlanId}':
+    # delete:
+    # patch:
+    # put:
+  # '/admin/users':
+    # delete:
+    # put:
+  # '/admin/users/{userId}/api-keys':
+    # put:
+  '/audit-logs':
+    get:
+      description: |
+        List all `AuditLog` entries that the logged in `User` has access to.
+        This endpoint is paginated and shows entries for all `Organizations` with which the logged in `User` has `AuditLog` `Permissions` to `read`.
+      summary: 'List Audit Log entries'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          description: ''
+      tags:
+        - audit
+  '/audit-logs/{auditLogId}':
+    parameters:
+      - '$ref': '#/components/parameters/auditLogId'
+    get:
+      description: |
+        Get an `AuditLog` entry by its identifier to allow for deep linking to audit log entries.
+      summary: 'Get Audit Log entry by ID'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          description: ''
+      tags:
+        - audit
+  # '/auth/github-login'
+  # '/auth/google-login'
+  '/bulk/organizations/{organizationId}/api-keys':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    post:
+      description: |
+        Perform a bulk operation on multiple `APIKeys` at one time.
+        All operations will fail if any individual operation fails.
+        The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `APIKeys` to perform the corresponding operation through a bulk operation.
+      summary: 'Bulk Update APIKeys for an Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+            - 'organization/{organizationId}:read'
+            - 'organization/{organizationId}/apiKeys:create'
+            - 'organization/{organizationId}/apiKeys:delete'
+            - 'organization/{organizationId}/apiKeys:update'
+            - 'organization/{organizationId}/apiKeys:read'
+            - 'organization/{organizationId}/apiKeys/{apiKeyId}:delete'
+            - 'organization/{organizationId}/apiKeys/{apiKeyId}:update'
+            - 'organization/{organizationId}/apiKeys/{apiKeyId}:read'
+      tags:
+        - bulk-organization
+  '/bulk/organizations/{organizationId}/flags':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    post:
+      description: |
+        Perform a bulk operation on multiple `Flags` at one time.
+        All operations will fail if any individual operation fails.
+        The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `Flags` to perform the corresponding operation through a bulk operation.
+      summary: 'Bulk Update Flags for an Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+            - 'organization/{organizationId}:read'
+            - 'organization/{organizationId}/flags:create'
+            - 'organization/{organizationId}/flags:delete'
+            - 'organization/{organizationId}/flags:update'
+            - 'organization/{organizationId}/flags:read'
+            - 'organization/{organizationId}/flags/{flagId}:delete'
+            - 'organization/{organizationId}/flags/{flagId}:update'
+            - 'organization/{organizationId}/flags/{flagId}:read'
+      tags:
+        - bulk-organization
+  '/bulk/organizations/{organizationId}/groups':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    post:
+      description: |
+        Perform a bulk operation on multiple `Permission` `Groups` at one time. |
+        All operations will fail if any individual operation fails. |
+        The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `Groups` to perform the corresponding operation through a bulk operation.
+      summary: 'Bulk Update Groups for an Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - bulk-organization
+  '/bulk/organizations/{organizationId}/members':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    post:
+      description: |
+        Perform a bulk operation on multiple members `Users` at one time. |
+        All operations will fail if any individual operation fails. |
+        The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` member `Users` to perform the corresponding operation through a bulk operation.
+      summary: 'Bulk Update Member Users for an Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - bulk-organization
+  '/bulk/organizations/{organizationId}/tags':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    post:
+      description: |
+        Perform a bulk operation on multiple `Tags` at one time. |
+        All operations will fail if any individual operation fails. |
+        The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `Tags` to perform the corresponding operation through a bulk operation.
+      summary: 'Bulk Update Tags for an Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - bulk-organization
+  '/organizations':
+    get:
+      description: |
+        List all `Organizations` that the logged in `User` is a member of. |
+        This endpoint is paginated and shows all `Organizations` which the logged in `User` owns or is a member of, with any `Permissions`
+      summary: List Organizations
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+      tags:
+        - organizations
+    post:
+      description: |
+        Create a new `Organization` and assign the logged in `User` to be the owner.
+        This creates a handful of additional `Permissions`, ` and `Tags` automatically for the new `Organization` 
+      summary: Create Organization
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - organizations
+  '/organizations/{organizationId}':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    delete:
+      description: |
+        Delete an `Organization` and all associated resources including `Permissions`, `Tags` and `V0Flags`. |
+        The logged in `User` must be the owner of the `Organization` as there is no `delete` `Permission` for `Organizations`. 
+      summary: 'Delete Organization'
+      responses:
+        '204':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '429':
+          description: ''
+      tags:
+        - organizations
+    get:
+      description: |
+        List all `Permissions` on the `Organization`. |
+        This endpoint is paginated and only returns successfully if the logged in `User` has `Permission` to `read` or `create` the `Organization`'s `Permissions`
+      summary: "List an Organization's permissions"
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          description: ''
+      tags:
+        - organizations
+    patch:
+      description: |
+        Partially update an `Organization` with some fields that will be updated. |
+        Omitted fields will be kept "as-is". |
+        The logged in `User` must have `Permissions` for the updated fields.
+      summary: 'Partially update Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - organizations
+    put:
+      description: |
+        Fully Update an `Organization` with some fields that will be updated. |
+        Omitted fields are not allowed unless the field is nullable. Omitting a field will nullify the field. |
+        The logged in `User` must have `Permissions` for any updated fields. |
+        A field that is the same value is not considered updated.
+      summary: 'Update Organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - organizations
+  '/organizations/{organizationId}/audit-logs/':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+      description: |
+        List all `AuditLog` entries for an `Organization`. |
+        This endpoint is paginated and 
+      summary: 'List audit log entries for an organization'
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          description: ''
+      tags:
+        - audit
+        - organizations
+  '/organizations/{organizationId}/api-keys':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+      description: |
+        List `APIKeys` for the `Organization`.
+        Must have `read` `Permission` for `APIKeys` on the `Organization`
+      summary: List APIKeys for an Organization
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - apiKeys
+        - organizations
+    post:
+      description: |
+        Create an `APIKey` for the `Organization` which can be given access like any `User`
+      summary: Create APIKey for an Organization
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+        '422':
+          description: ''
+        '429':
+          description: ''
+      tags:
+        - apiKeys
+        - organizations
+  '/organizations/{organizationId}/api-keys/{apiKeyId}':
+    parameters:
+      - '$ref': '#/components/parameters/apiKeyId'
+      - '$ref': '#/components/parameters/organizationId'
+    delete:
+      description: |
+        Delete an `APIKey` for an `Organization`
+      summary: Delete APIKey for an Organization
+      responses:
+        '204':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '415':
+          description: ''
+      tags:
+        - organizations
+    get:
+      parameters:
+        - '$ref': '#/components/parameters/apiKeyId'
+        - '$ref': '#/components/parameters/organizationId'
+      description: |
+        Get an APIKey for an `Organization` by ID
+      summary: Get APIKey for an Organization by ID
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          description: ''
+      tags:
+        - organizations
+    patch:
+    put:
+  '/organizations/{organizationId}/flags':
+    get:
+    post:
+  '/organizations/{organizationId}/flags/{flagId}':
+    parameters:
+      - '$ref': '#/components/parameters/flagId'
+      - '$ref': '#/components/parameters/organizationId'
+    delete:
+    get:
+    patch:
+    put:
+  '/organizations/{organizationId}/groups':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+    post:
+      description: ''
+      summary: Create a Permission Group
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+  '/organizations/{organizationId}/groups/{groupId}':
+    parameters:
+      - '$ref': '#/components/parameters/groupId'
+      - '$ref': '#/components/parameters/organizationId'
+    delete:
+    get:
+    patch:
+    put:
+  '/organizations/{organizationId}/members':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+    post:
+      description: ''
+      summary: Create a Permission Group
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+  '/organizations/{organizationId}/members/{userId}':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+      - '$ref': '#/components/parameters/userId'
+    delete:
+    get:
+    patch:
+    put:
+  '/organizations/{organizationId}/payment-plan':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+    patch:
+    put:
+  '/organizations/{organizationId}/payments':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+    post:
+  '/organizations/{organizationId}/payments/{paymentId}':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+      - '$ref': '#/components/parameters/paymentId'
+    get:
+    patch:
+    put:
+  '/organizations/{organizationId}/tags':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+    get:
+    post:
+      description: ''
+      summary: Create/Update/Delete Multiple Flags
+      responses:
+        '200':
+          description: ''
+        '406':
+          '$ref': '#/components/responses/406'
+  '/organizations/{organizationId}/tags/{tagId}':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
+      - '$ref': '#/components/parameters/tagId'
+    delete:
+      description: ''
+      summary: Delete User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+    get:
+      description: ''
+      summary: Read User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+    patch:
+      description: ''
+      summary: Partially update a tag
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+    put:
+      description: ''
+      summary: Update User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+  '/payment-plans':
+    get:
+  '/payment-plans/{paymentPlanId}':
+    parameters:
+      - '$ref': '#/components/parameters/paymentPlanId'
+    get:
+      description: ''
+      summary: Get Payment Plan By ID
+      responses:
+        '200':
+          description: ''
+  '/query/api-keys': 
+    post:
+      description: ''
+      summary: Query API Keys
+      responses:
+        '200':
+          description: ''
+        '406':
+          '$ref': '#/components/responses/406'
+  '/query/audit-logs':
+    post:
+      description: ''
+      summary: Query Audit Logs
+      responses:
+        '200':
+          description: ''
+        '406':
+          '$ref': '#/components/responses/406'
+  '/query/organizations':
+    post:
+      description: ''
+      summary: Query Organizations
+      responses:
+        '200':
+          description: ''
+        '406':
+          '$ref': '#/components/responses/406'
+  '/query/flags':
+    post:
+      description: ''
+      summary: Query Flags
+      responses:
+        '200':
+          description: ''
+        '406':
+          '$ref': '#/components/responses/406'
+  '/query/groups':
+    post:
+      description: ''
+      summary: Query Groups
+      responses:
+        '200':
+          description: ''
+        '406':
+          '$ref': '#/components/responses/406'
+  '/query/tags':
+    post:
+  '/query/users':
+    post:
+  '/users/{userId}':
+    parameters:
+      - '$ref': '#/components/parameters/userId'
+    delete:
+      description: ''
+      summary: Delete User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+    get:
+      description: ''
+      summary: Read User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+    patch:
+      description: ''
+      summary: Partially Update User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+    put:
+      description: ''
+      summary: Update User
+      responses:
+        '200':
+          description: ''
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+  '/users/{userId}/api-keys':
+    parameters:
+      - '$ref': '#/components/parameters/userId'
+    get:
+    post:
+  '/users/{userId}/api-keys/{apiKeyId}':
+    parameters:
+      - '$ref': '#/components/parameters/apiKeyId'
+      - '$ref': '#/components/parameters/userId'
+    delete:
+    get:
+    patch:
+    put:
+components:
+  headers:
+    Accept:
+      description: 'Acceptable MIME Content-Types for the response'
+      schema:
+        type: string
+        format: 'MIME type'
+        enum:
+          - 'application/json'
+    Content-Type:
+      description: 'The Content-Type of the response'
+      schema:
+        type: string
+        format: 'MIME type'
+        enum:
+          - 'application/json'
+  parameters:
+    apiKeyId: 
+      description: 'API Key Identifier'
+      in: path
+      name: apiKeyId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    auditLogId: 
+      description: 'Audit Log Identifier'
+      in: path
+      name: auditLogId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    flagId: 
+      description: 'Flag Identifier'
+      in: path
+      name: flagId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    groupId: 
+      description: 'Group Identifier'
+      in: path
+      name: groupId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    organizationId:
+      description: 'Organization Identifier'
+      in: path
+      name: organizationId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    paymentId:
+      description: 'Payment Identifier'
+      in: path
+      name: paymentId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    paymentPlanId:
+      description: 'Payment Plan Identifier'
+      in: path
+      name: paymentPlanId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    tagId:
+      description: 'Tag Identifier'
+      in: path
+      name: tagId
+      required: true
+      style: simple
+      schema: 
+        '$ref': '#/components/schemas/UrlSafeId'
+    userId:
+      description: 'User Identifier'
+      in: path
+      name: userId
+      required: true
+      style: simple
+      schema: 
+        '$ref': '#/components/schemas/UrlSafeId'
+  responses:
+    '400':
+      content:
+        'applications/json':
+          schema:
+            type: object
+      description: |
+        # Standard 400 Bad Request
+
+        This error is returned when the client has sent a request that the server understands but also all of the following are true:
+
+        * The User is Authenticated (Otherwise, 401)
+          - The User has provided an `Authorization` header correctly
+          - The `Authorization` header is still valid
+        * The Resource and path mapping exists (Otherwise, 404)
+          - The User has permissions to see that the resource exists
+        * The HTTP Method used in the request exists for the path/resource (Otherwise, 405)
+        * The `Accept` header used in the request is recognized (Otherwise, 406)
+        * The `Content-Type` header used in the request is recognized (Otherwise, 415)
+        * The implicit data validations described in the schema are met (Otherwise, 422)
+        * The user is not rate limited (Otherwise, 429)
+        * The User has permissions to perform the action they wish on the resource (Otherwise 403 unless read only)
+
+        The error message will attempt to describe the client issue that occurs, but most likely this is due to sending invalid JSON in the request.
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '401':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 401 Unauthorized Error
+
+        This error is returned for any API call which requires an Authorization header when none is provided or when an invalid Authorization header is provided.
+        This error is **not** returned for cases where the user is correctly Authenticated but does not have authorization to perform the action, despite it's name.
+        For un-authorized, authenticated errors, a `403 Forbidden` or `404 Not Found` (in some cases where enumeration is a risk) error will instead be used.
+
+        This error provides instructions to the user via headers and body for how to log in.
+        These instructions are not intended to be followed automatically, but rather are used for developers who might be debugging this error.
+
+        This error is used to indicated **expired** tokens as well, which developers could use to signal logging back in.
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+        Location:
+          description: 'The Login URL'
+          schema:
+            type: string
+            format: url
+        WWW-Authenticate:
+          description: 'A header showing token auth is expected'
+          schema:
+            type: string
+            format: 'token WWW-Authenticate'
+    '403':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 403 Forbidden Error
+        
+        This error is returned for any API call which requires permissions that a user does not have.
+        This error is **not** returned when the user is not properly authenticated or when the user does not have a list-equivalent read permission.
+        In those cases a `401 Unauthorized` or `404 Not Found` error is sent, respectively.
+    '404':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 404 Not Found
+        
+        This error is returned for any API call in which the resource cannot be found or its existence cannot be confirmed to the caller because they don't have sufficient permission.
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '405':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 405 Method Not Allowed
+
+        This error is returned by the server when an unsupported method is called on a path that is recognized, but does not have that HTTP verb available.
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '406':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 406 Not Acceptable
+
+        This error is returned when the client sends an `Accept` header with an unsupported MIME type.
+        Currently the only supported MIME type is `application/json`
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '409':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 409 Conflict
+
+        The resource that is trying to be created already exists.
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '415':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 415 Unsupported Media Type
+
+        This error is returned when the client sends a request with a `Content-Type` header for an unsupported MIME type.
+        Currently the only supported MIME type is `application/json`
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '422':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 422 Unprocessable Entity
+
+        This error is returned when the request contains valid JSON and headers on a valid resource, but some backend validation of the attributes fails.
+        The error will describe which fields (or combination of fields) have failed validation and why.
+        This error will attempt to comprehensively describe all errors in validation, but may be unable to if resources cascade.
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+    '429':
+      content:
+        'application/json':
+          schema:
+            type: object
+      description: |
+        # Standard 429 Too Many Requests
+
+        This error is returned when the client is being rate limited.
+        Typically this error will return with information about the limited resource, the limit, and when the client can call back.
+        If you're getting this error, it may be worth reaching out for support or using a back-off algorithm like "full jitter".
+      headers:
+        Content-Type:
+          '$ref': '#/components/headers/Content-Type'
+  securitySchemes:
+    token-auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AdminSubject:
+      properties:
+        adminName:
+          maxLength: 32
+          minLength: 1
+          type: string
+        type:
+          enum:
+            - 'admin'
+          type: string
+      required:
+        - type
+    ApiKey:
+      properties:
+        description:
+          maxLength: 200
+          minLength: 0
+          type: string
+        name:
+          type: string
+          maxLength: 32
+          minLength: 1
+      required:
+        - name
+      type: object
+    AuditLogEntry:
+      properties:
+        action:
+          maxLength: 32
+          minLength: 1
+          type: string
+        resource:
+          '$ref': '#/components/schemas/Resource'
+        subject:
+          '$ref': '#/components/schemas/Subject'
+      type: object
+    FlagResource:
+      properties:
+        flagId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - flag
+          type: string
+      required:
+        - flagId
+        - organizationId
+        - type
+    GroupResource:
+      properties:
+        groupId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - organization-group
+          type: string
+      required:
+        - groupId
+        - organizationId
+        - type
+    IdentifiedObject:
+      properties:
+        id:
+          '$ref': '#/components/schemas/UrlSafeId'
+      required:
+        - id
+      type: object
+    OrganizationApiKeySubjectOrResource:
+      properties:
+        apiKeyId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - organization-api-key
+          type: string
+      required:
+        - apiKeyId
+        - organizationId
+        - type
+    OrganizationMemberResource:
+      properties:
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - organization-member
+          type: string
+        userId:
+          '$ref': '#/components/schemas/UrlSafeId'
+      required:
+        - organizationId
+        - type
+        - userId
+    OrganizationPaymentResource:
+      properties:
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        paymentId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - organization-payment
+          type: string
+      required:
+        - organizationId
+        - paymentId
+        - type
+    OrganizationPaymentPlanResource:
+      properties:
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - organization-payment-plan
+          type: string
+      required:
+        - organizationId
+        - type
+    OrganizationResource:
+      properties:
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - organization
+          type: string
+      required:
+        - organizationId
+        - type
+    Resource:
+      oneOf:
+        - '$ref': '#/components/schemas/FlagResource'
+        - '$ref': '#/components/schemas/GroupResource'
+        - '$ref': '#/components/schemas/OrganizationApiKeySubjectOrResource'
+        - '$ref': '#/components/schemas/OrganizationMemberResource'
+        - '$ref': '#/components/schemas/OrganizationPaymentResource'
+        - '$ref': '#/components/schemas/OrganizationPaymentPlanResource'
+        - '$ref': '#/components/schemas/OrganizationResource'
+        - '$ref': '#/components/schemas/UserSubjectOrResource'
+        - '$ref': '#/components/schemas/UserApiKeySubjectOrResource'
+    Subject:
+      oneOf:
+        - '$ref': '#/components/schemas/AdminSubject'
+        - '$ref': '#/components/schemas/OrganizationApiKeySubjectOrResource'
+        - '$ref': '#/components/schemas/UserSubjectOrResource'
+        - '$ref': '#/components/schemas/UserApiKeySubjectOrResource'
+    UrlSafeId:
+      maxLength: 32
+      minLength: 8
+      type: string
+    UserSubjectOrResource:
+      properties:
+        type:
+          enum:
+            - user
+          type: string
+        userId:
+          '$ref': '#/components/schemas/UrlSafeId'
+      required:
+        - type
+        - userId
+    UserApiKeySubjectOrResource:
+      properties:
+        apiKeyId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        type:
+          enum:
+            - user-api-key
+          type: string
+        userId:
+          '$ref': '#/components/schemas/UrlSafeId'
+      required:
+        - apiKeyId
+        - type
+        - userId
