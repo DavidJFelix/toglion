@@ -29,10 +29,15 @@ x-tagGroups:
   - name: Flags
     tags:
       - flags
+      - bulk-flags
       - organizations-flags
   - name: Users
     tags:
       - users
+  - name: Tags
+    tags:
+      - organizations-tags
+      - bulk-tags
   - name: Errors
     tags:
       - '405-error'
@@ -92,17 +97,35 @@ paths:
         List all `AuditLog` entries that the logged in `User` has access to.
         This endpoint is paginated and shows entries for all `Organizations` with which the logged in `User` has `AuditLog` `Permissions` to `read`.
       summary: 'List Audit Log entries'
+      parameters:
+        - '$ref': '#/components/parameters/paginationCursor'
+        - '$ref': '#/components/parameters/paginationDirection'
+        - '$ref': '#/components/parameters/paginationLimit'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/AuditLogEntriesList'
+          description: |
+            # Success
+            A list of visible audit log entries, by default sorted most to least recent
+        '400':
+          '$ref': '#/components/responses/400'
         '401':
           '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - 'authenticated'
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/auditLogs:read'
+          # FIXME: list out permissions for individual resource read rights
       tags:
-        - audit
+        - audit-logs
   '/audit-logs/{auditLogId}':
     parameters:
       - '$ref': '#/components/parameters/auditLogId'
@@ -112,7 +135,13 @@ paths:
       summary: 'Get Audit Log entry by ID'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/AuditLogEntry'
+          description: |
+            # Success
+            An Audit Log Entry
         '401':
           '$ref': '#/components/responses/401'
         '404':
@@ -120,9 +149,15 @@ paths:
         '406':
           '$ref': '#/components/responses/406'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - 'authenticated'
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/auditLogs:read'
+          # FIXME: list out permissions for individual resource read rights
       tags:
-        - audit
+        - audit-logs
   # '/auth/github-login'
   # '/auth/google-login'
   '/bulk/organizations/{organizationId}/api-keys':
@@ -134,13 +169,23 @@ paths:
         All operations will fail if any individual operation fails.
         The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `APIKeys` to perform the corresponding operation through a bulk operation.
       summary: 'Bulk Update APIKeys for an Organization'
+      requestBody:
+        '$ref': '#/components/requestBodies/BulkOrganizationApiKeysRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/BulkOrganizationApiKeysResponse'
+          description: |
+            # Success
+            An Bulk Response for Organization API Keys
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '415':
@@ -151,7 +196,9 @@ paths:
           '$ref': '#/components/responses/429'
       security:
         - token-auth:
+            - 'authenticated'
             - 'organization/{organizationId}:read'
+            - 'organization/{organizationId}:update'
             - 'organization/{organizationId}/apiKeys:create'
             - 'organization/{organizationId}/apiKeys:delete'
             - 'organization/{organizationId}/apiKeys:update'
@@ -170,13 +217,23 @@ paths:
         All operations will fail if any individual operation fails.
         The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `Flags` to perform the corresponding operation through a bulk operation.
       summary: 'Bulk Update Flags for an Organization'
+      requestBody:
+        '$ref': '#/components/requestBodies/BulkOrganizationFlagsRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/BulkOrganizationFlagsResponse'
+          description: |
+            # Success
+            An Bulk Response for Organization API Keys
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '415':
@@ -187,7 +244,9 @@ paths:
           '$ref': '#/components/responses/429'
       security:
         - token-auth:
+            - 'authenticated'
             - 'organization/{organizationId}:read'
+            - 'organization/{organizationId}:update'
             - 'organization/{organizationId}/flags:create'
             - 'organization/{organizationId}/flags:delete'
             - 'organization/{organizationId}/flags:update'
@@ -206,9 +265,17 @@ paths:
         All operations will fail if any individual operation fails. |
         The logged in `User` must have `Permission` to `create`, `update`, and/or `delete` `Groups` to perform the corresponding operation through a bulk operation.
       summary: 'Bulk Update Groups for an Organization'
+      requestBody:
+        '$ref': '#/components/requestBodies/BulkOrganizationGroupsRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/BulkOrganizationGroupsResponse'
+          description: |
+            # Success
+            An Bulk Response for Organization API Keys
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -218,11 +285,23 @@ paths:
         '406':
           '$ref': '#/components/responses/406'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+            - 'authenticated'
+            - 'organization/{organizationId}:read'
+            - 'organization/{organizationId}:update'
+            - 'organization/{organizationId}/groups:create'
+            - 'organization/{organizationId}/groups:delete'
+            - 'organization/{organizationId}/groups:update'
+            - 'organization/{organizationId}/groups:read'
+            - 'organization/{organizationId}/groups/{groupId}:delete'
+            - 'organization/{organizationId}/groups/{groupId}:update'
+            - 'organization/{organizationId}/groups/{groupId}:read'
       tags:
         - bulk-organization
   '/bulk/organizations/{organizationId}/members':
@@ -246,11 +325,23 @@ paths:
         '406':
           '$ref': '#/components/responses/406'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - 'authenticated'
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/members:create'
+          - 'organization/{organizationId}/members:delete'
+          - 'organization/{organizationId}/members:update'
+          - 'organization/{organizationId}/members:read'
+          - 'organization/{organizationId}/members/{userId}:delete'
+          - 'organization/{organizationId}/members/{userId}:update'
+          - 'organization/{organizationId}/members/{userId}:read'
       tags:
         - bulk-organization
   '/bulk/organizations/{organizationId}/tags':
@@ -274,13 +365,25 @@ paths:
         '406':
           '$ref': '#/components/responses/406'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+            - 'authenticated'
+            - 'organization/{organizationId}:read'
+            - 'organization/{organizationId}/tags:create'
+            - 'organization/{organizationId}/tags:delete'
+            - 'organization/{organizationId}/tags:update'
+            - 'organization/{organizationId}/tags:read'
+            - 'organization/{organizationId}/tags/{tagId}:delete'
+            - 'organization/{organizationId}/tags/{tagId}:update'
+            - 'organization/{organizationId}/tags/{tagId}:read'  
       tags:
         - bulk-organization
+  # '/flags/{clientId}/{organizationId}/{flagId}'
   '/organizations':
     get:
       description: |
@@ -294,6 +397,10 @@ paths:
           '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
+      security:
+        - token-auth:
+          - 'authenticated'
+          - 'organization/{organizationId}:read' 
       tags:
         - organizations
     post:
@@ -308,12 +415,17 @@ paths:
           '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
+        '409':
+          '$ref': '#/components/responses/409'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
       tags:
         - organizations
   '/organizations/{organizationId}':
@@ -326,20 +438,22 @@ paths:
       summary: 'Delete Organization'
       responses:
         '204':
-          description: ''
+          '$ref': '#/components/responses/204'
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
       tags:
         - organizations
     get:
       description: |
-        List all `Permissions` on the `Organization`. |
-        This endpoint is paginated and only returns successfully if the logged in `User` has `Permission` to `read` or `create` the `Organization`'s `Permissions`
-      summary: "List an Organization's permissions"
+        Read `Organization` Details.
+        This endpoint returns high level `Organization` details and links to additional resource collections.
+      summary: 'Get Organization by ID'
       responses:
         '200':
           description: ''
@@ -347,10 +461,16 @@ paths:
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read' 
       tags:
         - organizations
     patch:
@@ -366,14 +486,21 @@ paths:
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
       tags:
         - organizations
     put:
@@ -390,17 +517,24 @@ paths:
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
       tags:
         - organizations
-  '/organizations/{organizationId}/audit-logs/':
+  '/organizations/{organizationId}/audit-logs':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
     get:
@@ -415,13 +549,19 @@ paths:
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/audit-logs:read'
       tags:
-        - audit
-        - organizations
+        - organizations-audit-logs
   '/organizations/{organizationId}/api-keys':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
@@ -432,22 +572,25 @@ paths:
       summary: List APIKeys for an Organization
       responses:
         '200':
-          description: ''
+          '$ref': '#/components/schemas/ApiKeyWithID'
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
-        '415':
-          description: ''
-        '422':
-          description: ''
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/api-keys:read'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:read'
       tags:
-        - apiKeys
-        - organizations
+        - organizations-api-keys
     post:
       description: |
         Create an `APIKey` for the `Organization` which can be given access like any `User`
@@ -459,17 +602,28 @@ paths:
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '409':
+          '$ref': '#/components/responses/409'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
         '422':
-          description: ''
+          '$ref': '#/components/responses/422'
         '429':
-          description: ''
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/api-keys:read'
+          - 'organization/{organizationId}/api-keys:create'
+          - 'organization/{organizationId}/groups:read'
+          - 'organization/{organizationId}/groups:create'          
       tags:
-        - apiKeys
-        - organizations
+        - organizations-api-keys
   '/organizations/{organizationId}/api-keys/{apiKeyId}':
     parameters:
       - '$ref': '#/components/parameters/apiKeyId'
@@ -480,17 +634,15 @@ paths:
       summary: Delete APIKey for an Organization
       responses:
         '204':
-          description: ''
+          '$ref': '#/components/responses/204'
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
         '404':
           '$ref': '#/components/responses/404'
-        '415':
-          description: ''
       tags:
-        - organizations
+        - organizations-api-keys
     get:
       parameters:
         - '$ref': '#/components/parameters/apiKeyId'
@@ -512,11 +664,22 @@ paths:
         '415':
           description: ''
       tags:
-        - organizations
+        - organizations-api-keys
     patch:
+      parameters:
+        - '$ref': '#/components/parameters/apiKeyId'
+        - '$ref': '#/components/parameters/organizationId'
+      description: |
+        Partially update an API key
+      summary: Partially update API Key
     put:
   '/organizations/{organizationId}/flags':
+    parameters:
+      - '$ref': '#/components/parameters/organizationId'
     get:
+      description: |
+        List flags for an `Organization`.
+        This lists all flags for an organization that a user
     post:
   '/organizations/{organizationId}/flags/{flagId}':
     parameters:
@@ -849,6 +1012,38 @@ components:
       style: simple
       schema:
         '$ref': '#/components/schemas/UrlSafeId'
+    paginationCursor:
+      description: 'The last item from the page prior to this'
+      in: query
+      name: cursor
+      required: false
+      style: form
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
+    paginationDirection:
+      description: 'The direction to to sort the page result'
+      in: query
+      name: dir
+      required: false
+      style: form
+      schema:
+        default: desc
+        enum:
+          - asc
+          - desc
+        type: string
+    paginationLimit:
+      description: 'The maximum number of items per for the API'
+      in: query
+      name: limit
+      required: false
+      style: form
+      schema:
+        default: 100
+        format: integer
+        maximum: 100
+        minimum: 1
+        type: number
     paymentId:
       description: 'Payment Identifier'
       in: path
@@ -881,10 +1076,53 @@ components:
       style: simple
       schema: 
         '$ref': '#/components/schemas/UrlSafeId'
+  requestBodies:
+    BulkOrganizationApiKeysRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/BulkOrganizationApiKeysRequest'
+      description: |
+        A Request for bulk changes to Organization API Keys
+    BulkOrganizationFlagsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/BulkOrganizationFlagsRequest'
+      description: |
+        A Request for bulk changes to Organization Flags
+    BulkOrganizationGroupsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/BulkOrganizationGroupsRequest'
+      description: |
+        A Request for bulk changes to Organization Groups
+    BulkOrganizationMembersRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/BulkOrganizationMembersRequest'
+      description: |
+        A Request for bulk changes to Organization Members
+    BulkOrganizationTagsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/BulkOrganizationTagsRequest'
+      description: |
+        A Request for bulk changes to Organization API Keys
   responses:
+    '204':
+      description: |
+        # Standard 204 No Content
+
+        This is a successful response code returned when the API has deleted a resource.
+        Note: deletion is an erasure, not a "pop" removal, so nothing is returned.
+        If your interaction requires "pop" style behavior, GET then DELETE.
     '400':
       content:
-        'applications/json':
+        'application/json':
           schema:
             type: object
       description: |
@@ -1044,7 +1282,17 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    Action:
+      type: string
+      enum:
+        - create
+        - delete
+        - read
+        - update
     AdminSubject:
+      description: |
+        # Admin Subject
+        A Permission "Subject" that references an Admin
       properties:
         adminName:
           maxLength: 32
@@ -1057,6 +1305,9 @@ components:
       required:
         - type
     ApiKey:
+      description: |
+        # API Key
+        A key used as a bearer token for API access
       properties:
         description:
           maxLength: 200
@@ -1069,17 +1320,230 @@ components:
       required:
         - name
       type: object
+    ApiKeyWithId:
+      allOf:
+        - '$ref': '#/components/schemas/ApiKey'
+        - '$ref': '#/components/schemas/WithIdMetaObject'
     AuditLogEntry:
+      description: |
+        # Audit Log entry
+        A log entry in the Audit Log that is used to trace interactions and changes.
       properties:
         action:
-          maxLength: 32
-          minLength: 1
-          type: string
+          '$ref': '#/components/schemas/Action'
         resource:
           '$ref': '#/components/schemas/Resource'
         subject:
           '$ref': '#/components/schemas/Subject'
+      required:
+        - action
+        - resource
+        - subject
       type: object
+    AuditLogEntriesList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/AuditLogEntry'
+              type: array
+          required:
+            - results
+          type: object
+      description: |
+        # Audit Log List
+        A list of Audit Log Entries
+    BulkOrganizationApiKeysRequest:
+      properties:
+        create:
+          items:
+            '$ref': '#/components/schemas/ApiKey'
+          type: array
+        delete:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        update:
+          items:
+            '$ref': '#/components/schemas/ApiKeyWithId'
+          type: array
+    BulkOrganizationApiKeysResponse:
+      properties:
+        created:
+          items:
+            '$ref': '#/components/schemas/ApiKeyWithId'
+          type: array
+        deletedIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        updated:
+          items:
+            '$ref': '#/components/schemas/ApiKeyWithId'
+          type: array
+      required:
+        - created
+        - deletedIds
+        - updated
+    BulkOrganizationFlagsRequest:
+      properties:
+        create:
+          items:
+            '$ref': '#/components/schemas/Flag'
+          type: array
+        delete:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        update:
+          items:
+            '$ref': '#/components/schemas/FlagWithId'
+          type: array
+    BulkOrganizationFlagsResponse:
+      properties:
+        created:
+          items:
+            '$ref': '#/components/schemas/FlagWithId'
+          type: array
+        deletedIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        updated:
+          items:
+            '$ref': '#/components/schemas/FlagWithId'
+          type: array
+      required:
+        - created
+        - deletedIds
+        - updated
+    BulkOrganizationGroupsRequest:
+      properties:
+        create:
+          items:
+            '$ref': '#/components/schemas/Group'
+          type: array
+        delete:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        update:
+          items:
+            '$ref': '#/components/schemas/GroupWithId'
+          type: array
+    BulkOrganizationGroupsResponse:
+      properties:
+        created:
+          items:
+            '$ref': '#/components/schemas/GroupWithId'
+          type: array
+        deletedIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        updated:
+          items:
+            '$ref': '#/components/schemas/GroupWithId'
+          type: array
+      required:
+        - created
+        - deletedIds
+        - updated
+    BulkOrganizationMembersRequest:
+      properties:
+        create:
+          items:
+            '$ref': '#/components/schemas/Member'
+          type: array
+        delete:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        update:
+          items:
+            '$ref': '#/components/schemas/Member'
+          type: array
+    BulkOrganizationMembersResponse:
+      properties:
+        created:
+          items:
+            '$ref': '#/components/schemas/Member'
+          type: array
+        deletedIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        updated:
+          items:
+            '$ref': '#/components/schemas/Member'
+          type: array
+      required:
+        - created
+        - deletedIds
+        - updated
+    BulkOrganizationTagsRequest:
+      properties:
+        create:
+          items:
+            '$ref': '#/components/schemas/Tag'
+          type: array
+        delete:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        update:
+          items:
+            '$ref': '#/components/schemas/TagWithId'
+          type: array
+    BulkOrganizationTagsResponse:
+      properties:
+        created:
+          items:
+            '$ref': '#/components/schemas/TagWithId'
+          type: array
+        deletedIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        updated:
+          items:
+            '$ref': '#/components/schemas/TagWithId'
+          type: array
+      required:
+        - created
+        - deletedIds
+        - updated
+    Flag:
+      allOf:
+        - properties:
+            name:
+              minimum: 1
+              maximum: 255
+              type: string
+            organizationId:
+              '$ref': '#/components/schemas/UrlSafeId'
+          required:
+            - name
+            - organizationId
+          type: object
+        - '$ref': '#/components/schemas/FlagTypes'
+    FlagTypes:
+      oneOf:
+        - properties:
+            type:
+              enum:
+                - boolean
+              type: string
+            value:
+              type: boolean
+          required:
+            - type
+            - value
+    FlagWithId:
+      allOf:
+        - '$ref': '#/components/schemas/Flag'
+        - '$ref': '#/components/schemas/WithIdMetaObject'
     FlagResource:
       properties:
         flagId:
@@ -1094,6 +1558,23 @@ components:
         - flagId
         - organizationId
         - type
+      type: object
+    Group:
+      properties:
+        name:
+          minimum: 1
+          maximum: 31
+          type: string
+        permissions:
+          items:
+            '$ref': '#/components/schemas/Permission'
+          type: array
+      required:
+        - name
+    GroupWithId:
+      allOf:
+        - '$ref': '#/components/schemas/Group'
+        - '$ref': '#/components/schemas/WithIdMetaObject'
     GroupResource:
       properties:
         groupId:
@@ -1115,6 +1596,31 @@ components:
       required:
         - id
       type: object
+    ListResponseMetaObject:
+      properties:
+        count:
+          description: the total number of list elements
+          format: integer
+          minimum: 0
+          type: number
+        next:
+          description: the url for the next "page" of the list
+          format: url
+          type: string
+        previous:
+          description: the url for the previous "page" of the list
+          format: url
+          type: string
+      required:
+        - count
+      type: object
+    Member:
+      properties:
+        userId:
+          '$ref': '#/components/schemas/UrlSafeId'
+        groupIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
     OrganizationApiKeySubjectOrResource:
       properties:
         apiKeyId:
@@ -1179,6 +1685,19 @@ components:
       required:
         - organizationId
         - type
+    Permission:
+      properties:
+        action:
+          '$ref': '#/components/schemas/Action'
+        resource:
+          '$ref': '#/components/schemas/Resource'
+        subject:
+          '$ref': '#/components/schemas/Subject'
+      required:
+        - action
+        - resource
+        - subject
+      type: object
     Resource:
       oneOf:
         - '$ref': '#/components/schemas/FlagResource'
@@ -1196,7 +1715,19 @@ components:
         - '$ref': '#/components/schemas/OrganizationApiKeySubjectOrResource'
         - '$ref': '#/components/schemas/UserSubjectOrResource'
         - '$ref': '#/components/schemas/UserApiKeySubjectOrResource'
+    Tag:
+      properties:
+        name:
+          type: string
+      required:
+        - name
+      type: object
+    TagWithId:
+      allOf:
+        - '$ref': '#/components/schemas/Tag'
+        - '$ref': '#/components/schemas/WithIdMetaObject'
     UrlSafeId:
+      format: ID
       maxLength: 32
       minLength: 8
       type: string
@@ -1225,3 +1756,7 @@ components:
         - apiKeyId
         - type
         - userId
+    WithIdMetaObject:
+      properties:
+        id:
+          '$ref': '#/components/schemas/UrlSafeId'
