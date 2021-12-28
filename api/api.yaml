@@ -3,6 +3,18 @@ info:
   title: toglion
   version: 'RFC'
 tags:
+  - name: bulk-organization
+    description: |
+      Bulk operations for organization management.
+      These can be useful for making multiple changes all in one API call.
+  - name: organizations
+    description: |
+      Organizations are an application grouping that segregates tenant resource and allows users to have multiple projects or employers in their own isolated area.
+      Organizations each have their own billing profile, limits, permissions and resources.
+      All flags must be owned by an organization.
+  - name: organizations-api-keys
+    description: |
+      API keys owned by an organization which allow them to perform organization automation.
   - name: '405-error'
     description: |
       <SchemaDefinition schemaRef="#/components/responses/401" showReadOnly={true} showWriteOnly={true} />
@@ -544,7 +556,13 @@ paths:
       summary: 'List audit log entries for an organization'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/AuditLogEntriesList'
+          description: |
+            # Success
+            A list of visible audit log entries, by default sorted most to least recent
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -560,6 +578,7 @@ paths:
           - authenticated
           - 'organization/{organizationId}:read'
           - 'organization/{organizationId}/audit-logs:read'
+          # FIXME: list out permissions for individual resource read rights
       tags:
         - organizations-audit-logs
   '/organizations/{organizationId}/api-keys':
@@ -572,7 +591,13 @@ paths:
       summary: List APIKeys for an Organization
       responses:
         '200':
-          '$ref': '#/components/schemas/ApiKeyWithID'
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyList'
+          description: |
+            # Success
+            A list of visible API keys
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -595,9 +620,17 @@ paths:
       description: |
         Create an `APIKey` for the `Organization` which can be given access like any `User`
       summary: Create APIKey for an Organization
+      requestBody:
+        '$ref': '#components/requestBodies/CreateApiKeyRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The newly created API Key
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -641,6 +674,17 @@ paths:
           '$ref': '#/components/responses/403'
         '404':
           '$ref': '#/components/responses/404'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/api-keys:delete'
+          - 'organization/{organizationId}/api-keys:read'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:delete'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:read'
       tags:
         - organizations-api-keys
     get:
@@ -652,17 +696,29 @@ paths:
       summary: Get APIKey for an Organization by ID
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The API Key
         '401':
           '$ref': '#/components/responses/401'
-        '403':
-          '$ref': '#/components/responses/403'
         '404':
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
         '415':
-          description: ''
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/api-keys:read'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:read'
       tags:
         - organizations-api-keys
     patch:
@@ -672,7 +728,85 @@ paths:
       description: |
         Partially update an API key
       summary: Partially update API Key
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateApiKeyRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The newly update API Key
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/api-keys:read'
+          - 'organization/{organizationId}/api-keys:update'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:read'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:update'
+      tags:
+        - organizations-api-keys
     put:
+      parameters:
+        - '$ref': '#/components/parameters/apiKeyId'
+        - '$ref': '#/components/parameters/organizationId'
+      description: |
+        Update an API key
+      summary: Update API Key
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateApiKeyRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The newly updated API Key
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/api-keys:read'
+          - 'organization/{organizationId}/api-keys:update'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:read'
+          - 'organization/{organizationId}/api-keys/{apiKeyId}:update'
+      tags:
+        - organizations-api-keys
   '/organizations/{organizationId}/flags':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
@@ -680,63 +814,620 @@ paths:
       description: |
         List flags for an `Organization`.
         This lists all flags for an organization that a user
+      summary: List Flags for an Organization
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/FlagList'
+          description: |
+            # Success
+            A list of Flags
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/flags:read'
+          - 'organization/{organizationId}/flags/{flagId}:read'
+      tags:
+        - flags
+        - organizations-flags
     post:
+      description: |
+        Create a flag for an `Organization`.
+      summary: Create Flag for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/CreateFlagRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/FlagWithId'
+          description: |
+            # Success
+            The newly created Flag
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/flags:create'
+      tags:
+        - flags
+        - organizations-flags
   '/organizations/{organizationId}/flags/{flagId}':
     parameters:
       - '$ref': '#/components/parameters/flagId'
       - '$ref': '#/components/parameters/organizationId'
     delete:
+      description: |
+        Delete a flag for an `Organization`.
+      summary: Delete a Flag by Id
+      responses:
+        '204':
+          '$ref': '#/components/responses/204'
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/flags:delete'
+          - 'organization/{organizationId}/flags/{flagId}:delete'
+      tags:
+        - flags
+        - organizations-flags
     get:
+      description: |
+        Get a flag for an `Organization` by.
+      summary: Get a Flag by Id
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/FlagWithId'
+          description: |
+            # Success
+            The Flag
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/flags:read'
+          - 'organization/{organizationId}/flags/{flagId}:read'
+      tags:
+        - flags
+        - organizations-flags
     patch:
+      description: |
+        Update a flag for an `Organization`.
+      summary: Partially Update a Flag for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateFlagRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/FlagWithId'
+          description: |
+            # Success
+            The newly created Flag
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/flags:update'
+          - 'organization/{organizationId}/flags/{flagId}:update'
+      tags:
+        - flags
+        - organizations-flags
     put:
+      description: |
+        Update a flag for an `Organization`.
+      summary: Update a Flag for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateFlagRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/FlagWithId'
+          description: |
+            # Success
+            The newly created Flag
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/flags:update'
+          - 'organization/{organizationId}/flags/{flagId}:update'
+      tags:
+        - flags
+        - organizations-flags
   '/organizations/{organizationId}/groups':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
     get:
-    post:
-      description: ''
-      summary: Create a Permission Group
+      description: |
+        List groups for an `Organization`.
+        This lists all groups for an organization that a user
+      summary: List Groups for an Organization
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/GroupList'
+          description: |
+            # Success
+            A list of Groups
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/groups:read'
+          - 'organization/{organizationId}/groups/{groupId}:read'
+      tags:
+        - organizations-groups
+    post:
+      description: |
+        Create a Group for an `Organization`.
+      summary: Create a Group for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/CreateGroupRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/GroupWithId'
+          description: |
+            # Success
+            The newly created Group
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/groups:create'
+      tags:
+        - organizations-groups
   '/organizations/{organizationId}/groups/{groupId}':
     parameters:
       - '$ref': '#/components/parameters/groupId'
       - '$ref': '#/components/parameters/organizationId'
     delete:
+      description: |
+        Delete a Group for an `Organization`.
+      summary: Delete a Group by Id
+      responses:
+        '204':
+          '$ref': '#/components/responses/204'
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/groups:delete'
+          - 'organization/{organizationId}/groups/{groupId}:delete'
+      tags:
+        - organizations-groups
     get:
+      description: |
+        Get a Group for an `Organization` by.
+      summary: Get a Group by Id
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/GroupWithId'
+          description: |
+            # Success
+            The Group
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/groups:read'
+          - 'organization/{organizationId}/groups/{groupId}:read'
+      tags:
+        - organizations-groups
     patch:
+      description: |
+        Update a Group for an `Organization`.
+      summary: Partially Update a Group for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateGroupRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/GroupWithId'
+          description: |
+            # Success
+            The newly created Group
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/groups:update'
+          - 'organization/{organizationId}/groups/{groupId}:update'
+      tags:
+        - organizations-groups
     put:
+      description: |
+        Update a Group for an `Organization`.
+      summary: Update a Group for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateGroupRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/GroupWithId'
+          description: |
+            # Success
+            The newly created Group
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/groups:update'
+          - 'organization/{organizationId}/groups/{groupId}:update'
+      tags:
+        - organizations-groups
   '/organizations/{organizationId}/members':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
     get:
-    post:
-      description: ''
-      summary: Create a Permission Group
+      description: |
+        List Members for an `Organization`.
+        This lists all Members for an organization
+      summary: List Members for an Organization
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/MemberList'
+          description: |
+            # Success
+            A list of Members
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/members:read'
+          - 'organization/{organizationId}/members/{memberId}:read'
+      tags:
+        - organizations-members
+    post:
+      description: |
+        Create a Member relationship for an `Organization`
+      summary: Create a Group for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/CreateMemberRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/MemberWithId'
+          description: |
+            # Success
+            The newly created Group
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
         '406':
           '$ref': '#/components/responses/406'
-  '/organizations/{organizationId}/members/{userId}':
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/members:create'
+      tags:
+        - organizations-members
+  '/organizations/{organizationId}/members/{memberId}':
     parameters:
+      - '$ref': '#/components/parameters/memberId'
       - '$ref': '#/components/parameters/organizationId'
-      - '$ref': '#/components/parameters/userId'
     delete:
+      description: |
+        Delete a Member from an `Organization`.
+      summary: Delete a Member by Id
+      responses:
+        '204':
+          '$ref': '#/components/responses/204'
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/members:delete'
+          - 'organization/{organizationId}/members/{memberId}:delete'
+      tags:
+        - organizations-members
     get:
+      description: |
+        Get a Member for an `Organization` by Id.
+      summary: Get a Member by Id
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/MemberWithId'
+          description: |
+            # Success
+            The Group
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/members:read'
+          - 'organization/{organizationId}/members/{memberId}:read'
+      tags:
+        - organizations-members
     patch:
+      description: |
+        Partially Update a Member for an `Organization`.
+      summary: Partially Update a Member for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateMemberRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/MemberWithId'
+          description: |
+            # Success
+            The newly created Group
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/members:update'
+          - 'organization/{organizationId}/members/{memberId}:update'
+      tags:
+        - organizations-members
     put:
+      description: |
+        Update a Member for an `Organization`.
+      summary: Update a Member for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateMemberRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/MemberWithId'
+          description: |
+            # Success
+            The updated member
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/members:update'
+          - 'organization/{organizationId}/members/{memberId}:update'
+      tags:
+        - organizations-members
   '/organizations/{organizationId}/payment-plan':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
@@ -1004,6 +1695,14 @@ components:
       style: simple
       schema:
         '$ref': '#/components/schemas/UrlSafeId'
+    memberId:
+      description: 'Organization Group Member'
+      in: path
+      name: memberId
+      required: true
+      style: simple
+      schema:
+        '$ref': '#/components/schemas/UrlSafeId'
     organizationId:
       description: 'Organization Identifier'
       in: path
@@ -1112,6 +1811,88 @@ components:
             '$ref': '#/components/schemas/BulkOrganizationTagsRequest'
       description: |
         A Request for bulk changes to Organization API Keys
+    CreateApiKeyRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/ApiKey'
+      description: |
+        A request to create a new API Key
+    CreateFlagRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Flag'
+    CreateGroupRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Group'
+    CreateMemberRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Member'
+    PartialUpdateApiKeyRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/PartialApiKey'
+      description: |
+        A request to partially update an API key
+    PartialUpdateFlagRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/PartialFlag'
+      description: |
+        A request to partially update a Flag
+    PartialUpdateGroupRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/PartialGroup'
+      description: |
+        A request to partially update a Group
+    PartialUpdateMemberRequest:
+      content:
+        'application/json':
+          schema:
+            anyOf:
+              - '$ref': '#/components/schemas/PartialMember'
+              - '$ref': '#/components/schemas/MemberStatusMetaObject'
+      description: |
+        A request to partially update a Group
+    UpdateApiKeyRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/ApiKey'
+      description: |
+        A request to update an API key
+    UpdateFlagRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Flag'
+      description: |
+        A request to update a Flag
+    UpdateGroupRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Group'
+      description: |
+        A request to update a Group
+    UpdateMemberRequest:
+      content:
+        'application/json':
+          schema:
+            allOf:
+              - '$ref': '#/components/schemas/Member'
+              - '$ref': '#/components/schemas/MemberStatusMetaObject'
+      description: |
+        A request to update a Member
   responses:
     '204':
       description: |
@@ -1305,21 +2086,25 @@ components:
       required:
         - type
     ApiKey:
+      allOf:
+        - '$ref': '#/components/schemas/PartialApiKey'
       description: |
         # API Key
         A key used as a bearer token for API access
-      properties:
-        description:
-          maxLength: 200
-          minLength: 0
-          type: string
-        name:
-          type: string
-          maxLength: 32
-          minLength: 1
       required:
         - name
       type: object
+    ApiKeyList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+              type: array
+          required:
+            - results
+          type: object
     ApiKeyWithId:
       allOf:
         - '$ref': '#/components/schemas/ApiKey'
@@ -1354,6 +2139,13 @@ components:
       description: |
         # Audit Log List
         A list of Audit Log Entries
+    BaseFlag:
+      allOf:
+        - '$ref': '#/components/schemas/PartialBaseFlag'
+      required:
+        - name
+        - organizationId
+      type: object
     BulkOrganizationApiKeysRequest:
       properties:
         create:
@@ -1516,30 +2308,37 @@ components:
         - updated
     Flag:
       allOf:
-        - properties:
-            name:
-              minimum: 1
-              maximum: 255
-              type: string
-            organizationId:
-              '$ref': '#/components/schemas/UrlSafeId'
-          required:
-            - name
-            - organizationId
-          type: object
+        - '$ref': '#/components/schemas/BaseFlag'
         - '$ref': '#/components/schemas/FlagTypes'
+    FlagList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/FlagWithId'
+              type: array
+          required:
+            - results
+          type: object
+      description: |
+        # Flag List
+        A list of Flags
+    FlagTypeBoolean:
+      properties:
+        type:
+          enum:
+            - boolean
+          type: string
+        value:
+          type: boolean
+      required:
+        - type
+        - value
+      type: object
     FlagTypes:
       oneOf:
-        - properties:
-            type:
-              enum:
-                - boolean
-              type: string
-            value:
-              type: boolean
-          required:
-            - type
-            - value
+        - '$ref': '#/components/schemas/FlagTypeBoolean'
     FlagWithId:
       allOf:
         - '$ref': '#/components/schemas/Flag'
@@ -1560,17 +2359,26 @@ components:
         - type
       type: object
     Group:
-      properties:
-        name:
-          minimum: 1
-          maximum: 31
-          type: string
-        permissions:
-          items:
-            '$ref': '#/components/schemas/Permission'
-          type: array
+      allOf:
+        - '$ref': '#/components/schemas/PartialGroup'
+      description: |
+        A group to assign users and api keys to permissions
       required:
+        - memberApiKeyIds
+        - memberUserIds
         - name
+        - permissions
+    GroupList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/GroupWithId'
+              type: array
+          required:
+            - results
+          type: object
     GroupWithId:
       allOf:
         - '$ref': '#/components/schemas/Group'
@@ -1615,12 +2423,31 @@ components:
         - count
       type: object
     Member:
+      allOf:
+        - '$ref': '#/components/schemas/PartialMember'
+      required:
+        - groupIds
+      type: object
+    MemberList:
+      items:
+        '$ref': '#/components/schemas/MemberWithId'
+      type: array
+    MemberStatusMetaObject:
       properties:
-        userId:
-          '$ref': '#/components/schemas/UrlSafeId'
-        groupIds:
-          items:
-            '$ref': '#/components/schemas/UrlSafeId'
+        status:
+          enum:
+            - accepted
+            - blocked
+            - pending
+          type: string
+      required:
+        - status
+      type: object
+    MemberWithId:
+      allOf:
+        - '$ref': '#/components/schemas/Member'
+        - '$ref': '#/components/schemas/MemberStatusMetaObject'
+        - '$ref': '#/components/schemas/WithIdMetaObject'
     OrganizationApiKeySubjectOrResource:
       properties:
         apiKeyId:
@@ -1685,6 +2512,56 @@ components:
       required:
         - organizationId
         - type
+    PartialApiKey:
+      properties:
+          description:
+            maxLength: 200
+            minLength: 0
+            type: string
+          name:
+            type: string
+            maxLength: 32
+            minLength: 1
+      type: object
+    PartialBaseFlag:
+      properties:
+        name:
+          minimum: 1
+          maximum: 255
+          type: string
+        organizationId:
+          '$ref': '#/components/schemas/UrlSafeId'
+      type: object
+    PartialFlag:
+      anyOf:
+        - '$ref': '#/components/schemas/PartialBaseFlag'
+        - '$ref': '#/components/schemas/FlagTypes'
+    PartialGroup:
+      properties:
+        memberApiKeyIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        memberUserIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+        name:
+          minimum: 1
+          maximum: 31
+          type: string
+        permissions:
+          items:
+            '$ref': '#/components/schemas/Permission'
+          type: array
+      type: object
+    PartialMember:
+      properties:
+        groupIds:
+          items:
+            '$ref': '#/components/schemas/UrlSafeId'
+          type: array
+      type: object
     Permission:
       properties:
         action:
@@ -1760,3 +2637,6 @@ components:
       properties:
         id:
           '$ref': '#/components/schemas/UrlSafeId'
+      required:
+        - id
+      type: object
