@@ -413,7 +413,7 @@ paths:
           content:
             'application/json':
               schema:
-                '$ref': '#/components/schemas/OrganizationsList'
+                '$ref': '#/components/schemas/OrganizationList'
           description: |
             # Success
             A list of organizations of which the logged in user is either a member or owner
@@ -1697,7 +1697,7 @@ paths:
           content:
             'application/json':
               schema:
-                '$ref': '#/components/schemas/OrganizationsList'
+                '$ref': '#/components/schemas/OrganizationList'
           description: |
             # Success
             A list of matching Organizations
@@ -1724,7 +1724,7 @@ paths:
         Perform an organization search.
       summary: Query Organizations
       requestBody:
-        '$ref': '#/components/requestBodies/QueryFlagssRequest'
+        '$ref': '#/components/requestBodies/QueryFlagsRequest'
       responses:
         '200':
           content:
@@ -2747,6 +2747,7 @@ components:
       description: |
         # Flag List
         A list of Flags
+      type: object
     FlagTypeBoolean:
       properties:
         type:
@@ -2852,9 +2853,17 @@ components:
         - groupIds
       type: object
     MemberList:
-      items:
-        '$ref': '#/components/schemas/MemberWithId'
-      type: array
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/MemberWithId'
+              type: array
+          required:
+            - results
+          type: object
+      type: object
     MemberStatusMetaObject:
       properties:
         status:
@@ -2887,6 +2896,18 @@ components:
         - apiKeyId
         - organizationId
         - type
+    OrganizationList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/OrganizationWithId'
+              type: array
+          required:
+            - results
+          type: object
+      type: object
     OrganizationMemberResource:
       properties:
         organizationId:
@@ -3100,6 +3121,18 @@ components:
           type: string
       required:
         - name
+      type: object
+    TagList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/TagWithId'
+              type: array
+          required:
+            - results
+          type: object
       type: object
     TagWithId:
       allOf:
