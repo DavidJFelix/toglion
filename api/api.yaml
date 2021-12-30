@@ -710,9 +710,6 @@ paths:
       tags:
         - organizations-api-keys
     get:
-      parameters:
-        - '$ref': '#/components/parameters/apiKeyId'
-        - '$ref': '#/components/parameters/organizationId'
       description: |
         Get an APIKey for an `Organization` by ID
       summary: Get APIKey for an Organization by ID
@@ -744,9 +741,6 @@ paths:
       tags:
         - organizations-api-keys
     patch:
-      parameters:
-        - '$ref': '#/components/parameters/apiKeyId'
-        - '$ref': '#/components/parameters/organizationId'
       description: |
         Partially update an API key
       summary: Partially update API Key
@@ -787,9 +781,6 @@ paths:
       tags:
         - organizations-api-keys
     put:
-      parameters:
-        - '$ref': '#/components/parameters/apiKeyId'
-        - '$ref': '#/components/parameters/organizationId'
       description: |
         Update an API key
       summary: Update API Key
@@ -1831,15 +1822,190 @@ paths:
     parameters:
       - '$ref': '#/components/parameters/userId'
     get:
+      description: |
+        List `APIKeys` for the `User`.
+        Must have `read` `Permission` for `APIKeys` on the `User`
+      summary: List APIKeys for a User
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyList'
+          description: |
+            # Success
+            A list of visible API keys
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - users-api-keys
     post:
+      description: |
+        Create an `APIKey` for the `User` which can be given access like any `User`
+      summary: Create APIKey for a User
+      requestBody:
+        '$ref': '#components/requestBodies/CreateApiKeyRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The newly created API Key
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '409':
+          '$ref': '#/components/responses/409'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated       
+      tags:
+        - users-api-keys
   '/users/{userId}/api-keys/{apiKeyId}':
     parameters:
       - '$ref': '#/components/parameters/apiKeyId'
       - '$ref': '#/components/parameters/userId'
     delete:
+      description: |
+        Delete an `APIKey` for a `User`
+      summary: Delete APIKey for a User
+      responses:
+        '204':
+          '$ref': '#/components/responses/204'
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - users-api-keys
     get:
+      description: |
+        Get an APIKey for a `User` by ID
+      summary: Get APIKey for a User by ID
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The API Key
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - users-api-keys
     patch:
+      description: |
+        Partially update an API key
+      summary: Partially update API Key for a User
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateApiKeyRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The newly update API Key
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - users-api-keys
     put:
+      description: |
+        Update an API key
+      summary: Update API Key
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateApiKeyRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyWithId'
+          description: |
+            # Success
+            The newly updated API Key
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - users-api-keys
 components:
   headers:
     Accept:
