@@ -1825,8 +1825,8 @@ paths:
   '/query/flags':
     post:
       description: |
-        Perform an organization search.
-      summary: Query Organizations
+        Perform an flags search.
+      summary: Query Flags
       requestBody:
         '$ref': '#/components/requestBodies/QueryFlagsRequest'
       responses:
@@ -1834,10 +1834,115 @@ paths:
           content:
             'application/json':
               schema:
-                '$ref': '#/components/schemas/AuditLogEntriesList'
+                '$ref': '#/components/schemas/FlagList'
           description: |
             # Success
-            A list of matching Audit Log Entries
+            A list of matching Flags
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read' 
+          - 'organization/{organizationId}/flags:read' 
+          - 'organization/{organizationId}/flags/{flagId}:read' 
+      tags:
+        - query
+        - flags
+  '/query/groups':
+    post:
+      description: |
+        Perform an group search.
+      summary: Query Groups
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryGroupsRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/GroupList'
+          description: |
+            # Success
+            A list of matching Groups
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read' 
+          - 'organization/{organizationId}/groups:read' 
+          - 'organization/{organizationId}/groups/{groupId}:read' 
+      tags:
+        - query
+        - groups
+  '/query/tags':
+    post:
+      description: |
+        Perform an tags search.
+      summary: Query Tags
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryTagsRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/TagList'
+          description: |
+            # Success
+            A list of matching Tags
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read' 
+          - 'organization/{organizationId}/tags:read' 
+          - 'organization/{organizationId}/tags/{tagId}:read' 
+      tags:
+        - query
+        - tags
+  '/query/users':
+    post:
+      description: |
+        Perform an flags search.
+      summary: Query Flags
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryUsersRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/UserList'
+          description: |
+            # Success
+            A list of matching Flags
         '401':
           '$ref': '#/components/responses/401'
         '406':
@@ -1853,29 +1958,17 @@ paths:
           - authenticated
       tags:
         - query
-        - flags
-  '/query/groups':
-    post:
-      description: ''
-      summary: Query Groups
-      responses:
-        '200':
-          description: ''
-        '406':
-          '$ref': '#/components/responses/406'
-  '/query/tags':
-    post:
-  '/query/users':
-    post:
+        - users
   '/users/{userId}':
     parameters:
       - '$ref': '#/components/parameters/userId'
     delete:
-      description: ''
+      description: |
+        Delete user
       summary: Delete User
       responses:
-        '200':
-          description: ''
+        '204':
+          '$ref': '#/components/responses/204'
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1883,23 +1976,48 @@ paths:
         '406':
           '$ref': '#/components/responses/406'
     get:
-      description: ''
-      summary: Read User
+      description: |
+        Get User 
+      summary: Get User by Id
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/UserWithId'
+          description: |
+            # Success
+            The User
         '401':
           '$ref': '#/components/responses/401'
         '404':
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - users
     patch:
-      description: ''
-      summary: Partially Update User
+      description: |
+        Update a user
+      summary: Partially Update a User
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateUserRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/UserWithId'
+          description: |
+            # Success
+            The updated user
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1908,12 +2026,27 @@ paths:
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
     put:
-      description: ''
-      summary: Update User
+      description: |
+        Update a user.
+      summary: Update a User
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateUserRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/UserWithId'
+          description: |
+            # Success
+            The updated user
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1922,6 +2055,12 @@ paths:
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
   '/users/{userId}/api-keys':
     parameters:
       - '$ref': '#/components/parameters/userId'
@@ -2340,6 +2479,20 @@ components:
               - '$ref': '#/components/schemas/MemberStatusMetaObject'
       description: |
         A request to partially update a Group
+    PartialUpdateTagRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/PartialTag'
+      description: |
+        A request to partially update a Tag
+    PartialUpdateUserRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/PartialUser'
+      description: |
+        A request to partially update a user
     QueryApiKeysRequest:
       content:
         'application/json':
@@ -2419,6 +2572,20 @@ components:
               - '$ref': '#/components/schemas/MemberStatusMetaObject'
       description: |
         A request to update a Member
+    UpdateTagRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Tag'
+      description: |
+        A request to update a tag
+    UpdateUserRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/User'
+      description: |
+        A request to update a user
   responses:
     '204':
       description: |
@@ -3104,8 +3271,8 @@ components:
             '$ref': '#/components/schemas/UrlSafeId'
           type: array
         name:
-          minimum: 1
-          maximum: 31
+          minLength: 1
+          maxLength: 31
           type: string
         permissions:
           items:
@@ -3119,6 +3286,17 @@ components:
             '$ref': '#/components/schemas/UrlSafeId'
           type: array
       type: object
+    PartialTag:
+      properties:
+        name:
+          type: string
+      type: object
+    PartialUser:
+      properties:
+        alias:
+          minLength: 1
+          maxLength: 31
+          type: string
     PaymentPlan:
       allOf:
         - '$ref': '#/components/schemas/WithIdMetaObject'
@@ -3220,9 +3398,7 @@ components:
         - '$ref': '#/components/schemas/UserSubjectOrResource'
         - '$ref': '#/components/schemas/UserApiKeySubjectOrResource'
     Tag:
-      properties:
-        name:
-          type: string
+
       required:
         - name
       type: object
