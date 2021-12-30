@@ -50,6 +50,12 @@ x-tagGroups:
     tags:
       - organizations-tags
       - bulk-tags
+  - name: Query
+    tags:
+      - query
+  - name: Payment Plans
+    tags:
+      - payment-plans
   - name: Errors
     tags:
       - '405-error'
@@ -404,11 +410,19 @@ paths:
       summary: List Organizations
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/OrganizationsList'
+          description: |
+            # Success
+            A list of organizations of which the logged in user is either a member or owner
         '401':
           '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
       security:
         - token-auth:
           - 'authenticated'
@@ -420,9 +434,17 @@ paths:
         Create a new `Organization` and assign the logged in `User` to be the owner.
         This creates a handful of additional `Permissions`, ` and `Tags` automatically for the new `Organization` 
       summary: Create Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/CreateOrganizationRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/OrganizationWithId'
+          description: |
+            # Success
+            The newly created organization
         '401':
           '$ref': '#/components/responses/401'
         '406':
@@ -1438,7 +1460,6 @@ paths:
     parameters:
       - '$ref': '#/components/parameters/organizationId'
     get:
-    post:
   '/organizations/{organizationId}/payments/{paymentId}':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
@@ -1450,6 +1471,37 @@ paths:
     parameters:
       - '$ref': '#/components/parameters/organizationId'
     get:
+      description: |
+        List Tags for an `Organization`.
+        This lists all tags for an organization
+      summary: List Tags for an Organization
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/TagList'
+          description: |
+            # Success
+            A list of tags
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/tags:read'
+          - 'organization/{organizationId}/tags/{tagId}:read'
+      tags:
+        - organizations-tags
     post:
       description: ''
       summary: Create/Update/Delete Multiple Flags
@@ -1520,51 +1572,193 @@ paths:
           '$ref': '#/components/responses/406'
   '/payment-plans':
     get:
+      description: |
+        List payment plan options for the application.
+      summary: List Payment plans
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/PaymentPlanList'
+          description: |
+            # Success
+            A list of payment plans
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - payment-plans
   '/payment-plans/{paymentPlanId}':
     parameters:
       - '$ref': '#/components/parameters/paymentPlanId'
     get:
-      description: ''
+      description: |
+        Get a payment plan by ID
       summary: Get Payment Plan By ID
       responses:
         '200':
-          description: ''
-  '/query/api-keys': 
-    post:
-      description: ''
-      summary: Query API Keys
-      responses:
-        '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/PaymentPlan'
+          description: |
+            # Success
+            The payment plan
+        '401':
+          '$ref': '#/components/responses/401'
+        '404':
+          '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - payment-plans
+  '/query/api-keys':
+    post:
+      description: |
+        Perform an API Keys search.
+      summary: Query API Keys
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryApiKeysRequest'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/ApiKeyList'
+          description: |
+            # Success
+            A list of matching API Keys
+        '401':
+          '$ref': '#/components/responses/401'
+        '406':
+          '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'api-keys/{apiKeyId}:read'
+          - 'organizations/{organizationId}/api-keys:read'
+          - 'organizations/{organizationId}/api-keys/{apiKey}:read'
+      tags:
+        - query
+        - api-keys
   '/query/audit-logs':
     post:
-      description: ''
-      summary: Query Audit Logs
+      description: |
+        Perform an Audit log search.
+      summary: Query Audit Log Entries
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryAuditLogsRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/AuditLogEntriesList'
+          description: |
+            # Success
+            A list of matching Audit Log Entries
+        '401':
+          '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'audit-logs/{auditLogId}:read'
+          - 'organizations/{organizationId}/audit-logs:read'
+          - 'organizations/{organizationId}/audit-logs/{auditLogId}:read'
+      tags:
+        - query
+        - api-keys
   '/query/organizations':
     post:
-      description: ''
+      description: |
+        Perform an organization search.
       summary: Query Organizations
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryOrganizationsRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/OrganizationsList'
+          description: |
+            # Success
+            A list of matching Organizations
+        '401':
+          '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read' 
+      tags:
+        - query
+        - api-keys
   '/query/flags':
     post:
-      description: ''
-      summary: Query Flags
+      description: |
+        Perform an organization search.
+      summary: Query Organizations
+      requestBody:
+        '$ref': '#/components/requestBodies/QueryFlagssRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/AuditLogEntriesList'
+          description: |
+            # Success
+            A list of matching Audit Log Entries
+        '401':
+          '$ref': '#/components/responses/401'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+      tags:
+        - query
+        - flags
   '/query/groups':
     post:
       description: ''
@@ -1823,16 +2017,29 @@ components:
         'application/json':
           schema:
             '$ref': '#/components/schemas/Flag'
+      description: |
+        A request to create a new flag
     CreateGroupRequest:
       content:
         'application/json':
           schema:
             '$ref': '#/components/schemas/Group'
+      description: |
+        A request to create a new group
     CreateMemberRequest:
       content:
         'application/json':
           schema:
             '$ref': '#/components/schemas/Member'
+      description: |
+        A request to add a member to a group in an organization
+    CreateOrganizationRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/Organization'
+      description: |
+        A request to create a new organization
     PartialUpdateApiKeyRequest:
       content:
         'application/json':
@@ -1863,6 +2070,55 @@ components:
               - '$ref': '#/components/schemas/MemberStatusMetaObject'
       description: |
         A request to partially update a Group
+    QueryApiKeysRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryApiKeysRequest'
+      description: |
+        A request to query api keys
+    QueryAuditLogsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryAuditLogsRequest'
+      description: |
+        A request to query audit logs
+    QueryFlagsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryFlagsRequest'
+      description: |
+        A request to query flags
+    QueryGroupsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryGroupsRequest'
+      description: |
+        A request to query groups
+    QueryOrganizationsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryOrganizationsRequest'
+      description: |
+        A request to query organizations
+    QueryTagsRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryTagsRequest'
+      description: |
+        A request to query tags
+    QueryUsersRequest:
+      content:
+        'application/json':
+          schema:
+            '$ref': '#/components/schemas/QueryUsersRequest'
+      description: |
+        A request to query users
     UpdateApiKeyRequest:
       content:
         'application/json':
@@ -2088,6 +2344,7 @@ components:
     ApiKey:
       allOf:
         - '$ref': '#/components/schemas/PartialApiKey'
+        - '$ref': '#/components/schemas/WithTimestampsMetaObject'
       description: |
         # API Key
         A key used as a bearer token for API access
@@ -2448,6 +2705,8 @@ components:
         - '$ref': '#/components/schemas/Member'
         - '$ref': '#/components/schemas/MemberStatusMetaObject'
         - '$ref': '#/components/schemas/WithIdMetaObject'
+    Organization:
+      type: object
     OrganizationApiKeySubjectOrResource:
       properties:
         apiKeyId:
@@ -2512,8 +2771,15 @@ components:
       required:
         - organizationId
         - type
+    OrganizationWithId:
+      allOf:
+        - '$ref': '#/components/schemas/Organization'
+        - '$ref': '#/components/schemas/WithIdMetaObject'
+      type: object
     PartialApiKey:
       properties:
+          createdBy:
+            '$ref': '#/components/schemas/Subject'
           description:
             maxLength: 200
             minLength: 0
@@ -2562,6 +2828,40 @@ components:
             '$ref': '#/components/schemas/UrlSafeId'
           type: array
       type: object
+    PaymentPlan:
+      allOf:
+        - '$ref': '#/components/schemas/WithIdMetaObject'
+        - properties:
+            description:
+              maxLength: 2047
+              minLength: 1
+              type: string
+            schedule:
+              enum:
+                - monthly
+                - yearly
+              type: string
+            details:
+              type: object
+          required:
+            - description
+            - schedule
+            - details
+          type: object
+    PaymentPlanList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                '$ref': '#/components/schemas/PaymentPlan'
+              type: array
+          required:
+            - results
+          type: object
+      description: |
+        # Payment Plan List
+        A list of Payment plans
     Permission:
       properties:
         action:
@@ -2575,6 +2875,37 @@ components:
         - resource
         - subject
       type: object
+    QueryApiKeysRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+        - '$ref': '#/components/schemas/WithQueryModifiedAtTimestampMetaObject'
+        - '$ref': '#/components/schemas/WithQueryNameMetaObject'
+        - '$ref': '#/components/schemas/WithQueryOrganizationIdMetaObject'
+      type: object
+    QueryAuditLogsRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+      type: object
+    QueryFlagsRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+      type: object
+    QueryGroupsRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+      type: object
+    QueryOrganizationsRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+      type: object
+    QueryTagsRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+      type: object
+    QueryUsersRequest:
+      oneOf:
+        - '$ref': '#/components/schemas/WithQueryCreatedAtTimestampMetaObject'
+      type: object
     Resource:
       oneOf:
         - '$ref': '#/components/schemas/FlagResource'
@@ -2586,6 +2917,11 @@ components:
         - '$ref': '#/components/schemas/OrganizationResource'
         - '$ref': '#/components/schemas/UserSubjectOrResource'
         - '$ref': '#/components/schemas/UserApiKeySubjectOrResource'
+    Rfc3339Iso8601DateTime:
+      description: |
+        A date time stored as a string, formatted using ISO8601, RFC3339
+      format: date-time
+      type: string
     Subject:
       oneOf:
         - '$ref': '#/components/schemas/AdminSubject'
@@ -2633,6 +2969,20 @@ components:
         - apiKeyId
         - type
         - userId
+    WithCreatedAtMetaObject:
+      properties:
+        createdAt:
+          '$ref': '#/components/schemas/Rfc3339Iso8601DateTime'
+      required:
+        - createdAt
+      type: object
+    WithDeletedAtMetaObject:
+      properties:
+        deletedAt:
+          '$ref': '#/components/schemas/Rfc3339Iso8601DateTime'
+      required:
+        - deletedAt
+      type: object
     WithIdMetaObject:
       properties:
         id:
@@ -2640,3 +2990,69 @@ components:
       required:
         - id
       type: object
+    WithModifiedAtMetaObject:
+      properties:
+        modifiedAt:
+          '$ref': '#/components/schemas/Rfc3339Iso8601DateTime'
+      required:
+        - modifiedAt
+      type: object
+    WithQueryCreatedAtTimestampMetaObject:
+      properties:
+        createdAt:
+          anyOf:
+            - '$ref': '#/components/schemas/WithQueryTimestampAfterMetaObject'
+            - '$ref': '#/components/schemas/WithQueryTimestampBeforeMetaObject'
+          type: object
+      required:
+        - createdAt
+      type: object
+    WithQueryModifiedAtTimestampMetaObject:
+      properties:
+        modifiedAt:
+          anyOf:
+            - '$ref': '#/components/schemas/WithQueryTimestampAfterMetaObject'
+            - '$ref': '#/components/schemas/WithQueryTimestampBeforeMetaObject'
+          type: object
+      required:
+        - modifiedAt
+      type: object
+    WithQueryNameMetaObject:
+      properties:
+        name:
+          '$ref': '#/components/schemas/WithQueryStringBeginsWithMetaObject'
+      required:
+        - name
+      type: object
+    WithQueryOrganizationIdMetaObject:
+      properties:
+        organization:
+          '$ref': '#/components/schemas/WithIdMetaObject'
+      required:
+        - organization
+      type: object
+    WithQueryStringBeginsWithMetaObject:
+      properties:
+        beginsWith:
+          type: string
+      required:
+        - beginsWith
+      type: object
+    WithQueryTimestampAfterMetaObject:
+      properties:
+        after:
+          '$ref': '#/components/schemas/Rfc3339Iso8601DateTime'
+      required:
+        - after
+      type: object
+    WithQueryTimestampBeforeMetaObject:
+      properties:
+        before:
+          '$ref': '#/components/schemas/Rfc3339Iso8601DateTime'
+      required:
+        - before
+      type: object
+    WithTimestampsMetaObject:
+      allOf:
+        - '$ref': '#/components/schemas/WithCreatedAtMetaObject'
+        - '$ref': '#/components/schemas/WithModifiedAtMetaObject'
