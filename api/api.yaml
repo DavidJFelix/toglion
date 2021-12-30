@@ -30,7 +30,6 @@ x-tagGroups:
       - audit-logs
   - name: Organizations
     tags:
-      - bulk-organization
       - organizations
       - organizations-api-keys
       - organizations-audit-logs
@@ -41,15 +40,12 @@ x-tagGroups:
   - name: Flags
     tags:
       - flags
-      - bulk-flags
-      - organizations-flags
   - name: Users
     tags:
       - users
   - name: Tags
     tags:
-      - organizations-tags
-      - bulk-tags
+      - tags
   - name: Query
     tags:
       - query
@@ -923,7 +919,7 @@ paths:
         - organizations-flags
     get:
       description: |
-        Get a flag for an `Organization` by.
+        Get a flag for an `Organization` by id.
       summary: Get a Flag by Id
       responses:
         '200':
@@ -967,7 +963,7 @@ paths:
                 '$ref': '#/components/schemas/FlagWithId'
           description: |
             # Success
-            The newly created Flag
+            The updated Flag
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1006,7 +1002,7 @@ paths:
                 '$ref': '#/components/schemas/FlagWithId'
           description: |
             # Success
-            The newly created Flag
+            The updated Flag
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1492,53 +1488,120 @@ paths:
           - 'organization/{organizationId}/tags:read'
           - 'organization/{organizationId}/tags/{tagId}:read'
       tags:
+        - tags
         - organizations-tags
     post:
-      description: ''
-      summary: Create/Update/Delete Multiple Flags
+      description: |
+        Create a tag for an `Organization`.
+      summary: Create Tag for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/CreateFlagRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/TagWithId'
+          description: |
+            # Success
+            The newly created Tag
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/tags:create'
+      tags:
+        - tags
+        - organizations-tags
   '/organizations/{organizationId}/tags/{tagId}':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
       - '$ref': '#/components/parameters/tagId'
     delete:
-      description: ''
-      summary: Delete User
+      description: |
+        Delete a Tag for an `Organization`.
+      summary: Delete a Tag by Id
       responses:
-        '200':
-          description: ''
+        '204':
+          '$ref': '#/components/responses/204'
         '401':
           '$ref': '#/components/responses/401'
         '403':
           '$ref': '#/components/responses/403'
         '404':
           '$ref': '#/components/responses/404'
-        '406':
-          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/tags:delete'
+          - 'organization/{organizationId}/tags/{tagId}:delete'
+      tags:
+        - tags
+        - organizations-tags
     get:
-      description: ''
-      summary: Read User
+      description: |
+        Get a tag for an `Organization` by id
+      summary: Get a Tag by Id
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/TagWithId'
+          description: |
+            # Success
+            The Tag
         '401':
           '$ref': '#/components/responses/401'
-        '403':
-          '$ref': '#/components/responses/403'
         '404':
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/tags:read'
+          - 'organization/{organizationId}/tags/{tagId}:read'
+      tags:
+        - tags
+        - organizations-tags
     patch:
-      description: ''
-      summary: Partially update a tag
+      description: |
+        Update a tags for an `Organization`.
+      summary: Partially Update a Tag for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/PartialUpdateTagRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/TagWithId'
+          description: |
+            # Success
+            The updated tag
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1547,12 +1610,37 @@ paths:
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/tags:update'
+          - 'organization/{organizationId}/tags/{tagId}:update'
+      tags:
+        - tags
+        - organizations-tags
     put:
-      description: ''
-      summary: Update User
+      description: |
+        Update a tag for an `Organization`.
+      summary: Update a Tag for an Organization
+      requestBody:
+        '$ref': '#/components/requestBodies/UpdateTagRequest'
       responses:
         '200':
-          description: ''
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/TagWithId'
+          description: |
+            # Success
+            The updated tag
         '401':
           '$ref': '#/components/responses/401'
         '403':
@@ -1561,6 +1649,22 @@ paths:
           '$ref': '#/components/responses/404'
         '406':
           '$ref': '#/components/responses/406'
+        '415':
+          '$ref': '#/components/responses/415'
+        '422':
+          '$ref': '#/components/responses/422'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}:update'
+          - 'organization/{organizationId}/tags:update'
+          - 'organization/{organizationId}/tags/{tagId}:update'
+      tags:
+        - tags
+        - organizations-tags
   '/payment-plans':
     get:
       description: |
