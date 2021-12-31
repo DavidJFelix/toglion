@@ -23,21 +23,21 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
-    iam: {
-      role: '${ssm:/services/api/LAMBDA_ROLE_ARN}',
-    },
+    // iam: {
+    //   role: '${ssm:/services/api/LAMBDA_ROLE_ARN}',
+    // },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },
-    deploymentBucket: {
-      name: '${ssm:/services/api/SERVERLESS_DEPLOYMENT_BUCKET}',
-      serverSideEncryption: 'AES256',
-    },
+    // deploymentBucket: {
+    //   name: '${ssm:/services/api/SERVERLESS_DEPLOYMENT_BUCKET}',
+    //   serverSideEncryption: 'AES256',
+    // },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      GLOBAL_DYNAMODB_TABLE: '${ssm:/services/api/GLOBAL_DYNAMODB_TABLE}',
-      REGIONAL_DYNAMODB_TABLE: '${ssm:/services/api/REGIONAL_DYNAMODB_TABLE}',
+      GLOBAL_DYNAMODB_TABLE: 'gdb', //'${ssm:/services/api/GLOBAL_DYNAMODB_TABLE}',
+      REGIONAL_DYNAMODB_TABLE: 'rdb', //'${ssm:/services/api/REGIONAL_DYNAMODB_TABLE}',
       WSAPI_GATEWAY_ENDPOINT: {
         'Fn::Join': [
           '/',
@@ -51,13 +51,13 @@ const serverlessConfiguration: AWS = {
       },
     },
     lambdaHashingVersion: '20201221',
-    vpc: {
-      // Types here don't account for variable lookup in the resultant cloudformation template.
-      securityGroupIds:
-        '${ssm:/services/api/LAMBDA_SECURITY_GROUPS}' as unknown as string[],
+    // vpc: {
+    //   // Types here don't account for variable lookup in the resultant cloudformation template.
+    //   securityGroupIds:
+    //     '${ssm:/services/api/LAMBDA_SECURITY_GROUPS}' as unknown as string[],
 
-      subnetIds: '${ssm:/services/api/LAMBDA_SUBNETS}' as unknown as string[],
-    },
+    //   subnetIds: '${ssm:/services/api/LAMBDA_SUBNETS}' as unknown as string[],
+    // },
     websocketsApiRouteSelectionExpression: '$request.body.type',
   },
   functions: {
@@ -75,7 +75,7 @@ const serverlessConfiguration: AWS = {
       CustomDomainMapping: {
         Type: 'AWS::ApiGatewayV2::ApiMapping',
         Properties: {
-          DomainName: '${ssm:/services/api/WEBSOCKET_DOMAIN_NAME}',
+          DomainName: 'hello', //'${ssm:/services/api/WEBSOCKET_DOMAIN_NAME}',
           ApiId: {
             Ref: 'WebsocketsApi',
           },
