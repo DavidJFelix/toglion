@@ -1,0 +1,11 @@
+{
+  "name": "@toglion/builder",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@swc/cli": "^0.1.54",
+    "@swc/core": "^1.2.119",
+    "esbuild": "^0.14.3"
+  }
+}
