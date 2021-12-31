@@ -1447,6 +1447,35 @@ paths:
     parameters:
       - '$ref': '#/components/parameters/organizationId'
     get:
+      description: |
+        List payments for an `Organization`
+      summary: List Payments for an Organization
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                '$ref': '#/components/schemas/PaymentList'
+          description: |
+            # Success
+            A list of Payments
+        '401':
+          '$ref': '#/components/responses/401'
+        '403':
+          '$ref': '#/components/responses/403'
+        '404':
+          '$ref': '#/components/responses/404'
+        '406':
+          '$ref': '#/components/responses/406'
+        '429':
+          '$ref': '#/components/responses/429'
+      security:
+        - token-auth:
+          - authenticated
+          - 'organization/{organizationId}:read'
+          - 'organization/{organizationId}/payments:read'
+      tags:
+        - organizations-payment
   '/organizations/{organizationId}/payments/{paymentId}':
     parameters:
       - '$ref': '#/components/parameters/organizationId'
@@ -3300,6 +3329,22 @@ components:
         fullName:
           minLength: 1
           maxLength: 127
+      type: object
+    Payment:
+      allOf:
+        - '$ref': '#/components/schemas/WithIdMetaObject'
+      type: object
+    PaymentList:
+      allOf:
+        - '$ref': '#/components/schemas/ListResponseMetaObject'
+        - properties:
+            results:
+              items:
+                - '$ref': '#/components/schemas/Payment'
+              type: array
+          required:
+            - results
+          type: object
       type: object
     PaymentPlan:
       allOf:
