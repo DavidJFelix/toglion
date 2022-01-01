@@ -29,8 +29,8 @@ const acmMainCertificate = regionalBaseStack.getOutput(
   'acmMainCertificate',
 ) as Output<acm.Certificate>
 
-const wsApiDomainName = new apigatewayv2.DomainName('websocket', {
-  domainName: `wsapi.${route53MainZone.name}`,
+export const wsApiDomainName = new apigatewayv2.DomainName('websocket', {
+  domainName: route53MainZone.apply(({name}) => `wsapi.${name}`),
   domainNameConfiguration: {
     certificateArn: acmMainCertificate.arn,
     endpointType: 'REGIONAL',
@@ -38,8 +38,8 @@ const wsApiDomainName = new apigatewayv2.DomainName('websocket', {
   },
 })
 
-const restApiDomainName = new apigatewayv2.DomainName('rest', {
-  domainName: `api.${route53MainZone.name}`,
+export const restApiDomainName = new apigatewayv2.DomainName('rest', {
+  domainName: route53MainZone.apply(({name}) => `api.${name}`),
   domainNameConfiguration: {
     certificateArn: acmMainCertificate.arn,
     endpointType: 'REGIONAL',
