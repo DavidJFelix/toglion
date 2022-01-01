@@ -1,0 +1,12 @@
+config:
+  010-aws-regional-app:data:
+    globalBaseStackName: 'DavidJFelix/000-aws-global-base/production-main'
+    regionalBaseStackName: 'DavidJFelix/001-aws-regional-base/production-us-east-1'
+    tags:
+      Application: 010-aws-regional-app
+      Environment: Production-main
+      IsCloudFormation: "False"
+      IsManual: "False"
+      IsPulumi: "True"
+      IsTerraform: "False"
+  aws:region: us-east-1
