@@ -1,0 +1,3 @@
+name: 010-aws-global-app
+runtime: nodejs
+description: A minimal AWS TypeScript Pulumi program
