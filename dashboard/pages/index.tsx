@@ -1,8 +1,8 @@
-import NextLink from 'next/link'
-import {Box, Heading, Link as ChakraLink} from '@chakra-ui/react'
+import {Box, Heading, Link as ChakraLink, Text} from '@chakra-ui/react'
 import {FeatureFlag} from '@toglion/types'
 import {useState} from 'react'
-import {FeatureFlagsList} from '../components/FeatureFlagsList'
+import {signIn, signOut, useSession} from 'next-auth/react'
+import {FeatureFlagsList} from 'components/FeatureFlagsList'
 
 const defaultFlags: FeatureFlag[] = [
   {
@@ -20,6 +20,7 @@ const defaultFlags: FeatureFlag[] = [
 ]
 
 function IndexPage() {
+  const {data: session, status: authStatus} = useSession()
   const [flags, setFlags] = useState(defaultFlags)
 
   const onFlagToggle = (id: string) => {
@@ -44,9 +45,14 @@ function IndexPage() {
     <Box maxW="lg">
       <Heading>Feature Flags</Heading>
       <FeatureFlagsList flags={flags} onToggle={onFlagToggle} />
-      <NextLink href="/test-auth" passHref>
-        <ChakraLink>Auth n stuff</ChakraLink>
-      </NextLink>
+      {authStatus !== 'authenticated' ? (
+        <ChakraLink onClick={() => signIn()}>Sign In</ChakraLink>
+      ) : (
+        <>
+          <Text>{session?.user?.email ?? 'Fug'}</Text>
+          <ChakraLink onClick={() => signOut()}>Sign Out</ChakraLink>
+        </>
+      )}
     </Box>
   )
 }
