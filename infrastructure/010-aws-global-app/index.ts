@@ -26,32 +26,33 @@ const kmsKeys = Object.fromEntries(
   ]),
 )
 
-const apiKeysTable = new dynamodb.Table('api-keys', {
+export const apiKeysTable = new dynamodb.Table('api-keys', {
   attributes: [
     {name: 'groupId', type: 'S'},
     {name: 'name', type: 'S'},
-    {name: 'pk', type: 'S'},
-    {name: 'sk', type: 'S'},
+    {name: 'id', type: 'S'},
     {name: 'userId', type: 'S'},
   ],
   billingMode: 'PAY_PER_REQUEST',
-  hashKey: 'pk',
-  rangeKey: 'sk',
   globalSecondaryIndexes: [
+    // Belongs To
     {
       hashKey: 'groupId',
-      rangeKey: 'pk',
+      rangeKey: 'id',
       name: 'owner-group',
       projectionType: 'ALL',
     },
+    // Query Key
     {hashKey: 'name', name: 'name', projectionType: 'ALL'},
+    // Belongs To
     {
       hashKey: 'userId',
-      rangeKey: 'pk',
+      rangeKey: 'id',
       name: 'owner-user',
       projectionType: 'ALL',
     },
   ],
+  hashKey: 'id',
   serverSideEncryption: {
     enabled: true,
     kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
@@ -70,25 +71,59 @@ const apiKeysTable = new dynamodb.Table('api-keys', {
   tags: {...tags},
 })
 
-const organizationsTable = new dynamodb.Table('organizations', {
+export const authAccountsTable = new dynamodb.Table('auth-accounts', {
+  attributes: [
+    {name: 'id', type: 'S'},
+    {name: 'userId', type: 'S'},
+  ],
+  billingMode: 'PAY_PER_REQUEST',
+  globalSecondaryIndexes: [
+    // Belongs to
+    {
+      hashKey: 'userId',
+      name: 'linked-user',
+      projectionType: 'ALL',
+      rangeKey: 'id',
+    },
+  ],
+  hashKey: 'id',
+  serverSideEncryption: {
+    enabled: true,
+    kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
+  },
+  replicas: awsRegion.apply((awsRegion) =>
+    Object.entries(kmsKeys)
+      .filter(([region]) => region !== awsRegion)
+      .map(([regionName, kmsKey]) => ({kmsKeyArn: kmsKey.arn, regionName})),
+  ),
+  streamEnabled: true,
+  streamViewType: 'NEW_AND_OLD_IMAGES',
+  ttl: {
+    enabled: true,
+    attributeName: 'ttl',
+  },
+  tags: {...tags},
+})
+
+export const organizationsTable = new dynamodb.Table('organizations', {
   attributes: [
     {name: 'name', type: 'S'},
-    {name: 'pk', type: 'S'},
-    {name: 'sk', type: 'S'},
+    {name: 'id', type: 'S'},
     {name: 'ownerUserId', type: 'S'},
   ],
   billingMode: 'PAY_PER_REQUEST',
-  hashKey: 'pk',
-  rangeKey: 'sk',
   globalSecondaryIndexes: [
+    // Query Key
     {hashKey: 'name', name: 'name', projectionType: 'ALL'},
+    // Belongs to
     {
       hashKey: 'ownerUserId',
-      rangeKey: 'pk',
-      name: 'owner',
+      rangeKey: 'id',
+      name: 'owner-user',
       projectionType: 'ALL',
     },
   ],
+  hashKey: 'id',
   serverSideEncryption: {
     enabled: true,
     kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
@@ -107,20 +142,20 @@ const organizationsTable = new dynamodb.Table('organizations', {
   tags: {...tags},
 })
 
-const usersTable = new dynamodb.Table('users', {
+export const usersTable = new dynamodb.Table('users', {
   attributes: [
     {name: 'alias', type: 'S'},
-    {name: 'groupId', type: 'S'},
-    {name: 'pk', type: 'S'},
-    {name: 'sk', type: 'S'},
+    {name: 'email', type: 'S'},
+    {name: 'id', type: 'S'},
   ],
   billingMode: 'PAY_PER_REQUEST',
-  hashKey: 'pk',
-  rangeKey: 'sk',
   globalSecondaryIndexes: [
+    // Query Key
     {hashKey: 'alias', name: 'alias', projectionType: 'ALL'},
-    {hashKey: 'groupId', rangeKey: 'pk', name: 'groups', projectionType: 'ALL'},
+    // Query Key
+    {hashKey: 'email', name: 'email', projectionType: 'ALL'},
   ],
+  hashKey: 'id',
   serverSideEncryption: {
     enabled: true,
     kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
