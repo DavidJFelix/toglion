@@ -142,6 +142,40 @@ export const organizationsTable = new dynamodb.Table('organizations', {
   tags: {...tags},
 })
 
+export const sessionsTable = new dynamodb.Table('sessions', {
+  attributes: [
+    {name: 'id', type: 'S'},
+    {name: 'userId', type: 'S'},
+  ],
+  billingMode: 'PAY_PER_REQUEST',
+  globalSecondaryIndexes: [
+    // Belongs To
+    {
+      hashKey: 'userId',
+      rangeKey: 'id',
+      name: 'user',
+      projectionType: 'ALL',
+    },
+  ],
+  hashKey: 'id',
+  serverSideEncryption: {
+    enabled: true,
+    kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
+  },
+  replicas: awsRegion.apply((awsRegion) =>
+    Object.entries(kmsKeys)
+      .filter(([region]) => region !== awsRegion)
+      .map(([regionName, kmsKey]) => ({kmsKeyArn: kmsKey.arn, regionName})),
+  ),
+  streamEnabled: true,
+  streamViewType: 'NEW_AND_OLD_IMAGES',
+  tags: {...tags},
+  ttl: {
+    enabled: true,
+    attributeName: 'ttl',
+  },
+})
+
 export const usersTable = new dynamodb.Table('users', {
   attributes: [
     {name: 'alias', type: 'S'},

@@ -11,6 +11,7 @@ import {config} from 'lib/config'
 const tableConfig = {
   accounts: 'auth-accounts-4ca9dc8',
   users: 'users-1a8d390',
+  sessions: 'sessions-1113ebd',
 }
 
 const ddbClient = new DynamoDB({})
@@ -23,12 +24,42 @@ interface UserRecord extends Record<string, unknown> {
 
 const adapter: Adapter = {
   async createUser(user) {
+    console.log(`createUser: ${JSON.stringify(user)}`)
+    const now = new Date()
     const newUser: AdapterUser = {
       id: ulid(),
       emailVerified: null,
       ...user,
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
     }
-    console.log(`createUser: ${JSON.stringify(user)}`)
+    await docDbClient.transactWrite({
+      TransactItems: [
+        {
+          Put: {
+            ConditionExpression: 'attribute_not_exists(#i)',
+            ExpressionAttributeNames: {
+              '#i': 'id',
+            },
+            Item: newUser,
+            TableName: tableConfig.users,
+          },
+        },
+        {
+          Put: {
+            ConditionExpression: 'attribute_not_exists(#i)',
+            ExpressionAttributeNames: {
+              '#i': 'id',
+            },
+            Item: {
+              id: `unique/email/${user.email}`,
+              userId: newUser.id,
+            },
+            TableName: tableConfig.users,
+          },
+        },
+      ],
+    })
     return newUser
   },
   async getUser(id: string) {
@@ -99,7 +130,36 @@ const adapter: Adapter = {
   },
   async linkAccount(account: Account) {
     console.log(`linkAccount: ${JSON.stringify(account)}`)
-    throw new Error('Function not implemented.')
+    await docDbClient.transactWrite({
+      TransactItems: [
+        {
+          Put: {
+            ConditionExpression: 'attribute_not_exists(#i)',
+            ExpressionAttributeNames: {
+              '#i': 'id',
+            },
+            Item: {
+              id: `${account.provider}/${account.providerAccountId}`,
+              ...account,
+            },
+            TableName: tableConfig.accounts,
+          },
+        },
+        {
+          Put: {
+            ConditionExpression: 'attribute_not_exists(#i)',
+            ExpressionAttributeNames: {
+              '#i': 'id',
+            },
+            Item: {
+              id: `unique/providerUser/provider/${account.provider}:user/${account.userId}`,
+            },
+            TableName: tableConfig.accounts,
+          },
+        },
+      ],
+    })
+    return account
   },
   async createSession(session: {
     sessionToken: string
@@ -107,7 +167,26 @@ const adapter: Adapter = {
     expires: Date
   }) {
     console.log(`createSession: ${JSON.stringify(session)}`)
-    throw new Error('Function not implemented.')
+    const ttl =
+      Math.round(session.expires.getTime() / 1000) +
+      session.expires.getTimezoneOffset() * 60
+    await docDbClient.put({
+      ConditionExpression: 'attribute_not_exists(#i)',
+      ExpressionAttributeNames: {
+        '#i': 'id',
+      },
+      Item: {
+        id: session.sessionToken,
+        userId: session.userId,
+        expiresAt: session.expires.toISOString(),
+        ttl,
+      },
+      TableName: tableConfig.sessions,
+    })
+    return {
+      id: session.sessionToken,
+      ...session,
+    }
   },
   async getSessionAndUser(sessionToken: string) {
     throw new Error('Function not implemented.')
