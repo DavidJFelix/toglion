@@ -3,7 +3,12 @@ import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
 import NextAuth, {Account} from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
-import {Adapter, AdapterSession, AdapterUser} from 'next-auth/adapters'
+import {
+  Adapter,
+  AdapterSession,
+  AdapterUser,
+  VerificationToken,
+} from 'next-auth/adapters'
 import {ulid} from 'ulid'
 
 import {config} from 'lib/config'
@@ -12,6 +17,7 @@ const tableConfig = {
   accounts: 'auth-accounts-4ca9dc8',
   users: 'users-1a8d390',
   sessions: 'sessions-1113ebd',
+  emailVerificationTokens: 'email-verification-tokens-51d6229',
 }
 
 const ddbClient = new DynamoDB({})
@@ -189,7 +195,38 @@ const adapter: Adapter = {
     }
   },
   async getSessionAndUser(sessionToken: string) {
-    throw new Error('Function not implemented.')
+    const sessionResponse = await docDbClient.get({
+      Key: {
+        id: sessionToken,
+      },
+      TableName: tableConfig.emailVerificationTokens,
+    })
+
+    if (!sessionResponse.Item) {
+      return null
+    }
+
+    const userResponse = await docDbClient.get({
+      Key: {
+        id: sessionResponse.Item?.userId,
+      },
+      TableName: tableConfig.users,
+    })
+
+    if (!userResponse.Item) {
+      return null
+    }
+
+    const session = sessionResponse.Item as AdapterSession
+    const {emailVerified, ...rest} = userResponse.Item as UserRecord
+
+    return {
+      session,
+      user: {
+        emailVerified: emailVerified ? Date.parse(emailVerified) : null,
+        ...rest,
+      } as AdapterUser,
+    }
   },
   async updateSession(
     session: Partial<AdapterSession> & Pick<AdapterSession, 'sessionToken'>,
@@ -197,6 +234,12 @@ const adapter: Adapter = {
     throw new Error('Function not implemented.')
   },
   async deleteSession(sessionToken: string) {
+    throw new Error('Function not implemented.')
+  },
+  async createVerificationToken(verificationToken: VerificationToken) {
+    throw new Error('Function not implemented.')
+  },
+  async useVerificationToken(params: {identifier: string; token: string}) {
     throw new Error('Function not implemented.')
   },
 }

@@ -105,6 +105,32 @@ export const authAccountsTable = new dynamodb.Table('auth-accounts', {
   tags: {...tags},
 })
 
+export const emailVerificationTokenTable = new dynamodb.Table(
+  'email-verification-tokens',
+  {
+    attributes: [{name: 'id', type: 'S'}],
+    billingMode: 'PAY_PER_REQUEST',
+    globalSecondaryIndexes: [],
+    hashKey: 'id',
+    serverSideEncryption: {
+      enabled: true,
+      kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
+    },
+    replicas: awsRegion.apply((awsRegion) =>
+      Object.entries(kmsKeys)
+        .filter(([region]) => region !== awsRegion)
+        .map(([regionName, kmsKey]) => ({kmsKeyArn: kmsKey.arn, regionName})),
+    ),
+    streamEnabled: true,
+    streamViewType: 'NEW_AND_OLD_IMAGES',
+    ttl: {
+      enabled: true,
+      attributeName: 'ttl',
+    },
+    tags: {...tags},
+  },
+)
+
 export const organizationsTable = new dynamodb.Table('organizations', {
   attributes: [
     {name: 'name', type: 'S'},
