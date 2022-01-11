@@ -70,7 +70,24 @@ const adapter: Adapter = {
   },
   async getUser(id: string) {
     console.log(`getUser: ${id}`)
-    throw new Error('Function not implemented.')
+    const userResponse = await docDbClient.get({
+      Key: {
+        id,
+      },
+      TableName: tableConfig.users,
+    })
+
+    if (!userResponse.Item || userResponse.Item.isDeleted) {
+      return null
+    }
+
+    const {emailVerified, ...rest} = userResponse.Item as UserRecord
+
+    return {
+      emailVerified: emailVerified ? Date.parse(emailVerified) : null,
+      ...rest,
+      id,
+    } as AdapterUser
   },
   async getUserByEmail(email: string) {
     console.log(`getUserByEmail: ${JSON.stringify(email)}`)
@@ -108,7 +125,7 @@ const adapter: Adapter = {
         id: `${provider}/${providerAccountId}`,
       },
     })
-    if (!accountResponse.Item) {
+    if (!accountResponse.Item || accountResponse.Item.isDeleted) {
       return null
     }
 
@@ -119,7 +136,7 @@ const adapter: Adapter = {
       },
     })
 
-    if (!userResponse.Item) {
+    if (!userResponse.Item || userResponse.Item.isDeleted) {
       // FIXME: maybe throw here?
       return null
     }
@@ -201,8 +218,15 @@ const adapter: Adapter = {
       },
       TableName: tableConfig.emailVerificationTokens,
     })
+    const now = new Date()
+    const ttlNow =
+      Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
 
-    if (!sessionResponse.Item) {
+    if (
+      !sessionResponse.Item ||
+      sessionResponse.Item.isDeleted ||
+      sessionResponse.Item.ttl <= ttlNow
+    ) {
       return null
     }
 
@@ -213,7 +237,7 @@ const adapter: Adapter = {
       TableName: tableConfig.users,
     })
 
-    if (!userResponse.Item) {
+    if (!userResponse.Item || userResponse.Item.isDeleted) {
       return null
     }
 
@@ -231,16 +255,121 @@ const adapter: Adapter = {
   async updateSession(
     session: Partial<AdapterSession> & Pick<AdapterSession, 'sessionToken'>,
   ) {
-    throw new Error('Function not implemented.')
+    console.log(`updateSession: ${JSON.stringify(session)}`)
+    if (!session.expires) {
+      // We only support updating the TTL
+      return null
+    }
+
+    const ttl =
+      Math.round(session.expires.getTime() / 1000) +
+      session.expires.getTimezoneOffset() * 60
+    await docDbClient.update({
+      Key: {
+        id: session.sessionToken,
+      },
+      ConditionExpression: 'attribute_exists(#i)',
+      ExpressionAttributeNames: {
+        '#e': 'expiresAt',
+        '#i': 'id',
+        '#t': 'ttl',
+      },
+      ExpressionAttributeValues: {
+        ':e': session.expires.toISOString(),
+        ':t': ttl,
+      },
+      ReturnValues: 'ALL_NEW',
+      TableName: tableConfig.sessions,
+      UpdateExpression: 'SET #e = :e, #t, :t',
+    })
+
+    return {
+      id: session.sessionToken,
+      ...session,
+    } as AdapterSession
   },
   async deleteSession(sessionToken: string) {
-    throw new Error('Function not implemented.')
+    console.log(`deleteSession: ${sessionToken}`)
+    const sessionResponse = await docDbClient.delete({
+      ConditionExpression: 'attribute_exists(#i)',
+      ExpressionAttributeNames: {
+        '#i': 'id',
+      },
+      Key: {
+        id: sessionToken,
+      },
+      ReturnValues: 'ALL_OLD',
+      TableName: tableConfig.sessions,
+    })
+
+    if (!sessionResponse.Attributes) {
+      return null
+    }
+
+    return {
+      id: sessionToken,
+      sessionToken,
+      expires: new Date(sessionResponse.Attributes.expiresAt),
+      userId: sessionResponse.Attributes.userId,
+    } as AdapterSession
   },
   async createVerificationToken(verificationToken: VerificationToken) {
-    throw new Error('Function not implemented.')
+    console.log(`createVerificationToken: ${JSON.stringify(verificationToken)}`)
+    const ttl =
+      Math.round(verificationToken.expires.getTime() / 1000) +
+      verificationToken.expires.getTimezoneOffset() * 60
+    await docDbClient.put({
+      ExpressionAttributeNames: {
+        '#i': 'id',
+        '#t': 'ttl',
+      },
+      ConditionExpression: 'attribute_not_exists(#i)',
+      Item: {
+        id: verificationToken.identifier,
+        expiresAt: verificationToken.expires.toISOString(),
+        token: verificationToken.token,
+        ttl,
+      },
+      TableName: tableConfig.emailVerificationTokens,
+    })
+
+    return verificationToken
   },
-  async useVerificationToken(params: {identifier: string; token: string}) {
-    throw new Error('Function not implemented.')
+  async useVerificationToken({
+    identifier,
+    token,
+  }: Pick<VerificationToken, 'identifier' | 'token'>) {
+    const now = new Date()
+    const ttlNow =
+      Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
+
+    const verificationTokenResponse = await docDbClient.delete({
+      ConditionExpression: 'attribute_exists(#i) AND #ttl > :ttl AND #t = :t',
+      ExpressionAttributeNames: {
+        '#i': 'id',
+        '#t': 'token',
+        '#ttl': 'ttl',
+      },
+      ExpressionAttributeValues: {
+        ':t': token,
+        ':ttl': ttlNow,
+      },
+      Key: {
+        id: identifier,
+      },
+      ReturnValues: 'ALL_OLD',
+      TableName: tableConfig.emailVerificationTokens,
+    })
+
+    if (!verificationTokenResponse.Attributes) {
+      return null
+    }
+
+    return {
+      identifier,
+      token,
+      expires: new Date(verificationTokenResponse.Attributes.expiresAt),
+    }
   },
 }
 
