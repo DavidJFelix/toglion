@@ -3,6 +3,7 @@ import {FeatureFlag} from '@toglion/types'
 import {useState} from 'react'
 import {signIn, signOut, useSession} from 'next-auth/react'
 import {FeatureFlagsList} from 'components/FeatureFlagsList'
+import {AppShell} from 'components/layout/AppShell'
 
 const defaultFlags: FeatureFlag[] = [
   {
@@ -42,18 +43,20 @@ function IndexPage() {
   }
 
   return (
-    <Box maxW="lg">
-      <Heading>Feature Flags</Heading>
-      <FeatureFlagsList flags={flags} onToggle={onFlagToggle} />
-      {authStatus !== 'authenticated' ? (
-        <ChakraLink onClick={() => signIn()}>Sign In</ChakraLink>
-      ) : (
-        <>
-          <Text>{session?.user?.email ?? 'Fug'}</Text>
-          <ChakraLink onClick={() => signOut()}>Sign Out</ChakraLink>
-        </>
-      )}
-    </Box>
+    <AppShell>
+      <Box maxW="lg">
+        <Heading>Feature Flags</Heading>
+        <FeatureFlagsList flags={flags} onToggle={onFlagToggle} />
+        {authStatus !== 'authenticated' ? (
+          <ChakraLink onClick={() => signIn()}>Sign In</ChakraLink>
+        ) : (
+          <>
+            <Text>{session?.user?.email ?? 'Fug'}</Text>
+            <ChakraLink onClick={() => signOut()}>Sign Out</ChakraLink>
+          </>
+        )}
+      </Box>
+    </AppShell>
   )
 }
 

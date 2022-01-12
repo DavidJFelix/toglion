@@ -84,7 +84,7 @@ const adapter: Adapter = {
     const {emailVerified, ...rest} = userResponse.Item as UserRecord
 
     return {
-      emailVerified: emailVerified ? Date.parse(emailVerified) : null,
+      emailVerified: emailVerified ? new Date(emailVerified) : null,
       ...rest,
       id,
     } as AdapterUser
@@ -110,7 +110,7 @@ const adapter: Adapter = {
     const {id, emailVerified, ...rest} = userResponse.Items[0] as UserRecord
     return {
       id,
-      emailVerified: emailVerified ? Date.parse(emailVerified) : null,
+      emailVerified: emailVerified ? new Date(emailVerified) : null,
       ...rest,
     } as AdapterUser
   },
@@ -144,11 +144,12 @@ const adapter: Adapter = {
     const {id, emailVerified, ...rest} = userResponse.Item as UserRecord
     return {
       id,
-      emailVerified: emailVerified ? Date.parse(emailVerified) : null,
+      emailVerified: emailVerified ? new Date(emailVerified) : null,
       ...rest,
     } as AdapterUser
   },
   async updateUser(user: Partial<AdapterUser>) {
+    console.log(`updateUser: ${JSON.stringify(user)}`)
     throw new Error('Function not implemented.')
   },
   async linkAccount(account: Account) {
@@ -212,11 +213,13 @@ const adapter: Adapter = {
     }
   },
   async getSessionAndUser(sessionToken: string) {
+    console.log(`getSessionAndUser: ${sessionToken}`)
+
     const sessionResponse = await docDbClient.get({
       Key: {
         id: sessionToken,
       },
-      TableName: tableConfig.emailVerificationTokens,
+      TableName: tableConfig.sessions,
     })
     const now = new Date()
     const ttlNow =
@@ -241,13 +244,16 @@ const adapter: Adapter = {
       return null
     }
 
-    const session = sessionResponse.Item as AdapterSession
+    const {expiresAt, ttl: _ttl, ...session} = sessionResponse.Item
     const {emailVerified, ...rest} = userResponse.Item as UserRecord
 
     return {
-      session,
+      session: {
+        ...session,
+        expires: new Date(expiresAt),
+      } as AdapterSession,
       user: {
-        emailVerified: emailVerified ? Date.parse(emailVerified) : null,
+        emailVerified: emailVerified ? new Date(emailVerified) : null,
         ...rest,
       } as AdapterUser,
     }
@@ -339,6 +345,7 @@ const adapter: Adapter = {
     identifier,
     token,
   }: Pick<VerificationToken, 'identifier' | 'token'>) {
+    console.log(`useVerificationToken: ${JSON.stringify({identifier, token})}`)
     const now = new Date()
     const ttlNow =
       Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
