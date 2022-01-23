@@ -275,6 +275,20 @@ export const dynamodbPolicy = new iam.Policy('dynamodb', {
           usersTable.arn.apply((arn) => `${arn}/index/email`),
         ],
       },
+      {
+        Action: [
+          'kms:Encrypt',
+          'kms:Decrypt',
+          'kms:ReEncrypt*',
+          'kms:GenerateDataKey*',
+          'kms:DescribeKey',
+          'kms:CreateGrant',
+        ],
+        Effect: 'Allow',
+        Resource: [
+          ...Object.entries(kmsKeys).map(([_region, kmsKey]) => kmsKey.arn),
+        ],
+      },
     ],
     Version: '2012-10-17',
   },
