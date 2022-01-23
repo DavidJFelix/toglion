@@ -1,5 +1,5 @@
-import {Config, Output, StackReference} from '@pulumi/pulumi'
-import {dynamodb, getRegionOutput, kms} from '@pulumi/aws'
+import {Config, getStack, Output, StackReference} from '@pulumi/pulumi'
+import {dynamodb, getRegionOutput, iam, kms} from '@pulumi/aws'
 
 const awsRegion = getRegionOutput().apply(({name}) => name)
 
@@ -232,4 +232,69 @@ export const usersTable = new dynamodb.Table('users', {
     enabled: true,
     attributeName: 'ttl',
   },
+})
+
+export const dynamodbPolicy = new iam.Policy('dynamodb', {
+  description:
+    'A policy which allows read/write access to the dynamodb tables created for the application.',
+  namePrefix: `dynamodb-${getStack()}`,
+  policy: {
+    Statement: [
+      {
+        Action: [
+          'dynamodb:BatchGetItem',
+          'dynamodb:BatchWriteItem',
+          'dynamodb:ConditionCheckItem',
+          'dynamodb:PutItem',
+          'dynamodb:DeleteItem',
+          'dynamodb:PartiQLUpdate',
+          'dynamodb:Scan',
+          'dynamodb:Query',
+          'dynamodb:UpdateItem',
+          'dynamodb:PartiQLSelect',
+          'dynamodb:PartiQLInsert',
+          'dynamodb:GetItem',
+          'dynamodb:PartiQLDelete',
+        ],
+        Effect: 'Allow',
+        Resource: [
+          apiKeysTable.arn,
+          apiKeysTable.arn.apply((arn) => `${arn}/index/name`),
+          apiKeysTable.arn.apply((arn) => `${arn}/index/owner-group`),
+          apiKeysTable.arn.apply((arn) => `${arn}/index/owner-user`),
+          authAccountsTable.arn,
+          authAccountsTable.arn.apply((arn) => `${arn}/index/linked-user`),
+          emailVerificationTokenTable.arn,
+          organizationsTable.arn,
+          organizationsTable.arn.apply((arn) => `${arn}/index/name`),
+          organizationsTable.arn.apply((arn) => `${arn}/index/owner-user`),
+          sessionsTable.arn,
+          sessionsTable.arn.apply((arn) => `${arn}/index/user`),
+          usersTable.arn,
+          usersTable.arn.apply((arn) => `${arn}/index/alias`),
+          usersTable.arn.apply((arn) => `${arn}/index/email`),
+        ],
+      },
+    ],
+    Version: '2012-10-17',
+  },
+  tags: {...tags},
+})
+
+export const vercelIamUser = new iam.User('vercel', {
+  name: `vercel-${getStack()}`,
+  tags: {...tags},
+})
+
+export const vercelIamPolicyAttachment = new iam.UserPolicyAttachment(
+  'vercel',
+  {
+    policyArn: dynamodbPolicy.arn,
+    user: vercelIamUser.name,
+  },
+)
+
+export const vercelAccessKey = new iam.AccessKey('vercel', {
+  user: vercelIamUser.name,
+  pgpKey: 'keybase:davidjfelix',
 })

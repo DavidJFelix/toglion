@@ -12,7 +12,12 @@ import {ulid} from 'ulid'
 
 import {config} from 'lib/config'
 
-const ddbClient = new DynamoDB({})
+const ddbClient = new DynamoDB({
+  credentials: {
+    accessKeyId: config.aws.accessKeyId,
+    secretAccessKey: config.aws.secretAccessKey,
+  },
+})
 const docDbClient = DynamoDBDocument.from(ddbClient)
 
 interface UserRecord extends Record<string, unknown> {
@@ -398,39 +403,27 @@ export async function useVerificationToken({
   const now = new Date()
   const ttlNow = Math.round(now.getTime() / 1000) + now.getTimezoneOffset() * 60
 
-  const verificationTokenResponse = await docDbClient.transactWrite({
-    TransactItems: [
-      {
-        Delete: {
-          ConditionExpression:
-            'attribute_exists(#i) AND #ttl > :ttl AND #t = :t',
-          ExpressionAttributeNames: {
-            '#i': 'id',
-            '#t': 'token',
-            '#ttl': 'ttl',
-          },
-          ExpressionAttributeValues: {
-            ':t': token,
-            ':ttl': ttlNow,
-          },
-          Key: {
-            id: identifier,
-          },
-          ReturnValues: 'ALL_OLD',
-          TableName: config.dynamodb.emailVerificationTokens,
-        },
-      },
-    ],
+  const verificationTokenResponse = await docDbClient.delete({
+    ConditionExpression: 'attribute_exists(#i) AND #ttl > :ttl AND #t = :t',
+    ExpressionAttributeNames: {
+      '#i': 'id',
+      '#t': 'token',
+      '#ttl': 'ttl',
+    },
+    ExpressionAttributeValues: {
+      ':t': token,
+      ':ttl': ttlNow,
+    },
+    Key: {
+      id: identifier,
+    },
+    TableName: config.dynamodb.emailVerificationTokens,
   })
-
-  if (!verificationTokenResponse.Attributes) {
-    return null
-  }
 
   return {
     identifier,
     token,
-    expires: new Date(verificationTokenResponse.Attributes.expiresAt),
+    expires: new Date(),
   }
 }
 

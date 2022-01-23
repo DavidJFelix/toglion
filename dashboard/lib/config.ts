@@ -1,4 +1,11 @@
 export const config = {
+  aws: {
+    accessKeyId:
+      process.env.TG_AWS_ACCESS_KEY_ID! || process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey:
+      process.env.TG_AWS_SECRET_ACCESS_KEY! ||
+      process.env.AWS_SECRET_ACCESS_KEY!,
+  },
   hostname: process.env.HOSTNAME!,
   github: {
     clientId: process.env.GITHUB_CLIENT_ID!,
