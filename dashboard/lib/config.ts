@@ -11,4 +11,10 @@ export const config = {
   auth: {
     secret: process.env.AUTH_SECRET!,
   },
+  dynamodb: {
+    accounts: 'auth-accounts-4ca9dc8',
+    users: 'users-1a8d390',
+    sessions: 'sessions-1113ebd',
+    emailVerificationTokens: 'email-verification-tokens-51d6229',
+  },
 }
