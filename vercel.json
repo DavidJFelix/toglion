@@ -1,3 +1,5 @@
 {
-  "functions": "dashboard/api/*"
+  "functions": {
+    "dashboard/api/*": {}
+  }
 }
