@@ -3471,7 +3471,7 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.2.0.tgz#667bfc6186ae7c9e0b45a08960c551437176e1ca"
   integrity sha512-VkE3KLBmJwcCaVARtQpfuKcKv8gcBmUubrfHGF84dXuuW6jgsRYxPtzcIhPyK9WAPpRt2/xY6zkD9MnRaJzSyw==
 
-"@storybook/addon-actions@6.4.16", "@storybook/addon-actions@^6.3.4":
+"@storybook/addon-actions@6.4.16", "@storybook/addon-actions@^6.4.16":
   version "6.4.16"
   resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-6.4.16.tgz#318a0060098f81c0287cc9df5d9f3bd92264ec38"
   integrity sha512-3rhlyt7QAIdGKDhEP2+KKfO6qFCU0jv9QzEoPj6K0d6tFO0Iia4QdTrks+hksKOjKDO/dCwmgbtk9B+jqAS0Sg==
@@ -3584,7 +3584,7 @@
     ts-dedent "^2.0.0"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-essentials@^6.3.4":
+"@storybook/addon-essentials@^6.4.16":
   version "6.4.16"
   resolved "https://registry.yarnpkg.com/@storybook/addon-essentials/-/addon-essentials-6.4.16.tgz#02908372dc7be34f4e22cdf15bef268d9726f676"
   integrity sha512-qKQR74+96Hj21HWrBj9FfTc8jvQNTOqFLPXsZzZXkxIsH6IcL5xs8KpjdjEWt2RrBiwlpcTSfxHULC1L7cLQDA==
@@ -3604,7 +3604,7 @@
     regenerator-runtime "^0.13.7"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-links@^6.3.4":
+"@storybook/addon-links@^6.4.16":
   version "6.4.16"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-6.4.16.tgz#1dc77181bde2d3cb7f5769b713efd4f063861293"
   integrity sha512-8Efdl0K1sgFwsjHHoeAgtKIRBvnjsSFPXM9WtrvXgxJVLAqHiFw+cuo591tEprECKSIpJSwyWh4cEfbL7n74Mg==
@@ -4162,7 +4162,7 @@
     react-docgen-typescript "^2.0.0"
     tslib "^2.0.0"
 
-"@storybook/react@^6.3.4":
+"@storybook/react@^6.4.16":
   version "6.4.16"
   resolved "https://registry.yarnpkg.com/@storybook/react/-/react-6.4.16.tgz#5c2e3b636d20bf7f9b5c1efcc474b1e0d3850bd6"
   integrity sha512-lnAabl3wuhXKolq+uY2x7Amb3sl5YPbF3CLNT18TSviw6mABiOCIFZUz2YothvJj/x/lW9aGSFT13vSiIFivAA==
@@ -14024,7 +14024,7 @@ store2@^2.12.0:
   resolved "https://registry.yarnpkg.com/store2/-/store2-2.12.0.tgz#e1f1b7e1a59b6083b2596a8d067f6ee88fd4d3cf"
   integrity sha512-7t+/wpKLanLzSnQPX8WAcuLCCeuSHoWdQuh9SB3xD0kNOM38DNf+0Oa+wmvxmYueRzkmh6IcdKFtvTa+ecgPDw==
 
-storybook-addon-next-router@^3.1.0:
+storybook-addon-next-router@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/storybook-addon-next-router/-/storybook-addon-next-router-3.1.1.tgz#46623ca36b450745c3517f5cdc4bf30fa4a4a930"
   integrity sha512-Z14dED37vNXkN7+VY80HhF9itGReWoBAlKREHEk2By/dW7zSSqcSyXYV4bDMXIMAFYHMaA1svcBC1idVG8FhAw==
