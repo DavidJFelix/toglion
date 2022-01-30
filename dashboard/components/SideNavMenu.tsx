@@ -1,4 +1,3 @@
-import React from 'react'
 import {Flex, Icon, VStack} from '@chakra-ui/react'
 import {useRouter} from 'next/router'
 import Link from 'next/link'

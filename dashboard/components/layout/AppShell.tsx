@@ -13,7 +13,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import {HiMenu} from 'react-icons/hi'
-import React, {ReactNode} from 'react'
+import {ReactNode} from 'react'
 import {SideNavMenu} from '../SideNavMenu'
 
 export interface AppShellProps {
