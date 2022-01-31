@@ -6,6 +6,7 @@ import {config} from 'lib/config'
 import {adapter} from 'lib/next-auth/dynamodb-adapter'
 
 export default NextAuth({
+  debug: true,
   adapter,
   providers: [
     GitHubProvider({

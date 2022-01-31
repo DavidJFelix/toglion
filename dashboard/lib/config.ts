@@ -23,5 +23,6 @@ export const config = {
     users: 'users-1a8d390',
     sessions: 'sessions-1113ebd',
     emailVerificationTokens: 'email-verification-tokens-51d6229',
+    organizations: 'organizations-ff92478',
   },
 }
