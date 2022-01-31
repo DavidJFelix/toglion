@@ -11,6 +11,7 @@ import {
 import {ulid} from 'ulid'
 
 import {config} from 'lib/config'
+import {NextApiRequest} from 'next'
 
 const ddbClient = new DynamoDB({
   credentials: {
@@ -181,9 +182,9 @@ export async function updateUser(user: Partial<AdapterUser>) {
       ...(user.name ? {'#n': 'name'} : {}),
     },
     ExpressionAttributeValues: {
-      ...(user.email ? {'#e': 'email'} : {}),
-      ...(user.image ? {'#im': 'image'} : {}),
-      ...(user.name ? {'#n': 'name'} : {}),
+      ...(user.email ? {':e': user.email} : {}),
+      ...(user.image ? {':im': user.image} : {}),
+      ...(user.name ? {':n': user.name} : {}),
     },
     Key: {
       id: user.id,
@@ -259,6 +260,19 @@ export async function createSession(session: {
     id: session.sessionToken,
     ...session,
   }
+}
+
+// Because next auth sucks
+export async function getSessionFromCookie(
+  req: NextApiRequest,
+): Promise<{session: AdapterSession; user: AdapterUser}> {
+  console.log(JSON.stringify(req.cookies))
+  const result = await getSessionAndUser(req.cookies['next-auth.session-token'])
+  if (!result) {
+    // FIXME
+    throw 'UGH'
+  }
+  return result
 }
 
 export async function getSessionAndUser(sessionToken: string) {
