@@ -1,5 +1,7 @@
 import {INITIAL_VIEWPORTS} from '@storybook/addon-viewport'
 import {RouterContext} from 'next/dist/shared/lib/router-context'
+import {QueryClient, QueryClientProvider} from 'react-query'
+import {initialize, mswDecorator} from 'msw-storybook-addon'
 
 export const parameters = {
   actions: {argTypesRegex: '^on[A-Z].*'},
@@ -16,3 +18,16 @@ export const parameters = {
     viewports: INITIAL_VIEWPORTS,
   },
 }
+
+initialize()
+
+const queryClient = new QueryClient()
+
+export const decorators = [
+  (Story) => (
+    <QueryClientProvider client={queryClient}>
+      <Story />
+    </QueryClientProvider>
+  ),
+  mswDecorator,
+]

@@ -33,5 +33,8 @@
       "client",
       "types"
     ]
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }

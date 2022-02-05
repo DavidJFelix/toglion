@@ -10,15 +10,80 @@ import {
   Icon,
   IconButton,
   Image,
+  Select,
   useDisclosure,
 } from '@chakra-ui/react'
 import {HiMenu} from 'react-icons/hi'
-import {ReactNode} from 'react'
+import {ChangeEvent, ReactNode, useCallback, useState} from 'react'
+import {useQuery} from 'react-query'
+import {useRouter} from 'next/router'
 import {SideNavMenu} from '../SideNavMenu'
+import {Organization} from '../../types'
 
 export interface AppShellProps {
   children?: ReactNode
 }
+
+const useSelectedOrganization = (organizations: Organization[]) => {
+  const [organizationId, setOrganizationId] = useState<string>(
+    () => localStorage.getItem('lastSelectedOrg') ?? '',
+  )
+}
+
+export const OrganizationSelect = () => {
+  // set the org name to the stored last org name or an empty string if no last
+  // org is set
+  const [orgName, setOrgName] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('lastSelectedOrg') ?? ''
+    }
+    return ''
+  })
+  const {data, isLoading} = useQuery<{organizations: Organization[]}>(
+    'organizations',
+    async () => {
+      const result = await fetch('/api/organizations/')
+      const x = result.json()
+      console.log(x)
+      return x
+    },
+  )
+  const router = useRouter()
+
+  const onChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      const organizationName = event.target.value
+
+      // do nothing if they picked the same value
+      if (orgName === organizationName) {
+        return
+      }
+
+      // update the selected org
+      setOrgName(organizationName)
+      // set the new org as the last org name
+      localStorage.setItem('lastSelectedOrg', organizationName)
+      // navigate to the router
+      router.push(`/o/${organizationName}`)
+    },
+    [orgName],
+  )
+
+  if (isLoading || !data?.organizations) {
+    return null
+  }
+
+  return (
+    <Select value={orgName} onChange={onChange}>
+      {data?.organizations.map((org) => (
+        <option key={org.id} value={org.name}>
+          {org.name}
+        </option>
+      ))}
+    </Select>
+  )
+}
+
 export function AppShell({children}: AppShellProps) {
   const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -48,6 +113,14 @@ export function AppShell({children}: AppShellProps) {
             backgroundColor={{base: 'orange.400', md: 'white'}}
             borderBottomWidth={1}
           >
+            <Box
+              display={{
+                base: 'none',
+                md: 'inline-flex',
+              }}
+            >
+              <OrganizationSelect />
+            </Box>
             <IconButton
               aria-label="Navigation Menu"
               borderRadius="base"

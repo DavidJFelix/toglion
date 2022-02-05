@@ -6,12 +6,14 @@ import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {ulid} from 'ulid'
 
+// TODO: extract and use a common type
 export interface Organization {
   id: string
   name: string
   ownerUserId: string
 }
 
+// TODO: extract this and use a common error
 export interface MyPoorlyNamedError {}
 
 // Post or Get (list)
@@ -89,6 +91,7 @@ export async function handler(
     const organizations = result.Items
     // Extract
 
+    // TODO: actually expose the correct, serialized object and not the raw value from docDB
     return res.status(200).json({organizations})
   } else {
     return res.status(405).json({
