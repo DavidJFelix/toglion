@@ -12,6 +12,7 @@ import {ulid} from 'ulid'
 
 import {config} from 'lib/config'
 import {NextApiRequest} from 'next'
+import {NextApiRequestCookies} from 'next/dist/server/api-utils'
 
 const ddbClient = new DynamoDB({
   credentials: {
@@ -264,7 +265,11 @@ export async function createSession(session: {
 
 // Because next auth sucks
 export async function getSessionFromCookie(
-  req: NextApiRequest,
+  req:
+    | NextApiRequest
+    | {
+        cookies: NextApiRequestCookies
+      },
 ): Promise<{session: AdapterSession; user: AdapterUser}> {
   console.log(JSON.stringify(req.cookies))
   const result = await getSessionAndUser(req.cookies['next-auth.session-token'])
