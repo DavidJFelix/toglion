@@ -24,7 +24,6 @@ const defaultFlags: FeatureFlag[] = [
 function IndexPage() {
   const {data: session, status: authStatus} = useSession()
   const [flags, setFlags] = useState(defaultFlags)
-  // FIXME: don't do this actually
 
   const onFlagToggle = (id: string) => {
     setFlags((flags) => {
