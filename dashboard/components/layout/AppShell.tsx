@@ -40,7 +40,7 @@ export const OrganizationSelect = () => {
     return ''
   })
   const {data, isLoading} = useQuery<{organizations: Organization[]}>(
-    'organizations',
+    ['organizations'],
     async () => {
       const result = await fetch('/api/organizations/')
       const x = result.json()

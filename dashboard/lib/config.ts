@@ -22,6 +22,7 @@ export const config = {
     accounts: 'auth-accounts-4ca9dc8',
     users: 'users-1a8d390',
     sessions: 'sessions-1113ebd',
+    flags: 'flags-d847b3a',
     emailVerificationTokens: 'email-verification-tokens-51d6229',
     organizations: 'organizations-ff92478',
   },

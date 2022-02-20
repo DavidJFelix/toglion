@@ -6,6 +6,16 @@ export interface User {
   name: string
 }
 
+export interface Flag {
+  name: string
+  id: string
+  organizationId: string
+  value: unknown // FIXME: actually define what type flags are for users
+}
+
+export type NewFlag = Omit<Flag, 'id'>
+export type UpdatedFlag = Partial<Flag> & Pick<Flag, 'id'>
+
 export interface Organization {
   name: string
   id: string

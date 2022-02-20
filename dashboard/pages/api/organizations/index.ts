@@ -1,12 +1,8 @@
-import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
-import {config} from 'lib/config'
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {createOrganization, listOrganizations} from 'services/organizations'
 import {Organization} from 'types'
-import {ulid} from 'ulid'
 
 // TODO: extract this and use a common error
 export interface MyPoorlyNamedError {}

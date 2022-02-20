@@ -131,6 +131,43 @@ export const emailVerificationTokenTable = new dynamodb.Table(
   },
 )
 
+export const flagsTable = new dynamodb.Table('flags', {
+  attributes: [
+    {name: 'name', type: 'S'},
+    {name: 'id', type: 'S'},
+    {name: 'organizationId', type: 'S'},
+  ],
+  billingMode: 'PAY_PER_REQUEST',
+  globalSecondaryIndexes: [
+    // Query Key
+    {hashKey: 'name', name: 'name', projectionType: 'ALL'},
+    // Belongs To
+    {
+      hashKey: 'organizationId',
+      rangeKey: 'id',
+      name: 'organization',
+      projectionType: 'ALL',
+    },
+  ],
+  hashKey: 'id',
+  serverSideEncryption: {
+    enabled: true,
+    kmsKeyArn: awsRegion.apply((awsRegion) => kmsKeys[awsRegion].arn),
+  },
+  replicas: awsRegion.apply((awsRegion) =>
+    Object.entries(kmsKeys)
+      .filter(([region]) => region !== awsRegion)
+      .map(([regionName, kmsKey]) => ({kmsKeyArn: kmsKey.arn, regionName})),
+  ),
+  streamEnabled: true,
+  streamViewType: 'NEW_AND_OLD_IMAGES',
+  ttl: {
+    enabled: true,
+    attributeName: 'ttl',
+  },
+  tags: {...tags},
+})
+
 export const organizationsTable = new dynamodb.Table('organizations', {
   attributes: [
     {name: 'name', type: 'S'},
