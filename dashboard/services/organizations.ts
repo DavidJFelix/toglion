@@ -44,6 +44,7 @@ export async function createOrganization(
       },
     ],
   })
+  // FIXME: handle case where transact fails
   return {id, ...newOrg}
 }
 
