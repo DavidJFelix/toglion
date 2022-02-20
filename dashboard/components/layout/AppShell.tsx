@@ -101,6 +101,7 @@ export function AppShell({children}: AppShellProps) {
           >
             <Image
               boxSize={12}
+              // FIXME: get rid of this external dep
               src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/google/313/lion_1f981.png"
             />
           </Flex>
