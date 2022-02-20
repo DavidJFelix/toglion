@@ -4,14 +4,9 @@ import {config} from 'lib/config'
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
 import {NextApiRequest, NextApiResponse} from 'next'
+import {createOrganization, listOrganizations} from 'services/organizations'
+import {Organization} from 'types'
 import {ulid} from 'ulid'
-
-// TODO: extract and use a common type
-export interface Organization {
-  id: string
-  name: string
-  ownerUserId: string
-}
 
 // TODO: extract this and use a common error
 export interface MyPoorlyNamedError {}
@@ -22,76 +17,14 @@ export async function handler(
   res: NextApiResponse<Organization | MyPoorlyNamedError>,
 ) {
   if (req.method === 'POST') {
-    // Create new
     const newOrg = await parseNewOrganization(req)
-
-    // Extract
-    const id = ulid()
-    const ddbClient = new DynamoDB({
-      credentials: {
-        accessKeyId: config.aws.accessKeyId,
-        secretAccessKey: config.aws.secretAccessKey,
-      },
-    })
-    const docDbClient = DynamoDBDocument.from(ddbClient)
-    await docDbClient.transactWrite({
-      TransactItems: [
-        {
-          Put: {
-            TableName: config.dynamodb.organizations,
-            ConditionExpression: 'attribute_not_exists(#i)',
-            ExpressionAttributeNames: {
-              '#i': 'id',
-            },
-            Item: {
-              id,
-              ...newOrg,
-            },
-          },
-        },
-        {
-          Put: {
-            TableName: config.dynamodb.organizations,
-            ConditionExpression: 'attribute_not_exists(#i)',
-            ExpressionAttributeNames: {
-              '#i': 'id',
-            },
-            Item: {
-              id: `unique/name/${newOrg.name}`,
-            },
-          },
-        },
-      ],
-    })
-
-    // Extract
-
-    return res.status(201).json({id, ...newOrg})
+    const createdOrg = await createOrganization(newOrg)
+    return res.status(201).json(createdOrg)
   } else if (req.method === 'GET') {
-    // list
     const session = await getSessionFromCookie(req)
-
-    // Extract
-
-    const ddbClient = new DynamoDB({
-      credentials: {
-        accessKeyId: config.aws.accessKeyId,
-        secretAccessKey: config.aws.secretAccessKey,
-      },
+    const organizations = await listOrganizations({
+      requestingUserId: session.user.id,
     })
-    const docDbClient = DynamoDBDocument.from(ddbClient)
-    const result = await docDbClient.query({
-      TableName: config.dynamodb.organizations,
-      IndexName: 'owner-user',
-      KeyConditionExpression: '#o = :o',
-      ExpressionAttributeNames: {'#o': 'ownerUserId'},
-      ExpressionAttributeValues: {':o': session.user.id},
-    })
-
-    const organizations = result.Items
-    // Extract
-
-    // TODO: actually expose the correct, serialized object and not the raw value from docDB
     return res.status(200).json({organizations})
   } else {
     return res.status(405).json({

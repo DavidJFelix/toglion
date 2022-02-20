@@ -11,3 +11,7 @@ export interface Organization {
   id: string
   ownerUserId: string
 }
+
+export type NewOrganization = Omit<Organization, 'id'>
+export type UpdatedOrganization = Partial<Organization> &
+  Pick<Organization, 'id'>
