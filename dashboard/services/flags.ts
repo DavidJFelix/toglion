@@ -59,7 +59,7 @@ export async function createFlag({
             '#i': 'id',
           },
           Item: {
-            id: `unique/name/${newFlag.name}`,
+            id: `unique/organization/${newFlag.organizationId}/name/${newFlag.name}`,
           },
         },
       },
