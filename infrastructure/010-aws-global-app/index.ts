@@ -140,7 +140,12 @@ export const flagsTable = new dynamodb.Table('flags', {
   billingMode: 'PAY_PER_REQUEST',
   globalSecondaryIndexes: [
     // Query Key
-    {hashKey: 'name', name: 'name', projectionType: 'ALL'},
+    {
+      hashKey: 'organizationId',
+      rangeKey: 'name',
+      name: 'name-by-organization',
+      projectionType: 'ALL',
+    },
     // Belongs To
     {
       hashKey: 'organizationId',
