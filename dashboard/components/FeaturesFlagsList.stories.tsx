@@ -12,15 +12,15 @@ export const WithFlags = {
     flags: [
       {
         id: '0',
-        isEnabled: true,
-        title: 'Very Important Flag',
-        description: 'This flag is very important',
+        value: true,
+        name: 'Very Important Flag',
+        organizationId: '1',
       },
       {
         id: '1',
-        isEnabled: false,
-        title: 'Not Important Flag',
-        description: 'This flag is not very important',
+        value: false,
+        name: 'Not Important Flag',
+        organizationId: '1',
       },
     ],
     onToggle: logToggle,

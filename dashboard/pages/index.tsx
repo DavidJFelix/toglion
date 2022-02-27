@@ -1,23 +1,23 @@
 import NextLink from 'next/link'
 import {Box, Heading, Link as ChakraLink, Text, VStack} from '@chakra-ui/react'
-import {FeatureFlag} from '@toglion/types'
 import {useState} from 'react'
 import {signIn, signOut, useSession} from 'next-auth/react'
 import {FeatureFlagsList} from 'components/FeatureFlagsList'
 import {AppShell} from 'components/layout/AppShell'
+import {Flag} from 'types'
 
-const defaultFlags: FeatureFlag[] = [
+const defaultFlags: Flag[] = [
   {
     id: 'maintenance',
-    title: 'Maintenance',
-    description: 'If enabled, the app is in maintenance mode',
-    isEnabled: true,
+    name: 'Maintenance',
+    value: true,
+    organizationId: 'DELETEME',
   },
   {
     id: 'experiment',
-    title: 'Experiment',
-    description: 'If enabled, The Big Experiment® is turned on',
-    isEnabled: false,
+    name: 'Experiment',
+    value: false,
+    organizationId: 'DELETEME',
   },
 ]
 
@@ -32,10 +32,10 @@ function IndexPage() {
 
       if (flagIndex !== -1) {
         const flag = flags[flagIndex]
-        const isEnabled = !flag.isEnabled
+        const isEnabled = !flag.value
         newFlags[flagIndex] = {
           ...flag,
-          isEnabled,
+          value: isEnabled,
         }
       }
 

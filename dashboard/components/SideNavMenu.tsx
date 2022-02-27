@@ -3,14 +3,25 @@ import {useRouter} from 'next/router'
 import Link from 'next/link'
 import {HiChartBar, HiCog, HiOutlineFlag, HiUserGroup} from 'react-icons/hi'
 
-export function SideNavMenu() {
-  const {pathname} = useRouter()
+export interface SideNavMenuProps {
+  organizationName: string
+}
+export function SideNavMenu({organizationName}: SideNavMenuProps) {
+  const {asPath} = useRouter()
 
   const routes = [
-    {icon: HiOutlineFlag, title: 'Flags', path: '/flags'},
-    {icon: HiChartBar, title: 'History', path: '/history'},
-    {icon: HiUserGroup, title: 'Organization Members', path: '/members'},
-    {icon: HiCog, title: 'Settings', path: '/settings'},
+    {icon: HiOutlineFlag, title: 'Flags', path: `/o/${organizationName}/flags`},
+    {
+      icon: HiChartBar,
+      title: 'History',
+      path: `/o/${organizationName}/history`,
+    },
+    {
+      icon: HiUserGroup,
+      title: 'Organization Members',
+      path: `/o/${organizationName}/members`,
+    },
+    {icon: HiCog, title: 'Settings', path: `/o/${organizationName}/settings`},
   ]
   return (
     <VStack
@@ -38,7 +49,7 @@ export function SideNavMenu() {
               color: 'gray.300',
               backgroundColor: 'gray.600',
             }}
-            {...(path === pathname
+            {...(path === asPath
               ? {
                   backgroundColor: 'gray.800',
                   color: 'white',

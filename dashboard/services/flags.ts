@@ -101,9 +101,9 @@ export async function listFlags({
   })
   const resultPromise = docDbClient.query({
     TableName: config.dynamodb.flags,
-    IndexName: 'name-by-organization',
+    IndexName: 'organization',
     KeyConditionExpression: '#o = :o',
-    ExpressionAttributeNames: {'#o': 'organization'},
+    ExpressionAttributeNames: {'#o': 'organizationId'},
     ExpressionAttributeValues: {':o': organizationId},
   })
 

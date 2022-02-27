@@ -90,6 +90,40 @@ export async function getOrganization({
   return result.Item as Organization
 }
 
+export interface GetOrganizationByNameParams {
+  organizationName: string
+  requestingUserId: string
+}
+export async function getOrganizationByName({
+  organizationName,
+  requestingUserId,
+}: GetOrganizationByNameParams) {
+  // FIXME: limit the results if user is not a member of the organization
+
+  const ddbClient = new DynamoDB({
+    credentials: {
+      accessKeyId: config.aws.accessKeyId,
+      secretAccessKey: config.aws.secretAccessKey,
+    },
+  })
+  const docDbClient = DynamoDBDocument.from(ddbClient)
+  const result = await docDbClient.query({
+    TableName: config.dynamodb.organizations,
+    IndexName: 'name',
+    KeyConditionExpression: '#n = :n',
+    ExpressionAttributeNames: {'#n': 'name'},
+    ExpressionAttributeValues: {':n': organizationName},
+  })
+
+  const organization = result.Items?.[0] as Organization
+
+  if (!organization) {
+    throw new NotFound()
+  }
+
+  return organization
+}
+
 export interface ListOrganizationsParams {
   requestingUserId: string
 }
