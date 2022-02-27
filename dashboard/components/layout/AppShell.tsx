@@ -20,10 +20,6 @@ import {useRouter} from 'next/router'
 import {SideNavMenu} from '../SideNavMenu'
 import {Organization} from '../../types'
 
-export interface AppShellProps {
-  children?: ReactNode
-}
-
 const useSelectedOrganization = (organizations: Organization[]) => {
   const [organizationId, setOrganizationId] = useState<string>(
     () => localStorage.getItem('lastSelectedOrg') ?? '',
@@ -84,7 +80,11 @@ export const OrganizationSelect = () => {
   )
 }
 
-export function AppShell({children}: AppShellProps) {
+export interface AppShellProps {
+  organizationName?: string
+  children?: ReactNode
+}
+export function AppShell({children, organizationName}: AppShellProps) {
   const {isOpen, onOpen, onClose} = useDisclosure()
 
   return (
@@ -137,7 +137,9 @@ export function AppShell({children}: AppShellProps) {
           </Flex>
         </Flex>
         <Flex flex="1 1 0">
-          <SideNavMenu />
+          {organizationName && (
+            <SideNavMenu organizationName={organizationName} />
+          )}
           <Box flex="1 1 0" backgroundColor="gray.50" p={6}>
             {children}
           </Box>

@@ -1,4 +1,4 @@
-import {useMutation, useQuery} from 'react-query'
+import {useMutation, useQuery, useQueryClient} from 'react-query'
 import {Flag} from 'types'
 
 export const useGetFlag = (id: string) =>
@@ -7,9 +7,26 @@ export const useGetFlag = (id: string) =>
     const flags = result.json()
     return flags
   })
-export const useCreateFlags = useMutation(async (newFlag: Omit<Flag, 'id'>) => {
-  return fetch('/api/flags', {
-    method: 'post',
-    body: JSON.stringify(newFlag),
+
+export const useListFlags = (organizationId: string) =>
+  useQuery<{flags: Flag[]}>(['flags'], async () => {
+    const result = await fetch(`/api/organizations/${organizationId}/flags`)
+    const flags = result.json()
+    return flags
   })
-})
+export const useCreateFlags = () => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    async (newFlag: Omit<Flag, 'id'>) => {
+      return fetch('/api/flags', {
+        method: 'post',
+        body: JSON.stringify(newFlag),
+      })
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['flags'])
+      },
+    },
+  )
+}

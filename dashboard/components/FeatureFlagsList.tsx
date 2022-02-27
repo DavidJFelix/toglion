@@ -7,10 +7,10 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react'
-import {FeatureFlag} from '@toglion/types'
+import {Flag} from 'types'
 
 export interface FeatureFlagsListProps {
-  flags: FeatureFlag[]
+  flags: Flag[]
   onToggle: (id: string) => void
 }
 
@@ -29,15 +29,12 @@ export function FeatureFlagsList({flags, onToggle}: FeatureFlagsListProps) {
     >
       {flags?.map((flag) => (
         <HStack key={flag.id} spacing={3} p={3}>
-          <EnabledIcon isEnabled={flag.isEnabled} />
+          <EnabledIcon isEnabled />
           <Box flexGrow={1}>
-            <Text color="blue.600">{flag.title}</Text>
-            <Text color="gray.600">{flag.description}</Text>
+            <Text color="blue.600">{flag.name}</Text>
+            <Text color="gray.600">no description</Text>
           </Box>
-          <Switch
-            isChecked={flag.isEnabled}
-            onChange={() => onToggle(flag.id)}
-          />
+          <Switch isChecked onChange={() => onToggle(flag.id)} />
         </HStack>
       ))}
     </VStack>
