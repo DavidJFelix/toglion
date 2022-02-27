@@ -3,6 +3,7 @@ import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
 import {config} from 'lib/config'
 import {NewOrganization, Organization, UpdatedOrganization} from 'types'
 import {ulid} from 'ulid'
+import {NotAuthorized, NotFound} from './errors'
 
 export async function createOrganization(
   newOrg: NewOrganization,
@@ -63,7 +64,7 @@ export interface GetOrganizationParams {
 export async function getOrganization({
   organizationId,
   requestingUserId,
-}: GetOrganizationParams): Promise<Organization | null> {
+}: GetOrganizationParams) {
   const ddbClient = new DynamoDB({
     credentials: {
       accessKeyId: config.aws.accessKeyId,
@@ -79,11 +80,11 @@ export async function getOrganization({
   })
 
   if (!result.Item) {
-    return null
+    throw new NotFound()
   }
 
   if (result.Item.ownerUserId !== requestingUserId) {
-    return null
+    throw new NotAuthorized()
   }
 
   return result.Item as Organization
