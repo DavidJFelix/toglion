@@ -104,7 +104,7 @@ export async function listFlags({
     IndexName: 'name-by-organization',
     KeyConditionExpression: '#o = :o',
     ExpressionAttributeNames: {'#o': 'organization'},
-    ExpressionAttributeValues: {':o': requestingUserId},
+    ExpressionAttributeValues: {':o': organizationId},
   })
 
   const [org, result] = await Promise.all([orgPromise, resultPromise])
