@@ -10,7 +10,8 @@ export interface Flag {
   name: string
   id: string
   organizationId: string
-  value: unknown // FIXME: actually define what type flags are for users
+  value: any // FIXME: actually define what type flags are for users
+  schema: string
 }
 
 export type NewFlag = Omit<Flag, 'id'>

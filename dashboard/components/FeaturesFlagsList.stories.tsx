@@ -1,3 +1,4 @@
+import {Flag} from 'types'
 import {FeatureFlagsList, FeatureFlagsListProps} from './FeatureFlagsList'
 
 export default {
@@ -15,18 +16,20 @@ export const WithFlags = {
         value: true,
         name: 'Very Important Flag',
         organizationId: '1',
+        schema: '{"type": "boolean"}',
       },
       {
         id: '1',
         value: false,
         name: 'Not Important Flag',
         organizationId: '1',
+        schema: '{"type": "boolean"}',
       },
     ],
-    onToggle: logToggle,
+    onFlagChange: logFlagChange,
   } as FeatureFlagsListProps,
 }
 
-function logToggle(id: string) {
-  console.log(`Toggling feature flag with id of ${id}`)
+function logFlagChange(newFlag: Flag) {
+  console.log(`Toggling feature flag: ${newFlag}`)
 }

@@ -11,14 +11,14 @@ import {Flag} from 'types'
 
 export interface FeatureFlagsListProps {
   flags: Flag[]
-  onToggle: (id: string) => void
+  onFlagChange: (newFlag: Flag) => void
 }
 
 const EnabledIcon = ({isEnabled}: {isEnabled: boolean}) => (
   <Circle w={2} h={2} bgColor={isEnabled ? 'green.500' : 'gray.500'} />
 )
 
-export function FeatureFlagsList({flags, onToggle}: FeatureFlagsListProps) {
+export function FeatureFlagsList({flags, onFlagChange}: FeatureFlagsListProps) {
   return (
     <VStack
       borderWidth="1px"
@@ -34,7 +34,12 @@ export function FeatureFlagsList({flags, onToggle}: FeatureFlagsListProps) {
             <Text color="blue.600">{flag.name}</Text>
             <Text color="gray.600">no description</Text>
           </Box>
-          <Switch isChecked onChange={() => onToggle(flag.id)} />
+          <Switch
+            isChecked={flag.value as boolean}
+            onChange={({target: {checked}}) =>
+              onFlagChange({...flag, value: checked})
+            }
+          />
         </HStack>
       ))}
     </VStack>

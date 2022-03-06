@@ -2,7 +2,6 @@ import NextLink from 'next/link'
 import {Box, Heading, Link as ChakraLink, Text, VStack} from '@chakra-ui/react'
 import {useState} from 'react'
 import {signIn, signOut, useSession} from 'next-auth/react'
-import {FeatureFlagsList} from 'components/FeatureFlagsList'
 import {AppShell} from 'components/layout/AppShell'
 import {Flag} from 'types'
 
@@ -12,12 +11,14 @@ const defaultFlags: Flag[] = [
     name: 'Maintenance',
     value: true,
     organizationId: 'DELETEME',
+    schema: '{"type": "boolean"}',
   },
   {
     id: 'experiment',
     name: 'Experiment',
     value: false,
     organizationId: 'DELETEME',
+    schema: '{"type": "boolean"}',
   },
 ]
 
@@ -47,7 +48,6 @@ function IndexPage() {
     <AppShell>
       <Box maxW="lg">
         <Heading>Feature Flags</Heading>
-        <FeatureFlagsList flags={flags} onToggle={onFlagToggle} />
         {authStatus !== 'authenticated' ? (
           <ChakraLink onClick={() => signIn()}>Sign In</ChakraLink>
         ) : (

@@ -5,7 +5,7 @@ import {FeatureFlagsList} from 'components/FeatureFlagsList'
 import {AppShell} from 'components/layout/AppShell'
 import {config} from 'lib/config'
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
-import {useCreateFlags, useListFlags} from 'lib/react-query/api'
+import {useCreateFlag, useListFlags, useUpdateFlag} from 'lib/react-query/api'
 import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
 import {useState} from 'react'
 import {getOrganizationByName} from 'services/organizations'
@@ -21,15 +21,19 @@ export function FlagListByOrganizationNamePage({
   const [flagName, setFlagName] = useState('New Flag')
 
   const {isLoading, data} = useListFlags(organization.id)
-  const {mutate: createFlag} = useCreateFlags()
+  const {mutate: createFlag} = useCreateFlag()
+  const {mutate: updateFlag} = useUpdateFlag()
 
-  const onFlagToggle = (id: string) => {}
+  const onFlagToggle = (newFlag: Flag) => {
+    // rq mutate - updateFlag(id, newValue)
+    updateFlag(newFlag)
+  }
 
   return (
     <AppShell organizationName={organization.name}>
       <Box>{JSON.stringify(organization)}</Box>
       {!isLoading && data && (
-        <FeatureFlagsList flags={data.flags} onToggle={onFlagToggle} />
+        <FeatureFlagsList flags={data.flags} onFlagChange={onFlagToggle} />
       )}
       <Input
         value={flagName}
@@ -41,6 +45,7 @@ export function FlagListByOrganizationNamePage({
           createFlag({
             name: flagName,
             value: true,
+            schema: JSON.stringify({type: 'boolean'}),
             organizationId: organization.id,
           })
         }
