@@ -14,7 +14,7 @@ export const useListFlags = (organizationId: string) =>
     const flags = result.json()
     return flags
   })
-export const useCreateFlags = () => {
+export const useCreateFlag = () => {
   const queryClient = useQueryClient()
   return useMutation(
     async (newFlag: Omit<Flag, 'id'>) => {
@@ -25,6 +25,24 @@ export const useCreateFlags = () => {
     },
     {
       onSuccess: () => {
+        queryClient.invalidateQueries(['flags'])
+      },
+    },
+  )
+}
+
+export const useUpdateFlag = () => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    async (newFlag: Flag) => {
+      return fetch(`/api/flags/${newFlag.id}`, {
+        method: 'put',
+        body: JSON.stringify(newFlag),
+      })
+    },
+    {
+      onSuccess: () => {
+        // FIXME: make this just invalidate the one flag
         queryClient.invalidateQueries(['flags'])
       },
     },

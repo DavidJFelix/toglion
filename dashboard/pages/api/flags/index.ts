@@ -41,6 +41,7 @@ async function parseNewFlag(req: NextApiRequest): Promise<Omit<Flag, 'id'>> {
     name: `${maybeNewFlag.name}`,
     organizationId: `${maybeNewFlag.organizationId}`,
     value: maybeNewFlag.value,
+    schema: maybeNewFlag.schema,
   }
 }
 
