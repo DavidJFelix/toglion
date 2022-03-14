@@ -27,7 +27,7 @@ export function FeatureFlagsList({flags, onFlagChange}: FeatureFlagsListProps) {
       spacing={0}
       align="stretch"
     >
-      {flags?.map((flag) => (
+      {flags.map((flag) => (
         <HStack key={flag.id} spacing={3} p={3}>
           <EnabledIcon isEnabled />
           <Box flexGrow={1}>

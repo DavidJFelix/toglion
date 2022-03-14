@@ -49,7 +49,7 @@ export function SideNavMenu({organizationName}: SideNavMenuProps) {
               color: 'gray.300',
               backgroundColor: 'gray.600',
             }}
-            {...(path === asPath
+            {...(asPath.startsWith(path)
               ? {
                   backgroundColor: 'gray.800',
                   color: 'white',

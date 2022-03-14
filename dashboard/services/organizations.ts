@@ -1,6 +1,5 @@
-import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
 import {config} from 'lib/config'
+import {dynamoDbDocumentClient} from 'lib/dynamodb'
 import {NewOrganization, Organization, UpdatedOrganization} from 'types'
 import {ulid} from 'ulid'
 import {NotAuthorized, NotFound} from './errors'
@@ -9,14 +8,7 @@ export async function createOrganization(
   newOrg: NewOrganization,
 ): Promise<Organization> {
   const id = ulid()
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-  await docDbClient.transactWrite({
+  await dynamoDbDocumentClient.transactWrite({
     TransactItems: [
       {
         Put: {
@@ -65,14 +57,7 @@ export async function getOrganization({
   organizationId,
   requestingUserId,
 }: GetOrganizationParams) {
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-  const result = await docDbClient.get({
+  const result = await dynamoDbDocumentClient.get({
     TableName: config.dynamodb.organizations,
     Key: {
       id: organizationId,
@@ -98,16 +83,7 @@ export async function getOrganizationByName({
   organizationName,
   requestingUserId,
 }: GetOrganizationByNameParams) {
-  // FIXME: limit the results if user is not a member of the organization
-
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-  const result = await docDbClient.query({
+  const result = await dynamoDbDocumentClient.query({
     TableName: config.dynamodb.organizations,
     IndexName: 'name',
     KeyConditionExpression: '#n = :n',
@@ -117,7 +93,8 @@ export async function getOrganizationByName({
 
   const organization = result.Items?.[0] as Organization
 
-  if (!organization) {
+  // FIXME: limit the results if user is not a member of the organization
+  if (!organization || organization.ownerUserId !== requestingUserId) {
     throw new NotFound()
   }
 
@@ -130,14 +107,7 @@ export interface ListOrganizationsParams {
 export async function listOrganizations({
   requestingUserId,
 }: ListOrganizationsParams): Promise<Organization[]> {
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-  const result = await docDbClient.query({
+  const result = await dynamoDbDocumentClient.query({
     TableName: config.dynamodb.organizations,
     IndexName: 'owner-user',
     KeyConditionExpression: '#o = :o',
