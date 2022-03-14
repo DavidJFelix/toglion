@@ -1,13 +1,14 @@
 import {DynamoDB} from '@aws-sdk/client-dynamodb'
 import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
-import {Box, Button, Input} from '@chakra-ui/react'
-import {FeatureFlagsList} from 'components/FeatureFlagsList'
+import {Box, Button, Flex, Heading, HStack} from '@chakra-ui/react'
+// import {Box, Button, Input} from '@chakra-ui/react'
+import {FeatureFlagsList} from 'components/FeatureFlagsListV2'
 import {AppShell} from 'components/layout/AppShell'
 import {config} from 'lib/config'
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {useCreateFlag, useListFlags, useUpdateFlag} from 'lib/react-query/api'
 import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
-import {useState} from 'react'
+// import {useState} from 'react'
 import {getOrganizationByName} from 'services/organizations'
 import {Flag, Organization} from 'types'
 
@@ -18,10 +19,10 @@ export interface FlagListByOrganizationNamePageProps {
 export function FlagListByOrganizationNamePage({
   organization,
 }: FlagListByOrganizationNamePageProps) {
-  const [flagName, setFlagName] = useState('New Flag')
+  // const [flagName, setFlagName] = useState('New Flag')
 
   const {isLoading, data} = useListFlags(organization.id)
-  const {mutate: createFlag} = useCreateFlag()
+  // const {mutate: createFlag} = useCreateFlag()
   const {mutate: updateFlag} = useUpdateFlag()
 
   const onFlagToggle = (newFlag: Flag) => {
@@ -31,11 +32,21 @@ export function FlagListByOrganizationNamePage({
 
   return (
     <AppShell organizationName={organization.name}>
-      <Box>{JSON.stringify(organization)}</Box>
+      <Flex justifyContent="space-between">
+        <Heading as="h1" size="lg" color="gray.800">
+          Flags
+        </Heading>
+        <Button colorScheme="orange">New flag</Button>
+      </Flex>
       {!isLoading && data && (
-        <FeatureFlagsList flags={data.flags} onFlagChange={onFlagToggle} />
+        <Box mt={6}>
+          <FeatureFlagsList
+            flags={data.flags}
+            organizationName={organization.name}
+          />
+        </Box>
       )}
-      <Input
+      {/* <Input
         value={flagName}
         onChange={({target: {value}}) => setFlagName(value)}
       />
@@ -51,7 +62,7 @@ export function FlagListByOrganizationNamePage({
         }
       >
         Create Flag
-      </Button>
+      </Button> */}
     </AppShell>
   )
 }
@@ -64,16 +75,6 @@ export async function getServerSideProps({
 > {
   const session = await getSessionFromCookie(req)
 
-  // Extract
-  // FIXME: get this into services asap
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-
   try {
     const organization = await getOrganizationByName({
       requestingUserId: session.user.id,
@@ -83,7 +84,6 @@ export async function getServerSideProps({
     // TODO: actually serialize
     return {props: {organization}}
   } catch {
-    // FIXME: there's no fallback view if we successfully get an organization by name but fail to list flags (because we're not a member)
     return {notFound: true}
   }
 }

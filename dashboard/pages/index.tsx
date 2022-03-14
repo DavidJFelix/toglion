@@ -47,7 +47,7 @@ function IndexPage() {
   return (
     <AppShell>
       <Box maxW="lg">
-        <Heading>Feature Flags</Heading>
+        <Heading>Placeholder</Heading>
         {authStatus !== 'authenticated' ? (
           <ChakraLink onClick={() => signIn()}>Sign In</ChakraLink>
         ) : (

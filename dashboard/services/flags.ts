@@ -1,5 +1,3 @@
-import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
 import {config} from 'lib/config'
 import {
   dynamoDbDocumentClient,
@@ -88,20 +86,13 @@ export async function listFlags({
   organizationId,
   requestingUserId,
 }: ListFlagParams) {
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-  const orgPromise = docDbClient.get({
+  const orgPromise = dynamoDbDocumentClient.get({
     TableName: config.dynamodb.organizations,
     Key: {
       id: organizationId,
     },
   })
-  const resultPromise = docDbClient.query({
+  const resultPromise = dynamoDbDocumentClient.query({
     TableName: config.dynamodb.flags,
     IndexName: 'organization',
     KeyConditionExpression: '#o = :o',
@@ -123,14 +114,7 @@ export interface GetFlagParams {
   requestingUserId: string
 }
 export async function getFlag({flagId, requestingUserId}: GetFlagParams) {
-  const ddbClient = new DynamoDB({
-    credentials: {
-      accessKeyId: config.aws.accessKeyId,
-      secretAccessKey: config.aws.secretAccessKey,
-    },
-  })
-  const docDbClient = DynamoDBDocument.from(ddbClient)
-  const flag = await docDbClient.get({
+  const flag = await dynamoDbDocumentClient.get({
     TableName: config.dynamodb.flags,
     Key: {
       id: flagId,
@@ -141,7 +125,7 @@ export async function getFlag({flagId, requestingUserId}: GetFlagParams) {
     throw new NotFound()
   }
 
-  const organization = await docDbClient.get({
+  const organization = await dynamoDbDocumentClient.get({
     TableName: config.dynamodb.organizations,
     Key: {
       id: flag.Item.organizationId,
@@ -153,6 +137,41 @@ export async function getFlag({flagId, requestingUserId}: GetFlagParams) {
   }
 
   return flag.Item as Flag
+}
+
+export interface GetFlagByNameParams {
+  flagName: string
+  organizationId: string
+  requestingUserId: string
+}
+export async function getFlagByName({
+  flagName,
+  organizationId,
+  requestingUserId,
+}: GetFlagByNameParams) {
+  const orgPromise = dynamoDbDocumentClient.get({
+    TableName: config.dynamodb.organizations,
+    Key: {
+      id: organizationId,
+    },
+  })
+  const flagPromise = dynamoDbDocumentClient.query({
+    TableName: config.dynamodb.flags,
+    IndexName: 'name-by-organization',
+    KeyConditionExpression: '#o = :o AND #n = :n',
+    ExpressionAttributeNames: {'#n': 'name', '#o': 'organizationId'},
+    ExpressionAttributeValues: {':n': flagName, ':o': organizationId},
+  })
+  const [orgResult, flagResult] = await Promise.all([orgPromise, flagPromise])
+
+  if (
+    orgResult.Item?.ownerUserId !== requestingUserId ||
+    (flagResult.Items ?? []).length < 1
+  ) {
+    throw new NotFound()
+  }
+
+  return flagResult.Items![0] as Flag
 }
 
 export interface UpdateFlagParams {
