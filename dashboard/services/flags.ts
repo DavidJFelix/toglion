@@ -154,13 +154,13 @@ export class FlagService implements Resource<Flag, FlagServiceContext> {
     //FIXME: list,
     context: {requestingUserId, organizationId},
   }: ListResourceParams<FlagServiceContext>): Promise<Flag[]> {
-    const orgPromise = dynamodb.dynamoDBDocumentClient.get({
+    const orgPromise = this.dynamoDBClient.dynamoDBDocumentClient.get({
       TableName: config.dynamodb.organizations,
       Key: {
         id: organizationId,
       },
     })
-    const resultPromise = dynamodb.dynamoDBDocumentClient.query({
+    const resultPromise = this.dynamoDBClient.dynamoDBDocumentClient.query({
       TableName: config.dynamodb.flags,
       IndexName: 'organization',
       KeyConditionExpression: '#o = :o',
