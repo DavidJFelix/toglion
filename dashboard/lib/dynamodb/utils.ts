@@ -1,15 +1,3 @@
-import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
-import {config} from './config'
-
-export const dynamoDbClient = new DynamoDB({
-  credentials: {
-    accessKeyId: config.aws.accessKeyId,
-    secretAccessKey: config.aws.secretAccessKey,
-  },
-})
-export const dynamoDbDocumentClient = DynamoDBDocument.from(dynamoDbClient)
-
 export interface DynamoDBTimestamps {
   createdAt: string
   updatedAt: string
