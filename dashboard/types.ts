@@ -1,3 +1,8 @@
+export interface StringTimeStamps {
+  createdAt: string
+  updatedAt: string
+}
+
 export interface User {
   id: string
   email: string
@@ -14,8 +19,14 @@ export interface Flag {
   schema: string
 }
 
-export type NewFlag = Omit<Flag, 'id'>
-export type UpdatedFlag = Partial<Flag> & Pick<Flag, 'id'>
+export interface BaseResource {
+  id: string
+}
+export type NewResource<T extends BaseResource> = Omit<T, 'id'>
+export type UpdatedResource<T extends BaseResource> = Partial<T> & Pick<T, 'id'>
+
+export type NewFlag = NewResource<Flag>
+export type UpdatedFlag = UpdatedResource<Flag>
 
 export interface Organization {
   name: string

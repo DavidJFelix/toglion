@@ -1,5 +1,5 @@
 import {config} from 'lib/config'
-import {dynamoDbDocumentClient} from 'lib/dynamodb'
+import {defaultClient as dynamodb} from 'lib/dynamodb'
 import {NewOrganization, Organization, UpdatedOrganization} from 'types'
 import {ulid} from 'ulid'
 import {NotAuthorized, NotFound} from './errors'
@@ -8,7 +8,7 @@ export async function createOrganization(
   newOrg: NewOrganization,
 ): Promise<Organization> {
   const id = ulid()
-  await dynamoDbDocumentClient.transactWrite({
+  await dynamodb.dynamoDBDocumentClient.transactWrite({
     TransactItems: [
       {
         Put: {
@@ -57,7 +57,7 @@ export async function getOrganization({
   organizationId,
   requestingUserId,
 }: GetOrganizationParams) {
-  const result = await dynamoDbDocumentClient.get({
+  const result = await dynamodb.dynamoDBDocumentClient.get({
     TableName: config.dynamodb.organizations,
     Key: {
       id: organizationId,
@@ -83,7 +83,7 @@ export async function getOrganizationByName({
   organizationName,
   requestingUserId,
 }: GetOrganizationByNameParams) {
-  const result = await dynamoDbDocumentClient.query({
+  const result = await dynamodb.dynamoDBDocumentClient.query({
     TableName: config.dynamodb.organizations,
     IndexName: 'name',
     KeyConditionExpression: '#n = :n',
@@ -107,7 +107,7 @@ export interface ListOrganizationsParams {
 export async function listOrganizations({
   requestingUserId,
 }: ListOrganizationsParams): Promise<Organization[]> {
-  const result = await dynamoDbDocumentClient.query({
+  const result = await dynamodb.dynamoDBDocumentClient.query({
     TableName: config.dynamodb.organizations,
     IndexName: 'owner-user',
     KeyConditionExpression: '#o = :o',
