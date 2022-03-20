@@ -1,0 +1,120 @@
+import {
+  Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  HStack,
+  Input,
+  Switch,
+  Text,
+  VStack,
+} from '@chakra-ui/react'
+import {Controller, useForm} from 'react-hook-form'
+import {Organization} from 'types'
+import {yupResolver} from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
+
+const flagSchema = Yup.object({
+  name: Yup.string()
+    .required('Flag Name is required')
+    .min(4, 'Flag name must be at least 4 characters'),
+  organizationId: Yup.string()
+    .required('Organization id is required')
+    .length(26, 'Organization id must be a valid ULID'),
+  value: Yup.boolean().required('Flag value is required'),
+})
+
+export interface CreateFlagDrawerProps {
+  isOpen?: boolean
+  onClose: () => void
+  organization: Organization
+}
+export function CreateFlagDrawer({
+  isOpen = false,
+  onClose,
+  organization,
+}: CreateFlagDrawerProps) {
+  const {control, handleSubmit} = useForm({
+    defaultValues: {
+      name: '',
+      organizationId: organization.id,
+      value: false,
+    },
+    resolver: yupResolver(flagSchema),
+  })
+  const onSubmit = (data: any) => console.log(data)
+
+  return (
+    <Drawer isOpen={isOpen} onClose={onClose} size="md">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>New Feature Flag</DrawerHeader>
+          <DrawerBody>
+            <VStack spacing={4}>
+              <Controller
+                name="organizationId"
+                control={control}
+                render={({field: {value, ...field}}) => (
+                  <FormControl>
+                    <FormLabel htmlFor={field.name}>Organization</FormLabel>
+                    <Input {...field} value={organization.name} isDisabled />
+                  </FormControl>
+                )}
+              />
+              <Controller
+                name="name"
+                control={control}
+                render={({field, fieldState: {invalid: isInvalid, error}}) => (
+                  <FormControl isRequired isInvalid={isInvalid}>
+                    <FormLabel htmlFor={field.name}>Name</FormLabel>
+                    <Input {...field} placeholder="Flag name" />
+                    {error ? (
+                      <FormErrorMessage>{error.message}</FormErrorMessage>
+                    ) : (
+                      <FormHelperText>
+                        Name of the flag, unique within the organization
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                name="value"
+                control={control}
+                render={({
+                  field: {value, ...field},
+                  fieldState: {invalid: isInvalid},
+                }) => (
+                  <FormControl isRequired>
+                    <FormLabel htmlFor={field.name}>Value</FormLabel>
+                    <HStack>
+                      <Switch
+                        isChecked={value}
+                        {...field}
+                        isInvalid={isInvalid}
+                      />
+                      <Text>({value ? 'true' : 'false'})</Text>
+                    </HStack>
+                  </FormControl>
+                )}
+              />
+            </VStack>
+          </DrawerBody>
+          <DrawerFooter>
+            <Button type="submit">Create flag</Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </form>
+    </Drawer>
+  )
+}

@@ -39,9 +39,7 @@ export const OrganizationSelect = () => {
     ['organizations'],
     async () => {
       const result = await fetch('/api/organizations/')
-      const x = result.json()
-      console.log(x)
-      return x
+      return result.json()
     },
   )
   const router = useRouter()
