@@ -2,8 +2,8 @@ import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
 import {getQueryFirst} from 'lib/next/utils'
 import {NextApiRequest, NextApiResponse} from 'next'
-import {getFlag, updateFlag} from 'services/flags'
-import {Flag} from 'types'
+import {flagService} from 'server'
+import {Flag, UpdatedFlag} from 'types'
 
 export async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSessionFromCookie(req)
@@ -11,9 +11,9 @@ export async function handler(req: NextApiRequest, res: NextApiResponse) {
   const flagId = getQueryFirst(req.query, 'flagId')! // TODO: handle odd case this doesn't exist
   if (req.method === 'GET') {
     try {
-      const flag = await getFlag({
-        flagId,
-        requestingUserId: session.user.id,
+      const flag = await flagService.get({
+        id: flagId,
+        context: {requestingUserId: session.user.id},
       })
       return res.status(200).json(flag)
     } catch {
@@ -21,10 +21,10 @@ export async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
   } else if (req.method === 'PUT') {
     try {
-      const flag = await updateFlag({
+      const flag = await flagService.update({
         // FIXME: actually parse this correctly
-        flag: JSON.parse(req.body) as Partial<Flag> & Pick<Flag, 'id'>,
-        requestingUserId: session.user.id,
+        updated: JSON.parse(req.body) as UpdatedFlag,
+        context: {requestingUserId: session.user.id},
       })
       return res.status(200).json(flag)
     } catch (err) {
