@@ -17,6 +17,7 @@
     "@chakra-ui/react": "^1.6.4",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
+    "@hookform/resolvers": "^2.8.8",
     "@octokit/oauth-app": "^3.5.1",
     "framer-motion": "^4.1.17",
     "googleapis": "^87.0.0",
@@ -25,11 +26,14 @@
     "next-auth": "^4.0.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-hook-form": "^7.28.1",
     "react-icons": "^4.3.1",
     "react-query": "^3.34.12",
-    "ulid": "^2.3.0"
+    "ulid": "^2.3.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@aws-sdk/types": "^3.54.1",
     "@chakra-ui/icons": "^1.1.1",
     "@chakra-ui/storybook-addon": "^1.0.0",
     "@storybook/addon-actions": "^6.4.16",
