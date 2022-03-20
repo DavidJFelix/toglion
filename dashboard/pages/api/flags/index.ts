@@ -1,3 +1,4 @@
+import {ConditionalCheckFailedException} from '@aws-sdk/client-dynamodb'
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
 import {NextApiRequest, NextApiResponse} from 'next'
@@ -27,12 +28,13 @@ export async function handler(
 }
 
 async function parseNewFlag(req: NextApiRequest): Promise<Omit<Flag, 'id'>> {
-  const maybeNewFlag = JSON.parse(req.body)
+  const maybeNewFlag = req.body
+  console.log(maybeNewFlag)
   // FIXME: do org name validations? no symbols? length?
   if (
     !maybeNewFlag?.name ||
     !maybeNewFlag?.organizationId ||
-    !maybeNewFlag?.value
+    !(maybeNewFlag?.value !== undefined)
   ) {
     // FIXME
     throw 'FAILURE'

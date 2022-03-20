@@ -18,10 +18,15 @@ export const useCreateFlag = () => {
   const queryClient = useQueryClient()
   return useMutation(
     async (newFlag: Omit<Flag, 'id'>) => {
-      return fetch('/api/flags', {
+      console.log(newFlag)
+      console.log(JSON.stringify(newFlag))
+      const response = await fetch('/api/flags', {
         method: 'post',
+        headers: {'content-type': 'application/json'},
         body: JSON.stringify(newFlag),
       })
+      const flag = await response.json()
+      return flag as Flag
     },
     {
       onSuccess: () => {
