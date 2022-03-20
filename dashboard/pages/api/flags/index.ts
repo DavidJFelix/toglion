@@ -1,7 +1,7 @@
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
 import {NextApiRequest, NextApiResponse} from 'next'
-import {createFlag} from 'services/flags'
+import {flagService} from 'server'
 import {Flag} from 'types'
 
 // TODO: extract this and use a common error
@@ -14,9 +14,9 @@ export async function handler(
   if (req.method === 'POST') {
     const session = await getSessionFromCookie(req)
     const newFlag = await parseNewFlag(req)
-    const createdFlag = await createFlag({
-      newFlag,
-      requestingUserId: session.user.id,
+    const createdFlag = await flagService.create({
+      new: newFlag,
+      context: {requestingUserId: session.user.id},
     })
     return res.status(201).json(createdFlag)
   } else {

@@ -93,6 +93,7 @@ export class FlagService implements Resource<Flag, FlagServiceContext> {
     // FIXME: handle case where transact fails
     return {id, ...newFlag}
   }
+
   async get({
     id: flagId,
     context: {requestingUserId},
@@ -121,6 +122,7 @@ export class FlagService implements Resource<Flag, FlagServiceContext> {
 
     return flag.Item as Flag
   }
+
   async getByName({
     name: flagName,
     context: {organizationId, requestingUserId},
@@ -176,6 +178,7 @@ export class FlagService implements Resource<Flag, FlagServiceContext> {
     // FIXME: actually do real marshalling
     return (result.Items ?? []) as Flag[]
   }
+
   async update({
     updated: flag,
     context: {requestingUserId},

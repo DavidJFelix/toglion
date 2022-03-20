@@ -1,12 +1,8 @@
-import {DynamoDB} from '@aws-sdk/client-dynamodb'
-import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
 import {Flex, Heading, Button} from '@chakra-ui/react'
 import {AppShell} from 'components/layout/AppShell'
-import {config} from 'lib/config'
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
 import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
-import {useRouter} from 'next/router'
-import {getFlagByName} from 'services/flags'
+import {flagService} from 'server'
 import {getOrganizationByName} from 'services/organizations'
 import {Flag, Organization} from 'types'
 
@@ -43,10 +39,12 @@ export async function getServerSideProps({
       organizationName: params!.organizationName as string,
       requestingUserId: session.user.id,
     })
-    const flag = await getFlagByName({
-      flagName: params!.flagName as string,
-      organizationId: organization.id,
-      requestingUserId: session.user.id,
+    const flag = await flagService.getByName({
+      name: params!.flagName as string,
+      context: {
+        organizationId: organization.id,
+        requestingUserId: session.user.id,
+      },
     })
 
     // TODO: actually serialize

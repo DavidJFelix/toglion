@@ -1,5 +1,5 @@
 import {getSessionFromCookie} from 'lib/next-auth/dynamodb-adapter'
-import {listFlags} from 'services/flags'
+import {flagService} from 'server'
 import {NextApiRequest, NextApiResponse} from 'next'
 import {Flag} from 'types'
 import {loginRequiredMiddleware} from 'lib/next-auth/middleware'
@@ -18,9 +18,11 @@ export async function handler(
 ) {
   if (req.method === 'GET') {
     const session = await getSessionFromCookie(req)
-    const flags = await listFlags({
-      organizationId: req.query.organizationId as string,
-      requestingUserId: session.user.id,
+    const flags = await flagService.list({
+      context: {
+        organizationId: req.query.organizationId as string,
+        requestingUserId: session.user.id,
+      },
     })
     // FIXME: handle failure on listFlags
     return res.status(200).json({flags})
