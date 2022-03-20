@@ -18,9 +18,12 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import {Controller, useForm} from 'react-hook-form'
-import {Organization} from 'types'
+import {NewFlag, Organization} from 'types'
 import {yupResolver} from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
+import {useCreateFlag} from 'lib/react-query/api'
+import {useRouter} from 'next/router'
+import {useState} from 'react'
 
 const flagSchema = Yup.object({
   name: Yup.string()
@@ -47,13 +50,38 @@ export function CreateFlagDrawer({
       name: '',
       organizationId: organization.id,
       value: false,
+      schema: '{"type": "boolean"}',
     },
     resolver: yupResolver(flagSchema),
   })
-  const onSubmit = (data: any) => console.log(data)
+  const {mutateAsync, isLoading: isSubmitting} = useCreateFlag()
+  const {push} = useRouter()
+
+  const wrappedOnClose = () => {
+    if (!isSubmitting) {
+      return onClose()
+    }
+    return
+  }
+
+  const onSubmit = async (flag: NewFlag) => {
+    console.log(flag)
+    const newFlag = await mutateAsync(flag)
+    push(
+      `/o/${encodeURIComponent(organization.name)}/flags/${encodeURIComponent(
+        newFlag.name,
+      )}`,
+    )
+  }
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} size="md">
+    <Drawer
+      isOpen={isOpen}
+      onClose={wrappedOnClose}
+      onEsc={wrappedOnClose}
+      onOverlayClick={wrappedOnClose}
+      size="md"
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
         <DrawerOverlay />
         <DrawerContent>
@@ -111,7 +139,13 @@ export function CreateFlagDrawer({
             </VStack>
           </DrawerBody>
           <DrawerFooter>
-            <Button type="submit">Create flag</Button>
+            <Button
+              isLoading={isSubmitting}
+              isDisabled={isSubmitting}
+              type="submit"
+            >
+              Create flag
+            </Button>
           </DrawerFooter>
         </DrawerContent>
       </form>

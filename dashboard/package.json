@@ -19,6 +19,7 @@
     "@emotion/styled": "^11.3.0",
     "@hookform/resolvers": "^2.8.8",
     "@octokit/oauth-app": "^3.5.1",
+    "@radix-ui/colors": "^0.1.8",
     "framer-motion": "^4.1.17",
     "googleapis": "^87.0.0",
     "jsonwebtoken": "^8.5.1",
