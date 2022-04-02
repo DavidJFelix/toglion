@@ -23,7 +23,6 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import {useCreateFlag} from 'lib/react-query/api'
 import {useRouter} from 'next/router'
-import {useState} from 'react'
 
 const flagSchema = Yup.object({
   name: Yup.string()
