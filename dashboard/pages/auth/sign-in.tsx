@@ -58,6 +58,10 @@ function SignInPage({providers}: SignInPageProps) {
           />
           {providers !== null && Object.keys(providers).includes('github') && (
             <Button
+              _focus={{
+                backgroundColor: 'black',
+                color: 'gray.300',
+              }}
               _hover={{
                 backgroundColor: 'black',
                 color: 'gray.300',
