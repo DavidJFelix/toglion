@@ -354,7 +354,7 @@ export async function updateSession(
     },
     ReturnValues: 'ALL_NEW',
     TableName: config.dynamodb.sessions,
-    UpdateExpression: 'SET #e = :e, #t, :t',
+    UpdateExpression: 'SET #e = :e, #t = :t',
   })
 
   return {
