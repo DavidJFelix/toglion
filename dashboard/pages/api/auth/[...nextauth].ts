@@ -8,6 +8,9 @@ import {adapter} from 'lib/next-auth/dynamodb-adapter'
 export default NextAuth({
   debug: true,
   adapter,
+  pages: {
+    signIn: '/auth/sign-in',
+  },
   providers: [
     GitHubProvider({
       clientId: config.github.clientId,
