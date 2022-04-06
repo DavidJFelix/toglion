@@ -19,11 +19,12 @@ export const config = {
     secret: process.env.AUTH_SECRET!,
   },
   dynamodb: {
-    accounts: 'auth-accounts-4ca9dc8',
-    users: 'users-1a8d390',
-    sessions: 'sessions-1113ebd',
-    flags: 'flags-d847b3a',
-    emailVerificationTokens: 'email-verification-tokens-51d6229',
-    organizations: 'organizations-ff92478',
+    accounts: process.env.DYNAMODB_ACCOUNTS_TABLE!,
+    users: process.env.DYNAMODB_USERS_TABLE!,
+    sessions: process.env.DYNAMODB_SESSIONS_TABLE!,
+    flags: process.env.DYNAMODB_FLAGS_TABLE!,
+    emailVerificationTokens:
+      process.env.DYNAMODB_EMAIL_VERIFICATION_TOKENS_TABLE!,
+    organizations: process.env.DYNAMODB_ORGANIZATIONS_TABLE!,
   },
 }
