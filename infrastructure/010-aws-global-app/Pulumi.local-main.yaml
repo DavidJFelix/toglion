@@ -1,0 +1,11 @@
+encryptionsalt: v1:al7H58zrzDU=:v1:9WPKuxbUWRoYDzEw:u29Tu1PteGurniPjZHq0NEEfQ+QpPQ==
+config:
+  010-aws-global-app:data:
+    isLocal: true
+    tags:
+      Application: 010-aws-global-app
+      Environment: local-main
+      IsCloudFormation: "False"
+      IsManual: "False"
+      IsPulumi: "True"
+      IsTerraform: "False"
