@@ -5,6 +5,7 @@
   "module": "dist/toglion-client.esm.js",
   "license": "MIT",
   "devDependencies": {
-    "@toglion/types": "*"
+    "@toglion/types": "*",
+    "wscat": "^5.1.0"
   }
 }
