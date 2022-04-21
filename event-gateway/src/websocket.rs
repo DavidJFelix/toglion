@@ -3,7 +3,7 @@ use axum::{
         ws::{Message, WebSocket},
         WebSocketUpgrade,
     },
-    response::IntoResponse,
+    response::{sse::Event, IntoResponse},
     Extension, TypedHeader,
 };
 use futures::{SinkExt, StreamExt, TryFutureExt};
@@ -52,25 +52,49 @@ async fn handle_socket(socket: WebSocket, connection_id: Ulid, connection_state:
     );
     while let Some(msg) = ws_requester.next().await {
         if let Ok(msg) = msg {
-            match msg {
-                Message::Text(t) => {
-                    println!("client sent str: {:?}", t);
-                }
-                Message::Binary(_) => {
-                    println!("client sent binary data");
-                }
-                Message::Ping(_) => {
-                    println!("socket ping");
-                }
-                Message::Pong(_) => {
-                    println!("socket pong");
-                }
-                Message::Close(_) => {
-                    println!("client disconnected");
-                    return;
-                }
-            }
+            echo(connection_id, msg, &connection_state).await;
         }
+    }
+}
+
+async fn echo(connection_id: Ulid, msg: Message, connection_state: &ConnectionState) {
+    let msg_str = if let Ok(s) = msg.to_text() {
+        s
+    } else {
+        return;
+    };
+
+    match msg {
+        Message::Text(_) => {
+            println!("client sent str");
+        }
+        Message::Binary(_) => {
+            println!("client sent binary data");
+        }
+        Message::Ping(_) => {
+            println!("socket ping");
+        }
+        Message::Pong(_) => {
+            println!("socket pong");
+        }
+        Message::Close(_) => {
+            println!("client disconnected");
+            return;
+        }
+    }
+
+    let new_msg = format!("#{}: {}", connection_id, msg_str);
+
+    for (_, connection) in connection_state.read().await.iter() {
+        match connection {
+            Connection::WebSocket(v) => {
+                v.resp_channel.send(Message::Text(new_msg.clone()));
+            }
+            Connection::SSE(v) => {
+                v.resp_channel.send(Event::default().data(new_msg.clone()));
+            }
+            _ => {}
+        };
     }
 }
 
