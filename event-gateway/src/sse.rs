@@ -1,5 +1,4 @@
 use axum::{
-    extract::TypedHeader,
     response::sse::{Event, Sse},
     Extension,
 };
@@ -30,8 +29,8 @@ pub async fn sse_handler(
 
     Sse::new(stream).keep_alive(
         axum::response::sse::KeepAlive::new()
-            .interval(Duration::from_secs(1))
-            .text("keep-alive-text"),
+            .interval(Duration::from_secs(15))
+            .text("ping"),
     )
 }
 
