@@ -59,46 +59,43 @@ async fn handle_socket(socket: WebSocket, connection_id: Ulid, connection_state:
 }
 
 async fn echo(connection_id: Ulid, msg: Message, connection_state: &ConnectionState) {
-    let msg_str = if let Ok(s) = msg.to_text() {
-        s
-    } else {
-        return;
-    };
-
     match msg {
         Message::Text(_) => {
-            println!("client sent str");
+            event!(Level::DEBUG, "client sent str");
+            let msg_str = if let Ok(s) = msg.to_text() {
+                s
+            } else {
+                return;
+            };
+            let new_msg = format!("#{}: {}", connection_id, msg_str);
+
+            for (_, connection) in connection_state.read().await.iter() {
+                match connection {
+                    Connection::WebSocket(v) => {
+                        // FIXME: don't unwrap
+                        v.resp_channel.send(Message::Text(new_msg.clone())).unwrap();
+                    }
+                    Connection::SSE(v) => {
+                        // FIXME: don't unwrap
+                        v.resp_channel
+                            .send(Event::default().data(new_msg.clone()))
+                            .unwrap();
+                    }
+                };
+            }
         }
         Message::Binary(_) => {
-            println!("client sent binary data");
+            event!(Level::DEBUG, "client sent binary data");
         }
         Message::Ping(_) => {
-            println!("socket ping");
+            event!(Level::DEBUG, "socket ping");
         }
         Message::Pong(_) => {
-            println!("socket pong");
+            event!(Level::DEBUG, "socket pong");
         }
         Message::Close(_) => {
-            println!("client disconnected");
-            return;
+            event!(Level::DEBUG, "client disconnected");
         }
-    }
-
-    let new_msg = format!("#{}: {}", connection_id, msg_str);
-
-    for (_, connection) in connection_state.read().await.iter() {
-        match connection {
-            Connection::WebSocket(v) => {
-                // FIXME: don't unwrap
-                v.resp_channel.send(Message::Text(new_msg.clone())).unwrap();
-            }
-            Connection::SSE(v) => {
-                // FIXME: don't unwrap
-                v.resp_channel
-                    .send(Event::default().data(new_msg.clone()))
-                    .unwrap();
-            }
-        };
     }
 }
 
