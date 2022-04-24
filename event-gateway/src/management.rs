@@ -1,28 +1,46 @@
 use axum::{
     extract::ws::Message,
-    response::{sse::Event, Html},
-    Extension,
+    http::StatusCode,
+    response::{sse::Event, IntoResponse},
+    Extension, Json,
 };
+use serde::Deserialize;
+use ulid::Ulid;
 
 use crate::app::{Connection, ConnectionState};
 
-pub async fn handle_mgmt(
+#[derive(Deserialize)]
+pub struct NotifyConnectionsRequest {
+    connection_id: String,
+    message: String,
+}
+
+pub async fn notify_connection(
+    Json(request): Json<NotifyConnectionsRequest>,
     Extension(connection_state): Extension<ConnectionState>,
-) -> Html<&'static str> {
-    let new_msg = format!("#management: hello");
-
-    for (_, connection) in connection_state.read().await.iter() {
-        match connection {
-            Connection::WebSocket(v) => {
-                v.resp_channel.send(Message::Text(new_msg.clone()));
+) -> impl IntoResponse {
+    match Ulid::from_string(&request.connection_id) {
+        Ok(connection_ulid) => {
+            if let Some(connection) = connection_state.read().await.get(&connection_ulid) {
+                match connection {
+                    Connection::WebSocket(v) => {
+                        // FIXME: don't unwrap
+                        v.resp_channel
+                            .send(Message::Text(request.message.clone()))
+                            .unwrap();
+                    }
+                    Connection::SSE(v) => {
+                        // FIXME: don't unwrap
+                        v.resp_channel
+                            .send(Event::default().data(request.message.clone()))
+                            .unwrap();
+                    }
+                };
+                StatusCode::OK
+            } else {
+                StatusCode::BAD_REQUEST
             }
-            Connection::SSE(v) => {
-                v.resp_channel.send(Event::default().data(new_msg.clone()));
-            }
-            _ => {}
-        };
+        }
+        _ => StatusCode::BAD_REQUEST,
     }
-
-    // FIXME: figure out how to return nothing here
-    Html("<h1>Hello, World!</h1>")
 }

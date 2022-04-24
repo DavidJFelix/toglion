@@ -40,7 +40,7 @@ async fn main() {
 
     let connection_state2 = connection_state.clone();
     let mgmt_app = Router::new()
-        .route("/", post(management::handle_mgmt))
+        .route("/notify-connection", post(management::notify_connection))
         .layer(Extension(connection_state2))
         .layer(
             TraceLayer::new_for_http()

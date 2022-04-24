@@ -88,12 +88,15 @@ async fn echo(connection_id: Ulid, msg: Message, connection_state: &ConnectionSt
     for (_, connection) in connection_state.read().await.iter() {
         match connection {
             Connection::WebSocket(v) => {
-                v.resp_channel.send(Message::Text(new_msg.clone()));
+                // FIXME: don't unwrap
+                v.resp_channel.send(Message::Text(new_msg.clone())).unwrap();
             }
             Connection::SSE(v) => {
-                v.resp_channel.send(Event::default().data(new_msg.clone()));
+                // FIXME: don't unwrap
+                v.resp_channel
+                    .send(Event::default().data(new_msg.clone()))
+                    .unwrap();
             }
-            _ => {}
         };
     }
 }

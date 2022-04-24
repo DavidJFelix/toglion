@@ -13,10 +13,11 @@ tracing = "0.1.34"
 tower = "0.4.12"
 tower-http = { version = "0.2.5", features = ["trace", "fs"] }
 tracing-subscriber = { version = "0.3.11", features = ["env-filter"] }
-tonic = { version = "0.7.1", features = ["tls", "tls-roots", "prost"] }
+# tonic = { version = "0.7.1", features = ["tls", "tls-roots", "prost"] }
 headers = "0.3.7"
 futures = "0.3.21"
-prost = "0.8"
+# prost = "0.8"
+serde = { version = "1.0.136", features = ["derive"] }
 
 
 [build-dependencies]
