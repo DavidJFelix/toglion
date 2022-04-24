@@ -5,6 +5,7 @@ export const config = {
     secretAccessKey:
       process.env.TG_AWS_SECRET_ACCESS_KEY! ||
       process.env.AWS_SECRET_ACCESS_KEY!,
+    endpoint: '',
   },
   hostname: process.env.HOSTNAME!,
   github: {

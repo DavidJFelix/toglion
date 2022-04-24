@@ -22,6 +22,7 @@ export class DynamoDBClient {
           accessKeyId: config.aws.accessKeyId,
           secretAccessKey: config.aws.secretAccessKey,
         },
+        endpoint: config.aws.endpoint,
         ...clientConfig,
       })
     }
