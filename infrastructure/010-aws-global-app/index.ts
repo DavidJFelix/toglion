@@ -5,23 +5,22 @@ import {PolicyStatement} from '@pulumi/aws/iam'
 // Manage configuration
 interface ConfigData {
   isLocal?: boolean
-  regionStackNames?: Record<string, string>
+  regionalBaseStackNames?: Record<string, string>
   tags: Record<string, string>
 }
 
 const config = new Config()
-const {isLocal, regionStackNames, tags} =
+const {isLocal, regionalBaseStackNames, tags} =
   config.requireObject<ConfigData>('data')
 
 // Get cross-stack outputs
-const stacks = Object.fromEntries(
-  Object.entries(regionStackNames ?? {}).map(([regionName, stackName]) => [
-    regionName,
-    new StackReference(stackName),
-  ]),
+const regionalBaseStacks = Object.fromEntries(
+  Object.entries(regionalBaseStackNames ?? {}).map(
+    ([regionName, stackName]) => [regionName, new StackReference(stackName)],
+  ),
 )
 const kmsKeys = Object.fromEntries(
-  Object.entries(stacks).map(([regionName, stack]) => [
+  Object.entries(regionalBaseStacks).map(([regionName, stack]) => [
     regionName,
     stack.getOutput('lambdaDeploymentKey') as Output<kms.Key>,
   ]),

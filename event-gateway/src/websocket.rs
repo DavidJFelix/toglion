@@ -9,6 +9,7 @@ use axum::{
 use futures::{SinkExt, StreamExt, TryFutureExt};
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
+use tracing::{event, Level};
 use ulid::Ulid;
 
 use crate::app::{Connection, ConnectionState, ULIDGenerator, WSConnectionState};
@@ -24,7 +25,7 @@ pub async fn ws_handler(
     }
     // TODO: i guess handle this?
     let ulid = ulid_generator.lock().await.generate().unwrap();
-
+    event!(Level::DEBUG, "websocket, ulid = {}", ulid.to_string());
     ws.on_upgrade(move |socket| handle_socket(socket, ulid, connection_state))
 }
 

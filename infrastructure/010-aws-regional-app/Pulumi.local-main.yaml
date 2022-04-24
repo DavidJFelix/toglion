@@ -1,0 +1,10 @@
+config:
+  010-aws-regional-app:data:
+    isLocal: true
+    tags:
+      Application: 010-aws-regional-app
+      Environment: local-main
+      IsCloudFormation: "False"
+      IsManual: "False"
+      IsPulumi: "True"
+      IsTerraform: "False"

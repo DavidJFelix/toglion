@@ -6,6 +6,7 @@ use futures::stream::Stream;
 use std::{convert::Infallible, time::Duration};
 use tokio::sync::mpsc;
 use tokio_stream::{wrappers::UnboundedReceiverStream, StreamExt};
+use tracing::{event, Level};
 
 use crate::app::{Connection, ConnectionState, SSEConnectionState, ULIDGenerator};
 
@@ -14,6 +15,7 @@ pub async fn sse_handler(
     Extension(connection_state): Extension<ConnectionState>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let connection_id = ulid_generator.lock().await.generate().unwrap();
+    event!(Level::DEBUG, "sse, ulid = {}", connection_id.to_string());
 
     let (chan_responder, chan_requester) = mpsc::unbounded_channel();
     let chan_requester_stream = UnboundedReceiverStream::from(chan_requester);

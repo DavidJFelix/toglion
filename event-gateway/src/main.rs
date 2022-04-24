@@ -13,7 +13,7 @@ mod sse;
 mod websocket;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), &'static str> {
     let connection_state = app::ConnectionState::default();
     let ulid_generator = app::ULIDGenerator::default();
     tracing_subscriber::registry()
@@ -58,7 +58,10 @@ async fn main() {
 
     let mgmt_server = axum::Server::bind(&mgmt_addr).serve(mgmt_app.into_make_service());
 
-    future::join(client_server, mgmt_server).await;
+    match future::try_join(client_server, mgmt_server).await {
+        Err(_) => Result::Err("Broke"),
+        _ => Result::Ok(()),
+    }
 
     // let mut sig_hup = signal(SignalKind::hangup()).unwrap();
     // let mut sig_term = signal(SignalKind::terminate()).unwrap();

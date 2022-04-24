@@ -10,6 +10,7 @@ use ulid::Ulid;
 use crate::app::{Connection, ConnectionState};
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NotifyConnectionsRequest {
     connection_id: String,
     message: String,
