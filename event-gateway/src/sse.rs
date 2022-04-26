@@ -1,5 +1,5 @@
 use axum::{
-    response::sse::{Event, Sse},
+    response::sse::{Event, KeepAlive, Sse},
     Extension,
 };
 use futures::stream::Stream;
@@ -17,20 +17,20 @@ pub async fn sse_handler(
     let connection_id = ulid_generator.lock().await.generate().unwrap();
     event!(Level::DEBUG, "sse, ulid = {}", connection_id.to_string());
 
-    let (chan_responder, chan_requester) = mpsc::unbounded_channel();
-    let chan_requester_stream = UnboundedReceiverStream::from(chan_requester);
+    let (chan_sender, chan_receiver) = mpsc::unbounded_channel();
+    let chan_receiver_stream = UnboundedReceiverStream::from(chan_receiver);
 
     connection_state.write().await.insert(
         connection_id,
         Connection::SSE(SSEConnectionState {
-            resp_channel: chan_responder,
+            resp_channel: chan_sender,
         }),
     );
 
-    let stream = chan_requester_stream.map(|msg| Ok(msg));
+    let stream = chan_receiver_stream.map(|msg| Ok(msg));
 
     Sse::new(stream).keep_alive(
-        axum::response::sse::KeepAlive::new()
+        KeepAlive::new()
             .interval(Duration::from_secs(15))
             .text("ping"),
     )
