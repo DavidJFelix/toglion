@@ -15,6 +15,10 @@ services:
       - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY-}  # only required for Pro
       - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
       - DOCKER_HOST=unix:///var/run/docker.sock
+    profiles:
+      - dev
+      - dashboard-dev
+      - event-gateway-dev
     volumes:
       - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
       # - "/var/run/docker.sock:/var/run/docker.sock" # TODO: probably necessary for ECR?
@@ -23,3 +27,18 @@ services:
     build:
       context: ./event-gateway
     container_name: event-gateway
+    init: true
+    profiles:
+      - dashboard-dev
+
+  event-gateway-dev:
+    build:
+      context: ./event-gateway
+      target: dev
+    container_name: event-gateway-dev
+    init: true
+    profiles:
+      - dev
+      - event-gateway-dev
+    volumes:
+      - "./event-gateway:/opt"
