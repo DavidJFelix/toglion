@@ -2,4 +2,4 @@ default:
   just --list
 
 dev:
-  docker-compose up
+  docker compose up
