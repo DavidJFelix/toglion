@@ -18,3 +18,8 @@ services:
     volumes:
       - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
       # - "/var/run/docker.sock:/var/run/docker.sock" # TODO: probably necessary for ECR?
+
+  event-gateway:
+    build:
+      context: ./event-gateway
+    container_name: event-gateway
