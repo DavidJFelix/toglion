@@ -16,11 +16,14 @@ RUN cargo fetch --locked
 # Rely on a volume mount and run the container in dev mode
 FROM dependency-cache as dev
 
+ENV RUST_LOG=debug
+
 EXPOSE 3030
 EXPOSE 3031
 
 RUN cargo install cargo-watch
-CMD ["cargo", "watch", "-x", "run"]
+
+CMD ["cargo", "run"]
 
 
 ### RELEASE BUILD ###

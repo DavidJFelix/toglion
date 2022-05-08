@@ -37,6 +37,10 @@ services:
       target: dev
     container_name: event-gateway-dev
     init: true
+    network_mode: bridge
+    ports:
+      - "3030:3030"
+      - "3031:3031"
     profiles:
       - dev
       - event-gateway-dev
