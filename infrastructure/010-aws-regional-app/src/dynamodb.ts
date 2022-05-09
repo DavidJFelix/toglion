@@ -1,39 +1,9 @@
-import {Config, Output, StackReference} from '@pulumi/pulumi'
-import {dynamodb, kms, Provider} from '@pulumi/aws'
+import * as aws from '@pulumi/aws'
+import {config} from './config'
+import {localProvider} from './providers'
+import {kmsKey} from './stack-references'
 
-// Manage configuration
-interface ConfigData {
-  globalBaseStackName: string
-  isLocal?: boolean
-  regionalBaseStackName?: string
-  tags: Record<string, string>
-}
-
-const config = new Config()
-const {isLocal, regionalBaseStackName, tags} =
-  config.requireObject<ConfigData>('data')
-
-const localProvider = new Provider('local-provider', {
-  skipCredentialsValidation: true,
-  skipRequestingAccountId: true,
-  endpoints: [
-    {
-      dynamodb: 'http://localhost:4566',
-    },
-    {
-      iam: 'http://localhost:4566',
-    },
-  ],
-})
-
-const regionalBaseStack = regionalBaseStackName
-  ? new StackReference(regionalBaseStackName)
-  : undefined
-const kmsKey = !isLocal
-  ? (regionalBaseStack!.getOutput('lambdaDeploymentKey') as Output<kms.Key>)
-  : undefined
-
-export const connectionsTable = new dynamodb.Table(
+export const connectionsTable = new aws.dynamodb.Table(
   'connections',
   {
     attributes: [
@@ -52,7 +22,7 @@ export const connectionsTable = new dynamodb.Table(
     ],
     hashKey: 'id',
     rangeKey: 'host',
-    ...(!isLocal
+    ...(!config.isLocal
       ? {
           serverSideEncryption: {
             enabled: true,
@@ -66,12 +36,12 @@ export const connectionsTable = new dynamodb.Table(
       enabled: true,
       attributeName: 'ttl',
     },
-    tags: {...tags},
+    tags: {...config.tags},
   },
-  {...(isLocal ? {provider: localProvider} : {})},
+  {...(config.isLocal ? {provider: localProvider} : {})},
 )
 
-export const subscriptionsTable = new dynamodb.Table(
+export const subscriptionsTable = new aws.dynamodb.Table(
   'subscriptions',
   {
     attributes: [
@@ -90,7 +60,7 @@ export const subscriptionsTable = new dynamodb.Table(
     ],
     hashKey: 'subscriptionKey',
     rangeKey: 'connectionId',
-    ...(!isLocal
+    ...(!config.isLocal
       ? {
           serverSideEncryption: {
             enabled: true,
@@ -104,7 +74,7 @@ export const subscriptionsTable = new dynamodb.Table(
       enabled: true,
       attributeName: 'ttl',
     },
-    tags: {...tags},
+    tags: {...config.tags},
   },
-  {...(isLocal ? {provider: localProvider} : {})},
+  {...(config.isLocal ? {provider: localProvider} : {})},
 )
