@@ -1,5 +1,6 @@
 import * as awsx from '@pulumi/awsx'
 import * as aws from '@pulumi/aws'
+import {config} from './config'
 
 const azs = aws.getAvailabilityZonesOutput({state: 'available'})
 
@@ -15,5 +16,6 @@ export const mainVpc = azs.apply(
       ],
       numberOfAvailabilityZones: azs.zoneIds.length,
       natGateways: {strategy: awsx.ec2.NatGatewayStrategy.None},
+      tags: {...config.tags},
     }),
 )
