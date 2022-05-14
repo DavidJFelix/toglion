@@ -67,10 +67,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@pulumi/aws@^4.0.0":
-  version "4.33.0"
-  resolved "https://registry.yarnpkg.com/@pulumi/aws/-/aws-4.33.0.tgz#674b3fce87e0b55c3a7e3b5df1cf0b3b193bd8b9"
-  integrity sha512-MPXpx3vDgKCD/hvaQ3TiO0BRLWiLJwX4QBvWBD9JoC4VWagRe+7YXd4eQnZ7/TUssrPKL4y5DSeLa/lgdJr8iw==
+"@pulumi/aws@^5.3.0", "@pulumi/aws@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@pulumi/aws/-/aws-5.4.0.tgz#8ba2b5ae13b0623b85c8c5e48dde510b8a8cbf43"
+  integrity sha512-98LnB+0CHM5xViIWD9Cs6P+lzLHvHVDw9EYVOOlNMA84pjid12f4vGBkxh3witritYVp5wpIEAaAKL3+3tUs4Q==
   dependencies:
     "@pulumi/pulumi" "^3.0.0"
     aws-sdk "^2.0.0"
@@ -79,13 +79,14 @@
     read-package-tree "^5.2.1"
     resolve "^1.7.1"
 
-"@pulumi/awsx@^0.30.0":
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/@pulumi/awsx/-/awsx-0.30.0.tgz#cbab6f745aa09ee7179880c99149f2d17c2e7b19"
-  integrity sha512-QtYVDFSkZxJ/JkAxaSwms9i/tJU2rA9F/VncCN6e8D0r29C5t4eYQhmB4chsLww9AjWJPRM7CXosDJs8+gy1Zg==
+"@pulumi/awsx@1.0.0-beta.2":
+  version "1.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@pulumi/awsx/-/awsx-1.0.0-beta.2.tgz#60c6ea0ca1cd1db1612be57ccb1f11e410167cdf"
+  integrity sha512-SrXrI3ESYIbfoIw/vRgU1OnuiXYb0fSC8osr3MnQqoGFOBaTzsr+Y3LInltxPh4wQpyZxvVSxENDQ3vdNGd8ng==
   dependencies:
+    "@pulumi/aws" "^5.3.0"
     "@pulumi/docker" "^3.0.0"
-    "@types/aws-lambda" "^8.10.23"
+    "@pulumi/pulumi" "^3.0.0"
     mime "^2.0.0"
 
 "@pulumi/docker@^3.0.0":
@@ -117,15 +118,32 @@
     typescript "~3.7.3"
     upath "^1.1.0"
 
+"@pulumi/pulumi@^3.32.1":
+  version "3.32.1"
+  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-3.32.1.tgz#d91a9fc14524ce749a8195b67aab8e26658f7027"
+  integrity sha512-R3pOp8BWEfQjZUdZXp4FRYjM4lCvDDwe4toe1uyqhtCoGSdtomHz0s6bHZ7SlLtjCgtWJklbi0p5V6WyiJ8IPg==
+  dependencies:
+    "@grpc/grpc-js" "~1.3.8"
+    "@logdna/tail-file" "^2.0.6"
+    "@pulumi/query" "^0.3.0"
+    google-protobuf "^3.5.0"
+    ini "^2.0.0"
+    js-yaml "^3.14.0"
+    minimist "^1.2.6"
+    normalize-package-data "^2.4.0"
+    protobufjs "^6.8.6"
+    read-package-tree "^5.3.1"
+    require-from-string "^2.0.1"
+    semver "^6.1.0"
+    source-map-support "^0.4.16"
+    ts-node "^7.0.1"
+    typescript "~3.7.3"
+    upath "^1.1.0"
+
 "@pulumi/query@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@pulumi/query/-/query-0.3.0.tgz#f496608e86a18c3dd31b6c533408e2441c29071d"
   integrity sha512-xfo+yLRM2zVjVEA4p23IjQWzyWl1ZhWOGobsBqRpIarzLvwNH/RAGaoehdxlhx4X92302DrpdIFgTICMN4P38w==
-
-"@types/aws-lambda@^8.10.23":
-  version "8.10.89"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.89.tgz#22617ecc1eef9571abebb50c947553362da6051b"
-  integrity sha512-jwtSuEZj4rY4R2pAEOXi+RutS8RWbwMzoGlRVukdyOpnfqA/XPkAf8QoGWmg4o/UaNpQ8Mj0Xhkp5SZ1t/Zq4Q==
 
 "@types/long@^4.0.1":
   version "4.0.1"
@@ -395,6 +413,11 @@ inherits@2:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
+ini@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ini/-/ini-2.0.0.tgz#e5fd556ecdd5726be978fa1001862eacb0a94bc5"
+  integrity sha512-7PnF4oN3CvZF23ADhA5wRaYEQpJ8qygSkbtTXWBeXWXmEVRXK+1ITciHWwHhsjv1TmW0MgacIv6hEi5pX5NQdA==
+
 internal-slot@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/internal-slot/-/internal-slot-1.0.3.tgz#7347e307deeea2faac2ac6205d4bc7d34967f59c"
@@ -533,6 +556,11 @@ minimist@^1.2.0, minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+
+minimist@^1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 mkdirp@^0.5.1:
   version "0.5.5"
